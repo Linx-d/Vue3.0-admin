@@ -15,14 +15,14 @@
     <div class="frame_head_bottom">
       <div class="frame_head_bottom_stage">
         <nav>
-          <a
+          <router-link
             v-for="(nav, index) in navList"
-            :href="nav.target"
+            :to="{ path: nav.target}"
             :id="nav.targetId"
             :key="nav.id"
             :class="['frame_nav', {frame_nav_Curr: nav.current}]"
-            @click="navTrigger(nav, index)"
-          >{{ nav.name }}</a>
+            @click.native="navTrigger(nav, index)"
+          >{{ nav.name }}</router-link>
         </nav>
         <div id="topNavLine" :style="stepStyle"></div>
       </div>
@@ -40,37 +40,37 @@ export default {
     const navList = reactive([
       {
         index: 0,
-        name: "首页",
-        targetId: "index",
-        target: "#/index",
-        current: true
+        name: "地图",
+        targetId: "map",
+        target: "/map",
+        current: false
       },
       {
         index: 1,
         name: "部门",
         targetId: "contacts",
-        target: "#/contacts",
+        target: "/contacts",
         current: false
       },
       {
         index: 2,
-        name: "地图",
-        targetId: "map",
-        target: "#/map",
-        current: false
+        name: "首页",
+        targetId: "index",
+        target: "/index",
+        current: true
       },
       {
         index: 3,
         name: "围栏",
         targetId: "rail",
-        target: "#/rail",
+        target: "/rail",
         current: false
       },
       {
         index: 4,
         name: "企业",
         targetId: "profile",
-        target: "#/profile",
+        target: "/profile",
         current: false
       }
     ]);
@@ -105,7 +105,7 @@ export default {
      * 生命周期函数 onMounted
      */
     onMounted(() => {
-      getSms(1);
+      //getSms(1);
     });
 
     /***
