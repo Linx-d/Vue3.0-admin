@@ -7,7 +7,7 @@ Vue.use(VueRouter)
   {
     path: '/',
     name: 'Home',
-    redirect: "/index"
+    redirect: "/map"
   },
   {
     path: "/index",
@@ -55,6 +55,7 @@ Vue.use(VueRouter)
 ]
 
 const router = new VueRouter({
+  mode: "history",
   routes
 })
 
