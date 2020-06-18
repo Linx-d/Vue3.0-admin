@@ -1,12 +1,11 @@
 import axios from "axios";
-import { Message } from "element-ui"; // 单独引入 Message：
 //使用自定义配置新建一个 axios 实例
 const service = axios.create({
-  baseURL: "http://192.168.0.192:8888/api",
-  timeout: 1000,
+  baseURL: "http://iot.chinautech.com/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api
+  timeout: 15000,
   headers: {
-    auth_token: "utechqm4CH4kSc8fwleV18AZBig"
-  },
+    auth_token: "utechiMZTF3DDOmX1RDhsMphG2Q"
+  }
 });
 
 // 添加请求拦截器
@@ -27,12 +26,12 @@ service.interceptors.response.use(
     // 对响应数据做点什么
     let data = response.data;
     if (data.code !== 0) {
-      console.log(data);
+      //console.log(data);
       //Message.error(data.msg);
       return Promise.reject(data);
     } else {
       //return response; //所有相应数据
-      console.log(data);
+      //console.log(data);
       //Message.success(data.msg);
       return Promise.resolve(data); //只有data数据
     }
