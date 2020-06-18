@@ -2,7 +2,7 @@
   <header class="frame_head qui_clear">
     <div class="frame_head_top">
       <a class="frame_logo" href="javascript:;">
-        <h1>企业微信</h1>
+        <h1>如泰科技</h1>
       </a>
       <aside class="frame_operation">
         <a href="javascript:;">文档</a>
@@ -107,7 +107,6 @@ export default {
     onMounted(() => {
       //getSms(1);
     });
-
     /***
      * 声明函数
      */
