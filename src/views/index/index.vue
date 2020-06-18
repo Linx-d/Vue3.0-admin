@@ -15,5 +15,14 @@
 </script>
 
 <style lang="scss" scoped>
-
+$indexHeight: 703px;
+.index_main {
+  height: $indexHeight;
+  .chunk_title {
+    height: $indexHeight;
+  }
+  .chunk_cnt {
+    height: $indexHeight;
+  }
+}
 </style>

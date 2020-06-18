@@ -41,10 +41,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tabNav_item_curr {
-  background: $tabNav_color;
-  a {
-    color: #fff;
+$profileHeight: 741px;
+.profile_main {
+  height: $profileHeight;
+  .chunk_title {
+    height: $profileHeight;
+  }
+  .chunk_cnt {
+    height: $profileHeight;
+  }
+  .tabNav_item_curr {
+    background: $tabNav_color;
+    a {
+      color: #fff;
+    }
   }
 }
 </style>

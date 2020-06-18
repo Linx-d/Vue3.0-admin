@@ -1,5 +1,6 @@
 <template>
-  <main id="mapShow" class="frame_center">
+  <main id="map">
+    <div id="mapShow" class="map_main frame_center"></div>
   </main>
 </template>
 
@@ -34,4 +35,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$mapHeight: 759px;
+.map_main {
+  height: $mapHeight;
+}
 </style>
