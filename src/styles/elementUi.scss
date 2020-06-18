@@ -1,3 +1,55 @@
 /**
  * element-ui 组件全局样式设置
  */
+
+/**
+  * input 搜索框样式
+  */
+.chunk_title_top .el-input__inner {
+  height: 25px;
+  width: 212px;
+  border: 1px solid #b4bec8;
+  border-radius: 0;
+  font-size: 12px;
+  color: #aaaaaa;
+}
+.chunk_title_top .el-input__inner:focus {
+  border: 1px solid $tabNav_color;
+}
+.chunk_title_bottom .el-tree {
+  background-color: transparent;
+}
+.chunk_title_bottom {
+  .addDialog, .modifyDialog {
+    .el-dialog {
+      @include webkit("box-shadow", none);
+    }
+  }
+  .memberList {
+    .el-tree-node__content {
+      position: relative;
+    }
+    .tree-text {
+      display: inline-block;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-right: 43px;
+      @include webkit("box-sizing", border-box);
+    }
+    .delMemberBtn {
+      /*position: absolute;
+      right: 0;
+      top: 0;*/
+    }
+    .addMemberBtn {
+      /*position: absolute;
+      right: 0;
+      top: 0;*/
+    }
+  }
+}
+.v-modal {
+  z-index: 1000 !important;
+}
