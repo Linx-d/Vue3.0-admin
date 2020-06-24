@@ -45,7 +45,7 @@
               <td :title="member.address">{{ member.address }}</td>
               <td :title="member.tel">{{ member.tel }}</td>
               <td class="tdTool">
-                <svg-icon class="tdMenuRight" iconClass="compileInfo"></svg-icon>
+                <svg-icon class="tdmenu_right" iconClass="compile_info"></svg-icon>
               </td>
             </tr>
           </tbody>
@@ -59,7 +59,7 @@
       </div>
       <div class="no_member" v-if="changeModule.null">
         <div class="no_member_top">
-          <svg-icon iconClass="member"></svg-icon>
+          <svg-icon iconClass="member" className="member"></svg-icon>
           <p>当前部门无任何成员</p>
         </div>
         <div class="no_member_bottom">
@@ -190,25 +190,14 @@ $contactsHeight: 592px;
         margin-top: 20px;
       }
     }
-    .memberLink {
-      font-size: 12px;
-      color: #000;
-      display: inline-block;
-      margin-right: 6px;
-      line-height: 24px;
-      padding: 0 12px;
-      border: 1px solid #aaaaaa;
-      background: #fff;
-      cursor: pointer;
-    }
-    .memberLink:hover {
-      background: #f0f0f0;
-    }
   }
 }
 
-/**Icon menuRight */
-.tdMenuRight {
+/**Icon menu_right */
+.tdmenu_right {
   color: #0c4c7f;
+}
+.member {
+  color: #ddd;
 }
 </style>
