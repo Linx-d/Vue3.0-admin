@@ -20,7 +20,6 @@
 .frame_center {
   background-color: #e9eaeb;
   width: 100%;
-  margin-bottom: 23px;
 }
 
 /**
@@ -30,7 +29,7 @@
   width: 1080px;
   margin: 0 auto;
   background: #fff;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  @include webkit("box-shadow", 0 1px 2px 0 rgba(0, 0, 0, 0.15));
   border-radius: 4px;
 }
 
@@ -62,9 +61,9 @@
 /**
  * a链接样式 tabNav_item 
  */
- .tabNav_item {
-   float: none;
- }
+.tabNav_item {
+  float: none;
+}
 
 /**
  * a链接样式 tabNav_item 
@@ -85,4 +84,84 @@
  */
 .tab_cnt {
   padding: 15px 25px;
+}
+
+/**
+ * 分隔符
+ */
+.frame_operation_separator {
+  height: 10px;
+  width: 8px;
+  color: #8298b4;
+  padding: 0 6px;
+}
+
+/**
+ * table
+ */
+.mm_tabel td {
+  font-size: 13px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  vertical-align: top;
+  border-bottom: solid 1px #e4e6e9;
+  width: 110px; 
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mm_tabel th,
+.mm_tabel td {
+  padding-left: 10px;
+  padding-right: 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+  input {
+    vertical-align: -3px;
+    width: 14px;
+    height: 14px;
+  }
+}
+.mm_tabel th:first-child,
+.mm_tabel td:first-child {
+  width: 20px;
+}
+.mm_tabel th:first-child {
+  input {
+    vertical-align: -3px;
+    width: 14px;
+    height: 14px;
+  }
+}
+.mm_tabel th:last-child:before {
+  width: 0;
+}
+.mm_tabel td:last-child {
+  width: 20px;
+  opacity: 0;
+}
+.mm_tabel th:first-child:before {
+  width: 0;
+}
+.mm_tabel th {
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e4e6e9;
+  line-height: 18px;
+  font-size: 12px;
+  color: #787878;
+}
+.mm_tabel th:before {
+  content: "";
+  width: 1px;
+  background-color: #e4e6e9;
+  height: 18px;
+  float: left;
+  margin-left: -10px;
+}
+thead,
+tbody {
+  display: table-header-group;
+  vertical-align: middle;
+  border-color: inherit;
 }

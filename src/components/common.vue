@@ -6,7 +6,7 @@
       :class="['tabNav_item', { 'tabNav_item_curr': tabNav.current}]"
       @click="changeTab(tabNav)"
     >
-      <a :href="tabNav.path" class="tabNav_item_Link">{{ tabNav.name }}</a>
+      <router-link :to="{ path: tabNav.path }" :id="tabNav.id" class="tabNav_item_Link">{{ tabNav.name }}</router-link>
     </li>
   </ul>
 </template>

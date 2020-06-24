@@ -26,6 +26,7 @@ export default {};
   padding-bottom: 23px;
   text-align: center;
   font-size: 12px;
+  margin-top: 23px;
   .frame_bottom_nav {
     margin-bottom: 2px;
     height: 24px;

@@ -31,11 +31,9 @@
 </template>
 
 <script>
-import { getSms } from "@/api/loginApi.js";
 import { reactive, ref, onMounted, computed } from "@vue/composition-api";
 export default {
   name: "frame",
-  props: ["header"],
   setup() {
     const navList = reactive([
       {
@@ -166,20 +164,13 @@ export default {
       a:hover {
         text-decoration: underline;
       }
-      .frame_operation_separator {
-        color: #fff;
-        height: 10px;
-        width: 8px;
-        color: #8298b4;
-        padding: 0 6px;
-      }
     }
   }
   .frame_head_bottom {
     height: 40px;
     width: 100%;
     background: #fff;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    @include webkit("box-shadow", 0 1px 2px 0 rgba(0, 0, 0, 0.1));
     .frame_head_bottom_stage {
       height: 100%;
       width: 1080px;
@@ -211,9 +202,7 @@ export default {
         background: #2c5480;
         position: absolute;
         bottom: 0px;
-        -webkit-transition: all 0.5s;
-        -o-transition: all 0.5s;
-        transition: all 0.5s;
+        @include webkit('transition', all 0.5s);
       }
     }
   }

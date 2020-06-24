@@ -10,18 +10,19 @@
         </div>
         <div class="chunk_title_bottom">
           <el-tree
-            class="filter-tree memberList"
-            :data="memberData"
+            :class="['filter-tree', 'memberList']"
+            :data="departData"
             :props="defaultProps"
             node-key="id"
             :filter-node-method="filterNode"
             @node-click="handleNodeClick"
             :expand-on-click-node="false"
+            :default-expanded-keys="[1]"
             ref="tree"
           >
-            <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span :class="['custom-tree-node']" slot-scope="{ node, data }">
               <span class="tree-text">{{ node.label }}</span>
-              <span>
+              <span class="departTool">
                 <!--
                 <el-button type="text" size="mini" @click="() => append(data)">Append</el-button>
                 <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>
@@ -101,13 +102,12 @@
                   </span>
                 </el-dialog>
               </span>
+              <svg-icon iconClass="menuRight"></svg-icon>
             </span>
           </el-tree>
         </div>
       </div>
-      <div class="chunk_cnt">
-        <el-button :plain="true" @click="open4">成功</el-button>
-      </div>
+      <router-view :currentDepart="currentDepart" :memberData="memberData"></router-view>
     </div>
   </main>
 </template>
@@ -144,8 +144,11 @@ export default {
     let companyData = reactive({
       companyId: 1
     }); // 顶级部门 id
+    let treeData = reactive({
+      status: false
+    });
     let memberLabel = ref("移除部门");
-    let memberData = reactive([
+    let departData = reactive([
       {
         label: "",
         displayOrder: 10001,
@@ -155,6 +158,12 @@ export default {
         childrenLen: 0
       }
     ]);
+    let currentDepart = reactive({
+      label: "",
+      id: 1,
+      pid: 0,
+      length: 0
+    }); // 当前部门信息
     //selectChildDepart(0);
     let childData = reactive({}); // add child
     let addStatus = ref(false); // 增加部门的确定按钮的禁用状态
@@ -179,6 +188,8 @@ export default {
     });
     const modifyData = reactive({ name: "", visibel: false, status: false }); // 修改部门名称 data
     const formLabelWidth = ref("100px");
+
+    /**---------------------------------- 部门 end---------------------------------- */
     /**
      * 函数
      *
@@ -270,7 +281,7 @@ export default {
      * 查询所有部门
      */
     const selectAllDepart = () => {
-      listAllDepartment()
+      return listAllDepartment()
         .then(response => {
           let data = response.data,
             len = data.length;
@@ -279,7 +290,7 @@ export default {
           } else {
             let id = data[0].id;
             companyData.companyId = id;
-            memberData[0].id = id;
+            departData[0].id = id;
             let treeData = translateDataToTree(data)[0];
             if (treeData == undefined) {
               root.$message({
@@ -287,12 +298,12 @@ export default {
                 type: "error"
               });
             } else {
-              memberData[0].label = treeData.name;
-              memberData[0].children = treeData.children;
-              memberData[0].childrenLen = treeData.childrenLen;
-              memberData[0].displayOrder = treeData.displayOrder;
-              memberData[0].id = treeData.id;
-              memberData[0].pid = treeData.pid;
+              departData[0].label = currentDepart.label = treeData.name;
+              departData[0].children = treeData.children;
+              departData[0].childrenLen = treeData.childrenLen;
+              departData[0].displayOrder = treeData.displayOrder;
+              departData[0].id = currentDepart.id = treeData.id;
+              departData[0].pid = currentDepart.pid = treeData.pid;
             }
           }
           return companyData;
@@ -309,7 +320,7 @@ export default {
               for (i; i < len; i++) {
                 let user = data[i];
                 userIdArr.push(user.userId);
-              } 
+              }
               addMemberFn(companyId, userIdArr).then(response => {
                 //console.log(response);// 将未分组用户自动加入顶级部门--添加成功
               });
@@ -318,8 +329,10 @@ export default {
               return;
             }
           });
+          return response;
         });
     };
+    selectAllDepart();
 
     /**
      * 添加部门
@@ -353,11 +366,28 @@ export default {
       });
     };
 
+    
     /**
-     * memberData 点击事件
+     * departData 点击事件
      */
     const handleNodeClick = data => {
-      //console.log(data);
+      // 当前部门信息
+      let id = data.id;
+      if (currentDepart.id === id) {
+        return;
+      }
+      currentDepart.label = data.label;
+      currentDepart.id = data.id;
+      currentDepart.pid = data.pid;
+      treeData.status = true;
+      memberData.splice(0, memberData.length);
+      selectChildMember(id);
+      window.event
+        ? (window.event.cancelBubble = true)
+        : event.stopPropagation();
+        root.$router.push({
+          path: "/contacts/memberList"
+        })
     };
 
     /**
@@ -383,6 +413,7 @@ export default {
       });
       selectAllDepart();
     };
+
     /**
      * handleClose
      */
@@ -409,6 +440,7 @@ export default {
         dialogFormVisible.value = true;
       }
     };
+
     /**
      * dialog 隐藏 btn
      * type: 添加部门
@@ -427,6 +459,7 @@ export default {
         });
       }
     };
+
     /**
      * dialogDel 显示 btn
      * type: 移除部门
@@ -447,6 +480,7 @@ export default {
         dialogVisible.value = true;
       }
     };
+
     /**
      * dialogDelHide 隐藏 btn
      * type: 移除部门
@@ -456,6 +490,7 @@ export default {
       remove(removeData.node, removeData.data);
       delDepart();
     };
+
     /**
      * dialogmodify 显示 btn
      * type: 修改部门名称
@@ -473,6 +508,7 @@ export default {
         });
       }
     };
+
     /**
      * dialogModifyHide 隐藏 btn
      * type: 修改部门名称
@@ -505,16 +541,41 @@ export default {
           });
       }
     };
+    /**---------------------------------- 部门 end---------------------------------- */
+
+    /**---------------------------------- 部门成员 login---------------------------------- */
+    let memberData = reactive([]);
+    /**
+     * 查询部门成员
+     */
+    const selectChildMember = id => {
+      let listUserId = new URLSearchParams(); // text post 提交
+      listUserId.append("id", id);
+      listUserByDepartment(listUserId).then(response => {
+        let data = response.data;
+        currentDepart.length = data.length;
+        let i = 0,
+          len = data.length;
+        for (i; i < len; i++) {
+          data[i].temperature = Number(data[i].temperature).toFixed(1);
+          memberData.push(data[i]);
+        }
+        //[ ... memberData] = data;
+      });
+    };
+    selectChildMember(companyData.companyId);
+    /**---------------------------------- 部门成员 end---------------------------------- */
+
+    /**---------------------------------- 生命周期 onMounted login---------------------------------- */
     onMounted(() => {
       console.log("挂载完成"); //addMemberFn selectNodepart
-      selectAllDepart();
       /**在挂载完成之后在执行侦听器 */
       watchEffect(
         () => filterText.value,
         val => {
           refs.tree.filter(val);
         },
-        () => memberData
+        () => departData
       );
       watchEffect(() => {
         //dialogFormVisible modifyData.visibel
@@ -545,34 +606,25 @@ export default {
         }
       });
       /*
-
-      
-      //查询部门成员
-      let listUserId = new URLSearchParams();
-      listUserId.append("id", 7);
-      listUserByDepartment(listUserId);
-
-      
-
       //删除部门成员
       let removeMemberParams = new URLSearchParams();
       removeMemberParams.append("userIds", [1, 2, 7]);
       removeMemberParams.append("depId", 7);
       removeMember(removeMemberParams);
-
-      //移动部门成员
-*/
+      */
     });
+    /**---------------------------------- 生命周期 onMounted end---------------------------------- */
 
     return {
       open4,
-      memberData,
+      departData,
       defaultProps,
       handleNodeClick,
       filterNode,
       filterText,
       append,
       remove,
+      treeData,
       //dialog
       dialogFormVisible,
       form,
@@ -591,7 +643,10 @@ export default {
       //modify
       modifyData,
       dialogmodify,
-      dialogModifyHide
+      dialogModifyHide,
+      // memberData
+      memberData,
+      currentDepart
     };
   }
 };
@@ -607,7 +662,7 @@ $contactsHeight: 592px;
       height: $contactsHeight;
       .chunk_title_top {
         padding: 10px;
-        border-bottom: #e4e6e9;
+        border-bottom: 1px solid #e4e6e9;
         position: relative;
         .search {
           width: 212px;
@@ -627,6 +682,7 @@ $contactsHeight: 592px;
         }
       }
       .chunk_title_bottom {
+        padding: 10px 0;
         .el-tree-node__children {
           max-width: 257px;
           overflow: hidden;
@@ -635,9 +691,9 @@ $contactsHeight: 592px;
         }
       }
     }
-    .chunk_cnt {
-      height: $contactsHeight;
-    }
   }
+}
+.tree-active {
+  background: #5090f1 !important;
 }
 </style>

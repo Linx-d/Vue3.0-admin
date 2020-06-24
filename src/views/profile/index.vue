@@ -13,7 +13,7 @@
 
 <script>
 import { reactive } from "@vue/composition-api";
-import titleTab from "../../components/common";
+import titleTab from "@/components/common";
 export default {
   name: "profile",
   components: { titleTab },
@@ -21,17 +21,17 @@ export default {
     const tabNavs = reactive([
       {
         name: "企业信息",
-        path: "#/profile/profile_info",
+        path: "/profile/profile_info",
         current: false
       },
       {
         name: "权限管理",
-        path: "#/profile/profile_juris",
+        path: "/profile/profile_juris",
         current: false
       },
       {
         name: "设置",
-        path: "#/profile/profile_set",
+        path: "/profile/profile_set",
         current: false
       }
     ]);
