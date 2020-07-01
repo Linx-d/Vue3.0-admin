@@ -12,6 +12,10 @@ Vue.use(ElementUI)
 Vue.use(VueCompositionApi)
 Vue.config.productionTip = false
 
+//全局注册echarts
+import echarts from "echarts"
+Vue.prototype.$echarts = echarts
+
 new Vue({
   router,
   store,
