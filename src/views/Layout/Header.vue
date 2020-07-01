@@ -23,6 +23,7 @@
             :class="['frame_nav', {frame_nav_Curr: nav.current}]"
             @click.native="navTrigger(nav, index)"
           >{{ nav.name }}</router-link>
+          <!--采取native，自定义事件注册到组件的顶级元素上-->
         </nav>
         <div id="topNavLine" :style="stepStyle"></div>
       </div>
@@ -31,10 +32,16 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted, computed } from "@vue/composition-api";
+import {
+  reactive,
+  ref,
+  onMounted,
+  computed,
+  watchEffect
+} from "@vue/composition-api";
 export default {
   name: "frame",
-  setup() {
+  setup(props, { root }) {
     const navList = reactive([
       {
         index: 0,
@@ -58,14 +65,14 @@ export default {
         current: true
       },
       {
-        index: 3,
+        index: 2,
         name: "围栏",
         targetId: "rail",
         target: "/rail",
         current: false
       },
       {
-        index: 4,
+        index: 3,
         name: "企业",
         targetId: "profile",
         target: "/profile",
@@ -119,6 +126,15 @@ export default {
       stepStyle.value = "transform:" + clickStr.value;
       data.current = true;
     };
+    /**监听路由 */
+    watchEffect(() => {
+      let path = root.$route.path;
+      if (path != "/") {
+        navList.forEach((item, index) => {
+          //console.log(item, index);
+        });
+      }
+    });
     return {
       navList,
       step,
@@ -202,7 +218,7 @@ export default {
         background: #2c5480;
         position: absolute;
         bottom: 0px;
-        @include webkit('transition', all 0.5s);
+        @include webkit("transition", all 0.5s);
       }
     }
   }
