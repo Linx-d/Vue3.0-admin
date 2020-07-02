@@ -41,13 +41,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$profileHeight: 741px;
+$profileHeight: 655px;
 .profile_main {
-  height: $profileHeight;
   .chunk_title {
-    height: $profileHeight;
-  }
-  .chunk_cnt {
     height: $profileHeight;
   }
   .tabNav_item_curr {
