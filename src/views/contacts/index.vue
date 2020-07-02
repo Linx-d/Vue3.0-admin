@@ -30,23 +30,43 @@
                 <el-button type="text" size="mini" @click="() => append(data)">Append</el-button>
                 <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>
                 -->
-                <el-button
-                  type="text"
-                  @click.stop="dialogShow(data, node)"
-                  class="addMemberBtn"
-                >id:{{data.id}} +</el-button>
-                <el-button
-                  type="text"
-                  size="mini"
-                  @click.stop="dialogDel(data, node)"
-                  class="delMemberBtn"
-                >-</el-button>
-                <el-button
-                  type="text"
-                  size="mini"
-                  @click.stop="dialogmodify(data, node)"
-                  class="modifyMemberBtn"
-                >*</el-button>
+                <div
+                  class="menu_right"
+                  @click.stop="showDepartClick"
+                  @mouseleave.stop="hideDepartLeave"
+                >
+                  <svg-icon iconClass="menu_link" class="menu_right_svg"></svg-icon>
+                  <div
+                    v-show="showDepartOperation"
+                    :class="['departOperation', {'showDepartOperation': showDepartOperation}]"
+                  >
+                    <ul>
+                      <li>
+                        <el-button
+                          type="text"
+                          @click.stop="dialogShow(data, node)"
+                          class="addMemberBtn"
+                        >添加子部门</el-button>
+                      </li>
+                      <li>
+                        <el-button
+                          type="text"
+                          @click.stop="dialogmodify(data, node)"
+                          class="modifyMemberBtn"
+                        >修改部门名称</el-button>
+                      </li>
+                      <li>
+                        <el-button
+                          type="text"
+                          @click.stop="dialogDel(data, node)"
+                          class="delMemberBtn"
+                        >删除部门</el-button>
+                      </li>
+                      <li>id:{{data.id}}</li>
+                    </ul>
+                  </div>
+                </div>
+
                 <el-dialog title="添加部门" :visible.sync="dialogFormVisible" class="addDialog">
                   <el-form :model="form">
                     <el-form-item label="部门名称" :label-width="formLabelWidth">
@@ -639,6 +659,16 @@ export default {
         //[ ... memberData] = data;
       });
     };
+    /**
+     * 左侧工具栏点击事件
+     */
+    let showDepartOperation = ref(false);
+    const showDepartClick = () => {
+      showDepartOperation.value = true;
+    };
+    const hideDepartLeave = () => {
+      showDepartOperation.value = false;
+    };
     watchEffect(() => {
       // 获取顶级部门的真实id
       selectChildMember(companyData.companyId);
@@ -731,6 +761,9 @@ export default {
       tmpHistory,
       updateDepart, // 修改部门名称
       modifyNodeData, // 传入子组件的部门修改信息
+      showDepartOperation, // 点击左侧导航栏的菜单栏的样式 布尔值
+      showDepartClick, // 鼠标 点击 控制左侧导航栏的显示菜单栏函数
+      hideDepartLeave // 鼠标离开 控制左侧导航栏隐藏的菜单栏函数
     };
   }
 };
@@ -806,5 +839,53 @@ $contactsHeight: 592px;
 }
 .depart {
   margin-right: 6px;
+}
+
+// 显示隐藏左侧导航工具栏
+.el-tree-node__content {
+  position: relative;
+  .menu_right {
+    opacity: 0;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    .departOperation {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      opacity: none;
+      background: #fff;
+      ul {
+        @include webkit("box-shadow", 0 0 3px 0 #c8c8c8);
+        li {
+          width: 98px;
+          height: 26px;
+          padding: 4px 9px;
+          line-height: 18px;
+          @include webkit("box-sizing", border-box);
+          .addMemberBtn,
+          .modifyMemberBtn,
+          .delMemberBtn {
+            padding: 0;
+            color: #000;
+          }
+        }
+        li:hover {
+          background-color: #f5f7fa;
+        }
+        li:last-child:hover {
+          background-color: #fff;
+        }
+      }
+    }
+    .showDepartOperation {
+      display: block;
+    }
+  }
+}
+.el-tree-node__content:hover {
+  .menu_right {
+    opacity: 1;
+  }
 }
 </style>
