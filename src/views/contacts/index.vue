@@ -21,6 +21,9 @@
             ref="tree"
           >
             <span :class="['custom-tree-node']" slot-scope="{ node, data }">
+              <i>
+                <svg-icon iconClass="depart" class="depart"></svg-icon>
+              </i>
               <span class="tree-text">{{ node.label }}</span>
               <span class="departTool">
                 <!--
@@ -53,6 +56,7 @@
                         ref="partmentContent"
                         maxlength="30"
                         placeholder="请输入部门名称"
+                        @click.stop.native="() => { return }"
                       ></el-input>
                     </el-form-item>
                   </el-form>
@@ -75,6 +79,7 @@
                         ref="partmentChangeContent"
                         maxlength="30"
                         :placeholder="modifyData.name"
+                        @click.stop.native="() => { return }"
                       ></el-input>
                     </el-form-item>
                   </el-form>
@@ -107,12 +112,36 @@
           </el-tree>
         </div>
       </div>
-      <router-view :currentDepart="currentDepart" :memberData="memberData"></router-view>
+      <contactsList
+        v-show="contactsModule.memberList"
+        :currentDepart="currentDepart"
+        :memberData="memberData"
+        :contactsModule="contactsModule"
+        :currentMemberInfo="currentMemberInfo"
+        :tmpHistory="tmpHistory"
+      ></contactsList>
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :size="memberData.length"
+        :total="memberData.length"
+        :hide-on-single-page="true"
+        class="pagination_my"
+      ></el-pagination>
+      <contactsInfo
+        v-show="contactsModule.memberInfo"
+        :currentDepart="currentDepart"
+        :contactsModule="contactsModule"
+        :currentMemberInfo="currentMemberInfo"
+        :tmpHistory="tmpHistory"
+      ></contactsInfo>
     </div>
   </main>
 </template>
 
 <script>
+import contactsInfo from "./components/memberInfo";
+import contactsList from "./components/memberList";
 import {
   addDepartment,
   listAllDepartment,
@@ -122,10 +151,9 @@ import {
   listUserByDepartment,
   listUserByNoDepartment,
   removeMember,
-  listDepartmentByPid,
-  translateDataToTree,
-  getObjLevel
+  listDepartmentByPid
 } from "@/api/contactsApi";
+import { translateDataToTree, switchModule } from "@/utils/common";
 import sha1 from "sha1"; //前台加密 使用:  sha1(value);
 import cookie from "cookie_js";
 import {
@@ -133,17 +161,61 @@ import {
   reactive,
   watchEffect,
   ref,
-  computed
+  computed,
+  watch
 } from "@vue/composition-api";
 export default {
   name: "contacts",
+  components: { contactsInfo, contactsList },
   setup(props, { root, refs, set }) {
+    /**
+     * contacts模块管理
+     */
+    let contactsModule = reactive({
+      memberList: true, // 成员列表
+      memberInfo: false, // 成员信息
+      memberModify: false // 修改信息
+    });
+    let currentMemberInfo = reactive({
+      address: "山西省太原市万柏林区a",
+      age: "23",
+      gmtCreate: null,
+      name: "aaaaaa",
+      radius: "25",
+      railLatitude: "29.825502",
+      railLongitude: "106.530144",
+      sex: "男",
+      tel: "13647684961",
+      temperature: "0.0",
+      userId: "5",
+      userLatitude: 106.53721028909878,
+      userLongitude: 29.821216648608489
+    }); // 当前成员信息
+    let tmpHistory = reactive({
+      newArr_time: [],
+      newArr_tmp: [],
+      online: false,
+      temperature: "33.78",
+      electric: "2",
+      location: "重庆市北碚区云汉大道",
+      railName: "万寿福居公租房",
+      lastUpdate: "2020-05-14 15:48:02",
+      tnumber: null,
+      pnumber: 109
+    }); // 当前成员温度随时间变化的历史数据
     /**
      * 数据
      */
     let companyData = reactive({
-      companyId: 1
+      companyId: 6
     }); // 顶级部门 id
+    const getCompanyId = () => {
+      listAllDepartment().then(response => {
+        let data = response.data.list ? response.data.list : response.data;
+        return data[0].id;
+      });
+    };
+
     let treeData = reactive({
       status: false
     });
@@ -152,18 +224,21 @@ export default {
       {
         label: "",
         displayOrder: 10001,
-        id: 1,
+        id: getCompanyId() || 6,
         pid: 0,
         children: [],
         childrenLen: 0
       }
     ]);
+    watchEffect(() => departData);
+    // 当前部门信息
     let currentDepart = reactive({
       label: "",
       id: 1,
       pid: 0,
-      length: 0
-    }); // 当前部门信息
+      length: 0,
+      topId: 2
+    });
     //selectChildDepart(0);
     let childData = reactive({}); // add child
     let addStatus = ref(false); // 增加部门的确定按钮的禁用状态
@@ -264,75 +339,82 @@ export default {
      * 添加部门成员
      */
     const addMemberFn = (depId, userIdArr) => {
+      console.log(depId, userIdArr);
       let params = new URLSearchParams();
       params.append("userId", userIdArr); // [1, 2, 7]
       params.append("depId", depId); // 7
+      //console.log(params);
+      console.log(params);
       return addMember(params);
     };
 
     /**
      * 查询未分组用户
      */
-    const selectNodepart = () => {
-      return listUserByNoDepartment();
+    const selectNodepart = (pageNum, pageSize) => {
+      return listUserByNoDepartment(pageNum, pageSize);
     };
 
     /**
      * 查询所有部门
      */
     const selectAllDepart = () => {
-      return listAllDepartment()
-        .then(response => {
-          let data = response.data,
-            len = data.length;
-          if (len <= 0) {
-            root.$message({ message: "暂无部门" });
+      return listAllDepartment().then(response => {
+        let data = response.data.list ? response.data.list : response.data,
+          len = data.length;
+        if (len <= 0) {
+          root.$message({ message: "暂无部门" });
+        } else {
+          let id = data[0].id;
+          companyData.companyId = id;
+          currentDepart.topId = id;
+          departData[0].id = id;
+          let treeData = translateDataToTree(data)[0];
+          if (treeData == undefined) {
+            root.$message({
+              message: "部门信息有误",
+              type: "error"
+            });
           } else {
-            let id = data[0].id;
-            companyData.companyId = id;
-            departData[0].id = id;
-            let treeData = translateDataToTree(data)[0];
-            if (treeData == undefined) {
-              root.$message({
-                message: "部门信息有误",
-                type: "error"
-              });
-            } else {
-              departData[0].label = currentDepart.label = treeData.name;
-              departData[0].children = treeData.children;
-              departData[0].childrenLen = treeData.childrenLen;
-              departData[0].displayOrder = treeData.displayOrder;
-              departData[0].id = currentDepart.id = treeData.id;
-              departData[0].pid = currentDepart.pid = treeData.pid;
-            }
+            departData[0].label = currentDepart.label = treeData.name;
+            departData[0].children = treeData.children;
+            departData[0].childrenLen = treeData.childrenLen;
+            departData[0].displayOrder = treeData.displayOrder;
+            departData[0].id = currentDepart.id = treeData.id;
+            departData[0].pid = currentDepart.pid = treeData.pid;
           }
-          return companyData;
-        })
-        .then(response => {
-          let id = response.companyId;
-          selectNodepart().then(response => {
-            let data = response.data,
-              len = data.length;
-            if (len !== 0) {
-              let companyId = id,
-                userIdArr = [],
-                i = 0;
-              for (i; i < len; i++) {
-                let user = data[i];
-                userIdArr.push(user.userId);
-              }
-              addMemberFn(companyId, userIdArr).then(response => {
-                //console.log(response);// 将未分组用户自动加入顶级部门--添加成功
-              });
-            } else {
-              //暂无为分组用户
-              return;
-            }
-          });
-          return response;
-        });
+        }
+        return companyData;
+      });
     };
     selectAllDepart();
+
+    /**
+     * 查询未分组用户
+     */
+    let ungrouped = reactive({
+      pageNum: 1,
+      pageSize: 20,
+      value: false,
+      data: []
+    });
+    const noDepart = () => {
+      selectNodepart(ungrouped.pageNum, ungrouped.pageSize).then(response => {
+        let data = response.data.list ? response.data.list : response.data,
+          len = data.length;
+        if (len !== 0) {
+          let i = 0;
+          for (i; i < len; i++) {
+            let user = data[i];
+          }
+          ungrouped.data = data; // 将未分组用户存入 ungrouped.data 中
+        } else {
+          //暂无为分组用户
+          return;
+        }
+      });
+    };
+    noDepart();
 
     /**
      * 添加部门
@@ -366,28 +448,19 @@ export default {
       });
     };
 
-    
     /**
      * departData 点击事件
      */
     const handleNodeClick = data => {
       // 当前部门信息
       let id = data.id;
-      if (currentDepart.id === id) {
-        return;
-      }
       currentDepart.label = data.label;
       currentDepart.id = data.id;
       currentDepart.pid = data.pid;
       treeData.status = true;
-      memberData.splice(0, memberData.length);
+      memberData.splice(0, memberData.length); // 删除之前的成员信息
       selectChildMember(id);
-      window.event
-        ? (window.event.cancelBubble = true)
-        : event.stopPropagation();
-        root.$router.push({
-          path: "/contacts/memberList"
-        })
+      switchModule(contactsModule, "memberList");
     };
 
     /**
@@ -430,6 +503,7 @@ export default {
      * type: 添加部门
      */
     const dialogShow = (data, node) => {
+      console.log(data, node);
       let len = node.level;
       if (len > 14) {
         root.$message({
@@ -531,6 +605,7 @@ export default {
               message: "修改名称成功",
               type: "success"
             });
+            currentDepart.label = inputTxt; // 修改memberList中的名称
             modifyData.visibel = false;
           })
           .catch(response => {
@@ -552,10 +627,11 @@ export default {
       let listUserId = new URLSearchParams(); // text post 提交
       listUserId.append("id", id);
       listUserByDepartment(listUserId).then(response => {
-        let data = response.data;
+        let data = response.data.list ? response.data.list : response.data;
         currentDepart.length = data.length;
         let i = 0,
           len = data.length;
+
         for (i; i < len; i++) {
           data[i].temperature = Number(data[i].temperature).toFixed(1);
           memberData.push(data[i]);
@@ -563,10 +639,13 @@ export default {
         //[ ... memberData] = data;
       });
     };
-    selectChildMember(companyData.companyId);
+    watchEffect(() => {
+      // 获取顶级部门的真实id
+      selectChildMember(companyData.companyId);
+    });
     /**---------------------------------- 部门成员 end---------------------------------- */
 
-    /**---------------------------------- 生命周期 onMounted login---------------------------------- */
+    /**---------------------------------- 生命周期 onMounted login ---------------------------------- */
     onMounted(() => {
       console.log("挂载完成"); //addMemberFn selectNodepart
       /**在挂载完成之后在执行侦听器 */
@@ -616,6 +695,7 @@ export default {
     /**---------------------------------- 生命周期 onMounted end---------------------------------- */
 
     return {
+      contactsModule,
       open4,
       departData,
       defaultProps,
@@ -646,7 +726,11 @@ export default {
       dialogModifyHide,
       // memberData
       memberData,
-      currentDepart
+      currentDepart,
+      currentMemberInfo,
+      tmpHistory,
+      updateDepart, // 修改部门名称
+      modifyNodeData, // 传入子组件的部门修改信息
     };
   }
 };
@@ -656,9 +740,11 @@ export default {
 $contactsHeight: 592px;
 #contacts {
   .contacts_main {
+    position: relative;
     .chunk_title {
       width: 257px;
       max-width: 257px;
+      min-width: 257px;
       height: $contactsHeight;
       .chunk_title_top {
         padding: 10px;
@@ -683,6 +769,23 @@ $contactsHeight: 592px;
       }
       .chunk_title_bottom {
         padding: 10px 0;
+        .memberList {
+          font-size: 14px;
+        }
+        .unrouped {
+          height: 26px;
+          line-height: 26px;
+          color: #606266;
+          width: 100%;
+          cursor: pointer;
+          margin-bottom: 10px;
+          padding-left: 24px;
+          font-size: 14px;
+          @include webkit("box-sizing", border-box);
+        }
+        .unrouped:hover {
+          background: rgb(245, 247, 250);
+        }
         .el-tree-node__children {
           max-width: 257px;
           overflow: hidden;
@@ -695,5 +798,13 @@ $contactsHeight: 592px;
 }
 .tree-active {
   background: #5090f1 !important;
+}
+.pagination_my {
+  position: absolute;
+  right: 7px;
+  bottom: 6px;
+}
+.depart {
+  margin-right: 6px;
 }
 </style>
