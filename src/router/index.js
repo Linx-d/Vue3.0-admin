@@ -17,20 +17,7 @@ Vue.use(VueRouter)
   {
     path: "/contacts",
     name: "Contacts",
-    component: () => import("../views/contacts/index.vue"),
-    redirect: "/contacts/memberList",
-    children: [
-      {
-        path: "/contacts/memberList",
-        name: "MemberList",
-        component: () => import("@/views/contacts/components/memberList.vue")
-      },
-      {
-        path: "/contacts/memberInfo",
-        name: "MemberInfo",
-        component: () => import("@/views/contacts/components/memberInfo.vue")
-      }
-    ]
+    component: () => import("../views/contacts/index.vue")
   },
   {
     path: "/rail",
