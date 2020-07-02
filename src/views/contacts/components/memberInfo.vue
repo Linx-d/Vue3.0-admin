@@ -4,10 +4,13 @@
       <span>成员详情</span>
     </div>
     <div class="cnt_tool">
-      <a class="memberLink" href="javascript:;">
-        <svg-icon iconClass="double_headed.svg" class="double_headed.svg"></svg-icon>返回
+      <a class="memberLink" href="javascript:;" @click="memberInfoBack">
+        <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
+      <!--
       <a class="memberLink" href="javascript:;">编辑</a>
+      <a class="memberLink" href="javascript:;">移除</a>
+      -->
     </div>
     <div class="info_main">
       <div class="info_head">
@@ -16,49 +19,59 @@
         </div>
         <div class="info_head_r">
           <p>
-            Name
+            {{ currentMemberInfo.name }}
             <span>
               <svg-icon iconClass="info_small" class="info_small"></svg-icon>
             </span>
           </p>
           <div class="info_status">
-            <span>online</span>
-            <span>TMP</span>
+            <span>{{ currentMemberInfo.online }}</span>
+            <span>{{ currentMemberInfo.temperature }}</span>
           </div>
-          <span>power</span>
+          <span>{{ currentMemberInfo.electric }}</span>
         </div>
       </div>
-      <div class="info_personal">
+      <div id="info_personal" class="info_module">
         <ul>
           <li>
+            <span>年龄：</span>
+            <i>{{ currentMemberInfo.age }}</i>
+          </li>
+          <li>
             <span>电话：</span>
-            <i>19922297443</i>
+            <i>{{ currentMemberInfo.tel }}</i>
           </li>
           <li>
             <span>地址：</span>
-            <i>如泰科技</i>
+            <i>{{ currentMemberInfo.address }}</i>
           </li>
           <li>
             <span>围栏：</span>
-            <i>万寿公租房</i>
+            <i>{{ currentMemberInfo.railName }}</i>
           </li>
           <li>
             <span>体温：</span>
-            <i>51</i>
+            <i>{{ currentMemberInfo.tnumber }}</i>
           </li>
           <li>
             <span>位置：</span>
-            <i>68</i>
+            <i>{{ currentMemberInfo.pnumber }}</i>
           </li>
         </ul>
       </div>
-      <div class="info_temperature"></div>
-      <div class="info_position"></div>
+      <div id="info_temperature" class="info_module"></div>
+      <div class="info_module mapBox">
+        <div id="mapShow"></div>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import { onMounted, computed } from "@vue/composition-api";
+import { Map } from "@/map"; // 导入map.js文件
+import { onMounted, watchEffect } from "@vue/composition-api";
+import { switchModule } from "@/utils/common";
+import { listUserLocationById } from "@/api/contactsApi";
+import { Message } from "element-ui";
 export default {
   name: "memberList",
   props: {
@@ -67,36 +80,231 @@ export default {
       type: Object,
       default: () => {} // default值 需要使用箭头函数回调
     },
-    memberData: {
-      type: Array,
+    currentMemberInfo: {
+      type: Object,
+      default: () => {}
+    },
+    contactsModule: {
+      type: Object,
       default: () => []
+    },
+    tmpHistory: {
+      type: Object,
+      default: () => {}
     }
   },
   setup(props, { root }) {
-    let changeModule = computed({
-      get: () => {
-        // 有无成员显示不同模块
-        let len = props.memberData.length;
-        if (len !== 0) {
-          return { status: true, null: false };
-        } else {
-          return { status: false, null: true };
-        }
-      },
-      set: () => {}
-    });
+    let contactsModule = props.contactsModule; // contacts 模块
     /**
-     *  td mouseenter事件
+     *  成员个人信息温度变化图表
      */
-    // fn: tdActive ref: tdTool
-    const compileTool = () => {
-      root.$router.push({
-        path: "/contacts/memberInfo"
+    const memberInfoEcharts = () => {
+      let tmpHistory = props.tmpHistory; //console.log(tmpHistory);
+      watchEffect(() => {
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = root.$echarts.init(
+          document.getElementById("info_temperature")
+        ); // root.$echarts
+        let newArr_time = tmpHistory.newArr_time;
+        let newArr_tmp = tmpHistory.newArr_tmp;
+        // 指定图表的配置项和数据
+        let option = {
+          title: {
+            text: "体温变化",
+            subtext: "疫情防控"
+          },
+          tooltip: {
+            trigger: "axis"
+          },
+          legend: {
+            data: ["最高温度"] //定义曲线具体数据
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              dataZoom: {
+                yAxisIndex: "none"
+              },
+              dataView: {
+                readOnly: true,
+                optionToContent: function(opt) {
+                  let axisData = opt.xAxis[0].data;
+                  let table =
+                    '<table style="width:70%;text-align:left"><tbody><tr>' +
+                    "<td>时间</td>" +
+                    "<td>温度</td>" +
+                    //+ '<td>' + series[1].name + '</td>'
+                    "</tr>";
+                  for (let len = newArr_time.length, i = len - 1; i >= 0; i--) {
+                    if (newArr_tmp[i] >= 37.3) {
+                      table += '<tr style="color: red;">';
+                    } else {
+                      table += '<tr">';
+                    }
+                    table +=
+                      "<td>" +
+                      newArr_time[i] +
+                      "</td>" +
+                      "<td>" +
+                      newArr_tmp[i] +
+                      "</td>" +
+                      //+ '<td>' + series[1].data[i] + '</td>'
+                      "</tr>";
+                  }
+                  table += "</tbody></table>";
+                  return table;
+                },
+                contentToOption: function(opts) {
+                  //this.optionToContent();
+                }
+              },
+              //magicType: {type: ['line', 'bar']}, // 柱状图
+              //restore: {}
+              saveAsImage: {}
+            }
+          },
+          xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: newArr_time,
+            axisLabel: {
+              rotate: 285
+            }
+          },
+          grid: {
+            bottom: "40%"
+          },
+          yAxis: {
+            type: "value",
+            axisLabel: {
+              formatter: "{value}°C" //Y坐标
+            }
+          },
+          dataZoom: [
+            {
+              type: "inside",
+              start: 0,
+              end: 100
+            },
+            {
+              start: 0,
+              end: 10,
+              handleIcon:
+                "M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z",
+              handleSize: "80%",
+              handleStyle: {
+                color: "#fff",
+                shadowBlur: 3,
+                shadowColor: "rgba(0, 0, 0, 0.6)",
+                shadowOffsetX: 2,
+                shadowOffsetY: 2
+              }
+            }
+          ],
+          visualMap: {
+            show: false,
+            dimension: 1,
+            pieces: [
+              {
+                gte: 37.3,
+                lte: 9999,
+                color: "rgb(194, 53, 49)"
+              }
+            ], //pieces的值由动态数据决定
+            outOfRange: {
+              color: "green"
+            }
+          },
+          series: [
+            {
+              name: "",
+              type: "line",
+              data: newArr_tmp,
+              markPoint: {
+                data: [
+                  { type: "max", name: "最大值" },
+                  { type: "min", name: "最小值" }
+                ]
+              },
+              markLine: {
+                data: [
+                  //{type: 'average', name: '平均值'}设置标线类型
+                  { yAxis: 37.3 }
+                ]
+              }
+            }
+          ]
+        };
+        // 使用刚指定的配置项和数据显示图表。
+
+        myChart.resize(); // 使 echarts 图表随页面大小变化而变化
+        myChart.setOption(option);
+        /*window.onresize = function() {
+          myChart.resize();
+          //myChart1.resize();    //若有多个图表变动，可多写
+        };*/
+      });
+    };
+    const memberInfoBack = () => {
+      switchModule(contactsModule, "memberList");
+    };
+    /**
+     * 百度地图方法
+     */
+    const baiduMap = () => {
+      watchEffect(() => {
+        // 成员坐标
+        let location = {
+          lng: props.currentMemberInfo.userLongitude, // 注意经纬度的对应 userLongitude
+          lat: props.currentMemberInfo.userLatitude // 注意经纬度的对应 userLatitude
+        };
+        // 围栏信息
+        let railInfo = {
+          lng: props.currentMemberInfo.railLongitude,
+          lat: props.currentMemberInfo.railLatitude,
+          radius: props.currentMemberInfo.radius
+        };
+        Map("ak").then(BMap => {
+          let map = new BMap.Map("mapShow"); // 创建Map实例
+          let pointArray = [];
+          let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
+          pointArray.push(point);
+          let marker = new BMap.Marker(point);
+          map.addOverlay(marker); //添加一个标注
+          map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
+          map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
+
+          //添加圆
+          let railPoint = new BMap.Point(railInfo.lng, railInfo.lat); //圆的中心坐标
+          let verify =
+            railInfo.lng == null ||
+            railInfo.lat == null ||
+            railInfo.radius == null; // 验证是否绑定围栏 true为未绑定围栏
+          if (verify) {
+            Message.warning("用户没有设置围栏");
+            map.centerAndZoom(point, 18); // 将个人作为地图中心点
+          } else {
+            map.centerAndZoom(railPoint, 18); // 将围栏作为地图中心点
+          }
+          let circle = new BMap.Circle(railPoint, railInfo.radius, {
+            strokeColor: "blue",
+            strokeWeight: 1,
+            strokeOpacity: 0.01,
+            fillColor: "#53aeff",
+            fillOpacity: 0.4
+          });
+          map.addOverlay(circle);
+        });
       });
     };
 
-    onMounted(() => {});
-    return { compileTool, changeModule };
+    onMounted(() => {
+      baiduMap();
+      memberInfoEcharts();
+    });
+    return {
+      memberInfoBack
+    };
   }
 };
 </script>
@@ -104,7 +312,6 @@ export default {
 $contactsHeight: 592px;
 .chunk_cnt {
   height: $contactsHeight;
-  padding: 16px 12px 24px;
   .info_title {
     font-size: 18px;
     font-weight: 700;
@@ -123,7 +330,7 @@ $contactsHeight: 592px;
   padding: 6px 10px;
   border-bottom: 1px solid #bdc9d6;
   box-sizing: border-box;
-  .double_headed.svg {
+  .double_headed {
     vertical-align: middle;
     margin-top: -2px;
     margin-right: 2px;
@@ -154,10 +361,10 @@ $contactsHeight: 592px;
           vertical-align: top;
         }
       }
-      .infoStatus {
+      .info_status {
         span:first-child {
           color: #787878;
-          margin-right: 5px;
+          margin-right: 8px;
         }
         span:last-child {
           color: #5090f1;
@@ -166,11 +373,12 @@ $contactsHeight: 592px;
       }
     }
   }
-  .info_personal {
-    height: 200px;
-    border-top: 1px dashed #e4e6e9;
+  .info_module {
     padding: 35px 25px 25px 25px;
-    @include webkit('box-sizing', border-box);
+    border-top: 1px dashed #e4e6e9;
+    @include webkit("box-sizing", border-box);
+  }
+  #info_personal {
     ul {
       li {
         font-size: 14px;
@@ -185,10 +393,31 @@ $contactsHeight: 592px;
       }
     }
   }
-  .info_temperature {
-    height: 200px;
-    border-top: 1px dashed #e4e6e9;
-    @include webkit('box-sizing', border-box);
+  #info_temperature {
+    height: 500px;
   }
+  .mapBox {
+    padding-top: 0;
+    border-top: none;
+  }
+  #mapShow {
+    height: 500px;
+  }
+}
+
+/**baidu echarts */
+.weui-grids .weui-grid {
+  background-color: #fff;
+}
+.BMap_cpyCtrl {
+  display: none;
+}
+.weui-cell_access .weui-cell__ft:after {
+  content: "";
+  border-style: none;
+  right: -10px;
+}
+.weui-cell_access .weui-cell__ft {
+  padding-right: 0;
 }
 </style>
