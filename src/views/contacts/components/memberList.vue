@@ -6,17 +6,15 @@
         <span>({{ currentDepart.length }}人)</span>
       </div>
       <div class="cnt_top_r">
-        <a href="javascript:;">修改名称</a>
-        <span class="frame_operation_separator">|</span>
-        <a href="javascript:;">添加子部门</a>
+        <a href="javascript:;"></a>
+        <!--<span class="frame_operation_separator" v-if="currentDepart.id!==currentDepart.topId">|</span>-->
       </div>
     </div>
     <div class="cnt_bottom">
       <div class="has_member" v-if="changeModule.status">
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;">添加成员</a>
-          <a class="memberLink" href="javascript:;">删除</a>
-          <a class="memberLink" href="javascript:;">设置所在部门</a>
+          <a class="memberLink" href="javascript:;" @click="addMember">添加成员</a>
+          <a class="memberLink" href="javascript:;" @click="delMember">删除</a>
         </div>
         <table class="memberTable mm_tabel">
           <thead>
@@ -28,50 +26,53 @@
               <th>性别</th>
               <th>年龄</th>
               <th>温度</th>
-              <th>地址</th>
               <th>电话</th>
+              <th>地址</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="member in memberData" :key="member.id" @click="compileTool">
-              <td>
+            <tr v-for="member in memberData" :key="member.id" @click="compileTool(member)">
+              <td @click.stop="checkChild">
                 <input type="checkbox" name="memberChoose" class="memberSelect" />
               </td>
               <td :title="member.name">{{ member.name }}</td>
               <td :title="member.sex">{{ member.sex }}</td>
               <td :title="member.age">{{ member.age }}</td>
               <td :title="member.temperature">{{ member.temperature }}</td>
-              <td :title="member.address">{{ member.address }}</td>
               <td :title="member.tel">{{ member.tel }}</td>
+              <td :title="member.address">{{ member.address }}</td>
               <td class="tdTool">
                 <svg-icon class="tdmenu_right" iconClass="compile_info"></svg-icon>
               </td>
             </tr>
           </tbody>
         </table>
-        <p></p>
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;">添加成员</a>
-          <a class="memberLink" href="javascript:;">删除</a>
-          <a class="memberLink" href="javascript:;">设置所在部门</a>
+          <a class="memberLink" href="javascript:;" @click="addMember">添加成员</a>
+          <a class="memberLink" href="javascript:;" @click="delMember">删除</a>
         </div>
       </div>
       <div class="no_member" v-if="changeModule.null">
         <div class="no_member_top">
-          <svg-icon iconClass="member" className="member"></svg-icon>
+          <svg-icon iconClass="member" class="member"></svg-icon>
           <p>当前部门无任何成员</p>
         </div>
         <div class="no_member_bottom">
           <a class="memberLink">添加成员</a>
         </div>
       </div>
-      
     </div>
   </div>
 </template>
 <script>
-import { onMounted, computed } from "@vue/composition-api";
+import { onMounted, computed, ref, watchEffect } from "@vue/composition-api";
+import { switchModule } from "@/utils/common";
+import {
+  listUserLocationById,
+  listDeviceAlarmInfoByUserId
+} from "@/api/contactsApi";
+import { Message } from "element-ui";
 export default {
   name: "memberList",
   props: {
@@ -83,9 +84,22 @@ export default {
     memberData: {
       type: Array,
       default: () => []
+    },
+    contactsModule: {
+      type: Object,
+      default: () => []
+    },
+    currentMemberInfo: {
+      type: Object,
+      default: () => {}
+    },
+    tmpHistory: {
+      type: Object,
+      default: () => {}
     }
   },
-  setup(props, {root}) {
+  setup(props, { root }) {
+    let currentDepart = props.currentDepart; // 当前部门信息
     let changeModule = computed({
       get: () => {
         // 有无成员显示不同模块
@@ -99,25 +113,92 @@ export default {
       set: () => {}
     });
     /**
-     *  td mouseenter事件
+     *  tr click事件
      */
-    // fn: tdActive ref: tdTool
-    const compileTool = () => {
-      root.$router.push({
-        path: "/contacts/memberInfo"
-      })
+    const compileTool = data => {
+      // 切换模块
+      let contactsModule = props.contactsModule;
+      switchModule(contactsModule, "memberInfo");
+
+      // 获得成员个人信息
+      let currentMemberInfo = props.currentMemberInfo;
+      for (let key in currentMemberInfo) {
+        currentMemberInfo[key] = data[key];
+      }
+
+      let tmpHistory = props.tmpHistory;
+      /**根据用户id获取历史数据信息 */
+      let currentObj = {
+        userId: currentMemberInfo.userId
+      };
+      listUserLocationById(currentObj).then(response => {
+        let array = Array.isArray(response.data.list)
+          ? response.data.list
+          : response.data; // 服务器与local切换
+        let newArr_time = [],
+          newArr_tmp = [];
+        array.forEach(item => {
+          newArr_time.push(item.gmtCreate);
+          let temperature = Number(item.temperature).toFixed(1);
+          newArr_tmp.push(temperature); //Number().toFiexd(1)
+        });
+        tmpHistory.newArr_time = newArr_time;
+        tmpHistory.newArr_tmp = newArr_tmp;
+      });
+      /**根据用户id获取设备最新数据和告警信息 */
+      let currentArray = [currentMemberInfo.userId];
+      listDeviceAlarmInfoByUserId(currentArray).then(response => {
+        let data = response.data[0] ? response.data[0] : [];
+        for(let key in data) {
+          currentMemberInfo[key] = data[key];
+        }
+        for(let key in currentMemberInfo) {
+          let verify = currentMemberInfo[key] == null || currentMemberInfo[key] == undefined || currentMemberInfo[key] == ''; // 验证值是否为空
+          if(verify) {
+            currentMemberInfo[key] = "暂无数据";
+          }
+        }
+      });
     };
 
+    /**选择单个成员 */
+    const checkChild = () => {
+      console.log("1");
+    };
+    /**
+     * 添加成员
+     */
+    const addMember = () => {
+      let verifyTopDepart = currentDepart.id !== currentDepart.topId; // 验证是否为顶级部门
+      if (!verifyTopDepart) {
+        Message.warning("顶级部门不能添加成员"); // 顶级部门不能添加成员
+      }
+    };
+    /**
+     * 移除成员
+     */
+    const delMember = () => {
+      let verifyTopDepart = currentDepart.id !== currentDepart.topId; // 验证是否为顶级部门
+      if (!verifyTopDepart) {
+        Message.warning("顶级部门不能移除成员"); // 顶级部门不能移除成员
+      }
+    };
     onMounted(() => {});
-    return { compileTool, changeModule };
+    return {
+      compileTool,
+      changeModule,
+      checkChild,
+      addMember, // Fn 添加部门成员
+      delMember // Fn 移除部门成员
+    };
   }
 };
 </script>
 <style lang="scss" scoped>
 $contactsHeight: 592px;
 .chunk_cnt {
-  padding: 16px 12px 24px;
   height: $contactsHeight;
+  padding-bottom: 45px !important;
   .cnt_top {
     font-weight: 700;
     overflow: hidden;
@@ -166,7 +247,7 @@ $contactsHeight: 592px;
             background: #f5f5f5;
           }
           tr:hover .tdTool {
-            opacity: 1;
+            opacity: 0;
           }
         }
       }
