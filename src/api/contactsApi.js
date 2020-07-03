@@ -1,4 +1,4 @@
-import service from "@/utils/request";
+import service from "@/utils/request"
 
 /**
  * 查询所有部门

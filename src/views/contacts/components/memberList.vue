@@ -281,4 +281,8 @@ $contactsHeight: 592px;
 .member {
   color: #ddd;
 }
+.mm_tabel td:last-child {
+  width: 20px;
+  opacity: 0;
+}
 </style>

@@ -146,7 +146,7 @@ export default {
     /**查询所有围栏信息 */
     let railListPaging = reactive({
       pageNum: 1,
-      pageSize: 15
+      pageSize: 15 
     });
     // 围栏信息
     let railData = reactive({

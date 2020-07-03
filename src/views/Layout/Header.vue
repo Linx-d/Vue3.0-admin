@@ -65,14 +65,14 @@ export default {
         current: true
       },
       {
-        index: 2,
+        index: 3,
         name: "围栏",
         targetId: "rail",
         target: "/rail",
         current: false
       },
       {
-        index: 3,
+        index: 4,
         name: "企业",
         targetId: "profile",
         target: "/profile",
