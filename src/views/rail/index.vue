@@ -12,7 +12,7 @@
             <el-pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
-              :page-sizes="[10, 20, 30, 40]"
+              :page-sizes="[15, 20, 30, 40]"
               :page-size="railListPaging.pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="railData.total"
@@ -146,7 +146,7 @@ export default {
     /**查询所有围栏信息 */
     let railListPaging = reactive({
       pageNum: 1,
-      pageSize: 10
+      pageSize: 15
     });
     // 围栏信息
     let railData = reactive({
