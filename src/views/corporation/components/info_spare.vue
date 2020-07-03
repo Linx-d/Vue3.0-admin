@@ -1,5 +1,5 @@
 <template>
-  <div class="profile_main frame_center_main">
+  <div class="corporation_main frame_center_main">
     <div class="chunk_title">
       <titleTab :father="tabNavs"></titleTab>
     </div>
@@ -20,17 +20,17 @@ export default {
     const tabNavs = reactive([
       {
         name: "企业信息",
-        path: "#/profile/profile_info",
+        path: "#/corporation/corporation_info",
         current: true
       },
       {
         name: "权限管理",
-        path: "#/profile/profile_juris",
+        path: "#/corporation/corporation_juris",
         current: false
       },
       {
         name: "设置",
-        path: "#/profile/profile_set",
+        path: "#/corporation/corporation_set",
         current: false
       }
     ]);
