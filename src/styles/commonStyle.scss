@@ -37,6 +37,7 @@
  * main 中左侧的样式 chunk块
  */
 .chunk_title {
+  height: 100%;
   width: 184px;
   border-right: 1px dotted #dce1e6;
   border-radius: 4px 0 0 4px;
@@ -51,6 +52,7 @@
  * main 中右侧的样式
  */
 .chunk_cnt {
+  height: 100%;
   width: 895px;
   display: table-cell;
   vertical-align: top;

@@ -74,8 +74,8 @@ export default {
       {
         index: 4,
         name: "企业",
-        targetId: "profile",
-        target: "/profile",
+        targetId: "corporation",
+        target: "/corporation",
         current: false
       }
     ]);
