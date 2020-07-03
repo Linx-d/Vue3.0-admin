@@ -1,7 +1,8 @@
 import axios from "axios";
+import { Message } from 'element-ui';
 //使用自定义配置新建一个 axios 实例
 const service = axios.create({
-  baseURL: "http://iot.chinautech.com/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api
+  baseURL: "http://192.168.0.180:8888/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api
   timeout: 15000,
   headers: {
     auth_token: "utechiMZTF3DDOmX1RDhsMphG2Q"
@@ -28,7 +29,7 @@ service.interceptors.response.use(
     if (data.code !== 0) {
       //console.log(data);
       //Message.error(data.msg);
-      return Promise.reject(data);
+      return Promise.resolve(data);  //return Promise.reject(data);
     } else {
       //return response; //所有相应数据
       //console.log(data);
