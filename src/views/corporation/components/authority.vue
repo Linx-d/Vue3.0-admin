@@ -142,7 +142,7 @@ export default {
         key: 3,
         label: `备选项 3`,
         disabled: 3 % 4 === 0
-      },
+      }
     ]);
     /**
      * 员工信息集合
