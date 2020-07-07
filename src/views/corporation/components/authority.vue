@@ -47,8 +47,8 @@
         </el-form-item>
         <el-form-item label="管理权限" v-else>
           <el-radio-group v-model="employee.role.id">
-            <el-radio label="1">普通管理员</el-radio>
-            <el-radio label="2">部门管理员</el-radio>
+            <el-radio label="2">普通管理员</el-radio>
+            <el-radio label="3">部门管理员</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="管理范围">
@@ -64,12 +64,14 @@
           <el-dialog
               title="提示"
               :visible.sync="dialogVisible"
-              width="30%"
-              center>
-              <span>需要注意的是内容是默认不居中的</span>
+              width="640px"
+              center >
+              <span>
+                <el-transfer v-model="chooseDepartment" :data="allDepartment"></el-transfer>
+              </span>
               <span slot="footer" class="dialog-footer">
-                <el-button @click="centerDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
               </span>
             </el-dialog>
         </el-form-item>
@@ -113,16 +115,37 @@ export default {
       pageNum: 1,
       pageSize: 50,
     });
+    /**
+     * 角色集合
+     */
     let roleList = reactive([]);
+
+    
+    let chooseDepartment = [];
 
     /**
      * 部门集合
      */
-    let allDepartment =reactive([]);
+    let allDepartment =reactive([
+      {
+         key: 1,
+        label: `备选项 1`,
+        disabled: 1 % 4 === 0
+      },{
+         key: 2,
+        label: `备选项2`,
+        disabled: 2 % 4 === 0
+      },{
+        key: 3,
+        label: `备选项 3`,
+        disabled: 3 % 4 === 0
+      },
+    ]);
     /**
      * 员工信息集合
      */
     let employees = reactive({});
+
     
     /**
      * 员工信息详情
@@ -204,6 +227,7 @@ export default {
      * 选择员工 获取详情
      */
     const choose =(id)=>{
+      isEdit.value=false;
       getEmployee(id).then((res)=>{
         if(res.code==0){
           return res.data;
@@ -237,7 +261,9 @@ export default {
       edit,
       submit,
       showDepartments,
-      dialogVisible
+      dialogVisible,
+      allDepartment,
+      chooseDepartment
     };
   },
 };
