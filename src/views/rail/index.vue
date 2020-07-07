@@ -1,5 +1,45 @@
 <template>
   <main id="customer" class="frame_center">
+    <el-drawer
+      title="修改围栏"
+      :visible.sync="modifyDrawer"
+      :before-close="handleClose"
+      :with-header="false"
+      class="modifyRailModule"
+      size="50%"
+    >
+      <div id="modifyMap"></div>
+      <el-form
+        :model="modifyData"
+        :rules="rules"
+        ref="modifyData"
+        label-width="100px"
+        class="modify_ruleForm"
+      >
+        <el-form-item label="围栏名称" prop="railName" class="form-item">
+          <el-input v-model="modifyData.railName"></el-input>
+        </el-form-item>
+        <el-form-item label="围栏地址" prop="railAddr" class="form-item">
+          <el-input v-model="modifyData.railAddr" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="围栏半径" prop="radius" class="form-item">
+          <el-input v-model="modifyData.radius" disabled></el-input>
+        </el-form-item>
+        <el-form-item class="modifyBtn">
+          <el-button type="primary" @click="submitForm('modifyData')">修改围栏</el-button>
+          <el-button @click="resetForm('modifyData')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-drawer>
+    <el-drawer
+      title="新增围栏"
+      :visible.sync="addDrawer"
+      :with-header="false"
+      class="addRailModule"
+      size="50%"
+    >
+      <div id="addMap"></div>
+    </el-drawer>
     <div class="customer_main frame_center_main">
       <div class="chunk_cnt">
         <div class="cnt_top">
@@ -25,7 +65,7 @@
           </div>
         </div>
         <div class="cnt_bottom">
-          <div class="has_depart">
+          <div class="has_depart" v-show="railData.status">
             <div class="cnt_tool">
               <a class="memberLink" href="javascript:;" @click="addRailFn">增加围栏</a>
             </div>
@@ -52,7 +92,7 @@
                   <td :title="rail.latitude">({{ rail.longitude }},{{ rail.latitude }})</td>
                   <td :title="rail.railAddr">{{ rail.railAddr }}</td>
                   <td class="tdTool">
-                    <a href="javascript:;" @click.stop="modifyRailFn()">修改</a>
+                    <a href="javascript:;" @click.stop="modifyRailFn(rail, index)">修改</a>
                     <a href="javascript:;" @click.stop="delRailFn(rail.id, index)">删除</a>
                   </td>
                 </tr>
@@ -62,15 +102,17 @@
               <a class="memberLink" href="javascript:;" @click="addRailFn">增加围栏</a>
             </div>
           </div>
-          <div class="no_depart" v-if="changeModule.null">
+          <div class="no_depart" v-show="!railData.status">
             <div class="no_depart_top">
               <svg-icon iconClass="rail" class="rail"></svg-icon>
               <p>暂无围栏</p>
             </div>
             <div class="no_depart_bottom">
-              <a class="memberLink" @click="addRail">增加围栏</a>
+              <a class="memberLink" @click="addRailFn">增加围栏</a>
             </div>
           </div>
+          <p>{{ railData.data[currentRailData.index] }}</p>
+          <p>{{ listByRailData }}</p>
         </div>
       </div>
     </div>
@@ -78,36 +120,41 @@
 </template>
 
 <script>
-import { listRail, addRail, deleteRail } from "@/api/railApi";
-import { reactive, ref } from "@vue/composition-api";
+import {
+  listRail,
+  addRail,
+  deleteRail,
+  listUserInfoByRail
+} from "@/api/railApi";
+import { reactive, ref, onMounted, watchEffect } from "@vue/composition-api";
 import { Message } from "element-ui";
+import { cloneArray, cloneObject } from "@/utils/common";
+import { Map } from "@/map";
 export default {
   name: "rail",
-  setup(props, { root }) {
+  setup(props, { root, refs }) {
     /**
      * data
      */
-    // 切换模块
-    const changeModule = reactive({
-      null: false
+    const modifyDrawer = ref(false); // 切换修改围栏模块
+    const addDrawer = ref(false); // 切换新增围栏模块
+    // 指定围栏下的用户信息
+    let listByRailData = reactive([]);
+    // 当前围栏信息
+    let currentRailData = reactive({
+      index: null
     });
-
-    /**
-     * 函数
-     */
-
     // 增加围栏 data
     const addRailData = reactive({
-      latitude: "1212.21",
-      longitude: "32125.2134",
+      latitude: "29.490295",
+      longitude: "106.48665",
       radius: "200",
       railName: "围栏6",
-      railAddr: "万寿福居",
-      gmtCreate: new Date(),
-      gmtModified: new Date(),
-      personSum: 0
+      railAddr: "万寿福居"
     });
     const addRailFn = () => {
+      addDrawer.value = true; // 显示新增围栏模块
+      addBaiduMap();
       let num = Math.random() * 10;
       num = num.toFixed(1);
       addRailData.railName = `围栏${num}`;
@@ -123,9 +170,34 @@ export default {
       });
     };
     // 修改围栏
-    const modifyRailFn = () => {
-      console.log("修改");
+    const modifyData = reactive({
+      latitude: "",
+      longitude: "",
+      radius: "",
+      railName: "",
+      id: null,
+      railAddr: ""
+    });
+    const modifyRailFn = (data, index) => {
+      cloneObject(modifyData, data);
+      modifyBaiduMap();
+      let id = data.id;
+      modifyDrawer.value = true; // 显示修改围栏模块
+      currentRailData.index = index; // 当前围栏的索引
+      listUserInfoByRail(id).then(res => {
+        let data = res.data.list ? res.data.list : res.data;
+        // 深拷贝数组
+        cloneArray(listByRailData, data);
+      });
     };
+    const rules = reactive({
+      railName: [
+        { required: true, message: "请输入围栏名称", trigger: "blur" },
+        { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+      ],
+      railAddr: [{ required: true }],
+      radius: [{ required: true }]
+    });
     // 删除围栏
     const delRailFn = (id, index) => {
       let params = {
@@ -143,26 +215,57 @@ export default {
       });
     };
 
+    // 提交
+    const submitForm = formName => {
+      refs[formName].validate(valid => {
+        if (valid) {
+          console.log(modifyData);
+          alert("submit!");
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    };
+    // 重置
+    const resetForm = formName => {
+      refs[formName].resetFields();
+    };
+    // 点击覆盖层触发事件
+    const handleClose = done => {
+      root
+        .$confirm("确认关闭？")
+        .then(_ => {
+          done();
+          resetForm("modifyData");
+        })
+        .catch(_ => {});
+    };
     /**查询所有围栏信息 */
     let railListPaging = reactive({
       pageNum: 1,
-      pageSize: 15 
+      pageSize: 15
     });
     // 围栏信息
     let railData = reactive({
       total: 10,
       lastPage: 2,
-      data: []
+      data: [],
+      status: true
     });
+
+    /**
+     * 函数
+     */
+
     // 查询所有围栏信息 selectRailList
     const selectRailList = railListPaging => {
       listRail(railListPaging).then(response => {
-        console.log(response);
         let data = response.data.list ? response.data.list : response.data;
+        let len = data.length;
+        railData.status = len != 0 ? true : false; // 有无围栏切换
         railData.total = response.data.total; // 总围栏数
         railData.lastPage = response.data.lastPage; // 最后一页的页码
-        console.log(data);
-        console.log(railData);
 
         railData.data.splice(0, railData.data.length);
         data.forEach(item => {
@@ -182,15 +285,89 @@ export default {
       selectRailList(railListPaging);
     };
 
+    let modifyBaiduMap = () => {
+      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
+        return BMap;
+      }).then((BMap) => {
+        /*let map = new BMap.Map("modifyMap"); // 创建Map实例
+        let point = new BMap.Point(modifyData.longitude, modifyData.latitude); // 创建点坐标
+        let marker = new BMap.Marker(point);
+        map.addOverlay(marker); //添加一个标注
+        map.centerAndZoom(point, 18); //添加初始化中心点及地图层级
+        map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
+        map.enableContinuousZoom(); //启用连续缩放效果，默认禁用*/
+
+        // 百度地图API功能
+        let map = new BMap.Map("modifyMap");
+        let poi = new BMap.Point(modifyData.longitude, modifyData.latitude);
+        map.centerAndZoom(poi, 16);
+        map.enableScrollWheelZoom();
+        let overlays = [];
+        let overlaycomplete = function(e) {
+          overlays.push(e.overlay);
+        };
+        let styleOptions = {
+          strokeColor: "red", //边线颜色。
+          fillColor: "red", //填充颜色。当参数为空时，圆形将没有填充效果。
+          strokeWeight: 3, //边线的宽度，以像素为单位。
+          strokeOpacity: 0.8, //边线透明度，取值范围0 - 1。
+          fillOpacity: 0.6, //填充的透明度，取值范围0 - 1。
+          strokeStyle: "solid" //边线的样式，solid或dashed。
+        };
+        //实例化鼠标绘制工具
+        let drawingManager = new BMapLib.DrawingManager(map, {
+          isOpen: false, //是否开启绘制模式
+          enableDrawingTool: true, //是否显示工具栏
+          drawingToolOptions: {
+            anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+            offset: new BMap.Size(5, 5) //偏离值
+          },
+          circleOptions: styleOptions, //圆的样式
+          polylineOptions: styleOptions, //线的样式
+          polygonOptions: styleOptions, //多边形的样式
+          rectangleOptions: styleOptions //矩形的样式
+        });
+        //添加鼠标绘制工具监听事件，用于获取绘制结果
+        drawingManager.addEventListener("overlaycomplete", overlaycomplete);
+        function clearAll() {
+          for (let i = 0; i < overlays.length; i++) {
+            map.removeOverlay(overlays[i]);
+          }
+          overlays.length = 0;
+        }
+      });
+    };
+
+    let addBaiduMap = () => {
+      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
+        let map = new BMap.Map("addMap"); // 创建Map实例
+        let point = new BMap.Point(114.065537, 22.553321); // 创建点坐标
+        let marker = new BMap.Marker(point);
+        map.addOverlay(marker); //添加一个标注
+        map.centerAndZoom(point, 13); //添加初始化中心点及地图层级
+        map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
+        map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
+      });
+    };
+
+    onMounted(() => {});
     return {
       railData, // 围栏信息
-      changeModule, // 切换模块
       modifyRailFn, // 修改围栏
       delRailFn, // 删除围栏
       addRailFn, // 增加围栏
       handleCurrentChange, // 当前页变动时候触发的事件
       handleSizeChange, // 每页条数
-      railListPaging // 分页配置
+      railListPaging, // 分页配置
+      addDrawer, // 切换新增围栏模块
+      modifyDrawer, // 切换修改围栏模块
+      modifyData, // 修改围栏信息
+      listByRailData, // 指定围栏下的用户信息
+      currentRailData, // 当前围栏信息
+      rules, // 校验规则
+      submitForm, // 提交表单
+      resetForm, // 重置表单
+      handleClose // 点击覆盖层触发事件
     };
   }
 };
@@ -199,6 +376,13 @@ export default {
 <style lang="scss" scoped>
 $customerHeight: 648px;
 .customer_main {
+}
+.modifyRailModule {
+  .el-drawer__container {
+    .el-drawer {
+      width: 50%;
+    }
+  }
 }
 .chunk_title {
   height: $customerHeight;
@@ -313,4 +497,14 @@ $customerHeight: 648px;
   right: 10px;
   top: 20px;
 }
+
+#addMap {
+  height: 70%;
+  width: 100%;
+}
+#modifyMap {
+  height: 70%;
+  width: 100%;
+}
+// modify form表单
 </style>
