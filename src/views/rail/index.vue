@@ -289,14 +289,6 @@ export default {
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
         return BMap;
       }).then((BMap) => {
-        /*let map = new BMap.Map("modifyMap"); // 创建Map实例
-        let point = new BMap.Point(modifyData.longitude, modifyData.latitude); // 创建点坐标
-        let marker = new BMap.Marker(point);
-        map.addOverlay(marker); //添加一个标注
-        map.centerAndZoom(point, 18); //添加初始化中心点及地图层级
-        map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
-        map.enableContinuousZoom(); //启用连续缩放效果，默认禁用*/
-
         // 百度地图API功能
         let map = new BMap.Map("modifyMap");
         let poi = new BMap.Point(modifyData.longitude, modifyData.latitude);
