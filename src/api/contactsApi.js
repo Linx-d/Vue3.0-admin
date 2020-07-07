@@ -161,8 +161,8 @@ export function listDepartmentByPid(data) {
 export function listUserLocationById(data) {
   return service.request({
     method: "post",
-    url: "/deviceData/listUserLocationById?page=1&limit=10",
-    data
+    url: "/deviceData/listUserLocationById?pageNum=" + 1 + "&pageSize=10&userId=" + data.userId
+    
   });
 }
 

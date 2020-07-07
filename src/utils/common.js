@@ -1,3 +1,5 @@
+import { EleResize } from "./esresize"; // 图表自适应
+
 /**
  *
  * 树状数组
@@ -67,8 +69,55 @@ export function getObjLevel(obj) {
  * contacts
  */
 export function switchModule(data, current) {
-  for(let key in data) {
+  for (let key in data) {
     data[key] = false;
   }
   data[current] = true;
+}
+
+/**
+ * echarts 图表自适应
+ * parms 1. dom 这个图表dom元素 , 2. 注册的图表
+ */
+export function adaptionEcharts(element, myChart) {
+  EleResize.on(element, () => {
+    console.log(EleResize);
+    myChart.resize();
+  });
+}
+
+export function adaptionEchartsV2(myChart) {
+  window.addEventListener("resize", () => {
+    myChart.resize();
+  });
+}
+
+/**
+ * 拷贝数组
+ * parms arr: 需要拷贝的数组,
+ * data: 被拷贝数组
+ */
+export function cloneArray(arr, data) {
+  arr.splice(0, arr.length);
+  let len = data.length;
+  if (len != 0) {
+    // 数组拷贝
+    data.forEach((item) => {
+      arr.push(item);
+    });
+  } else {
+    return;
+  }
+}
+
+/**
+ * 拷贝对象
+ * parms arr: 需要拷贝的对象,
+ * data: 被拷贝对象
+ */
+export function cloneObject(obj, data) {
+  let key = '';
+  for(key in obj) {
+    obj[key] = data[key];
+  }
 }
