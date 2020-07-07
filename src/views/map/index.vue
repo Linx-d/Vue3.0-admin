@@ -17,7 +17,7 @@
       </div>
       <div class="alanysis_bottom">
         <div id="device" class="alanysis_bottom_L"></div>
-        <div id="history" class="alanysis_bottom_R"></div>
+        <div id="history" :class="['alanysis_bottom_R']"></div>
       </div>
     </div>
     <!-- alanysis 数据分析模块 end -->
@@ -25,13 +25,14 @@
 </template>
 
 <script>
-import { Map } from "@/map";
-import { onMounted, computed } from "@vue/composition-api";
-import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
-import alarmOption from "./options/alarmOption.js"; //
-import deviceOption from "./options/deviceOption.js";
-import historyOption from "./options/historyOption.js";
-import onlineOption from "./options/onlineOption.js";
+import { Map } from "@/map"
+import { onMounted, computed } from "@vue/composition-api"
+import individuaction from "./custom_map_config/custom_map_config.json" // 个性化地图 所用样式文件
+import { adaptionEchartsV2 } from "@/utils/common" // 图表自适应
+import alarmOption from "./options/alarmOption.js" // 告警模块
+import deviceOption from "./options/deviceOption.js" // 设备模块
+import historyOption from "./options/historyOption.js" // 历史告警模块
+import onlineOption from "./options/onlineOption.js"  // 在线统计模块
 export default {
   name: "mapModule",
   setup(props, { root }) {
@@ -62,6 +63,7 @@ export default {
      */
     const online = () => {
       let myChart = root.$echarts.init(document.getElementById("online"));
+      adaptionEchartsV2(myChart);
       let option = onlineOption;
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
@@ -72,6 +74,7 @@ export default {
      */
     const alarm = () => {
       let myChart = root.$echarts.init(document.getElementById("alarm"));
+      adaptionEchartsV2(myChart);
       let option = alarmOption;
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
@@ -80,7 +83,8 @@ export default {
      * 设备统计 divice
      */
     const device = () => {
-      let myChart = root.$echarts.init(document.getElementById("device"));
+      let myChart = root.$echarts.init(document.getElementById("device")); 
+      adaptionEchartsV2(myChart);
       let option = deviceOption;
 
       // 使用刚指定的配置项和数据显示图表。
@@ -91,26 +95,27 @@ export default {
      */
     const history = () => {
       let myChart = root.$echarts.init(document.getElementById("history"));
+      adaptionEchartsV2(myChart);
       // 使用刚指定的配置项和数据显示图表。
       let option = historyOption;
-      myChart.on('updateAxisPointer', function (event) {
+      myChart.on("updateAxisPointer", function(event) {
         var xAxisInfo = event.axesInfo[0];
         if (xAxisInfo) {
-            var dimension = xAxisInfo.value + 1;
-            myChart.setOption({
-                series: {
-                    id: 'pie',
-                    label: {
-                        formatter: '{b}: {@[' + dimension + ']} ({d}%)'
-                    },
-                    encode: {
-                        value: dimension,
-                        tooltip: dimension
-                    }
-                }
-            });
+          var dimension = xAxisInfo.value + 1;
+          myChart.setOption({
+            series: {
+              id: "pie",
+              label: {
+                formatter: "{b}: {@[" + dimension + "]} ({d}%)"
+              },
+              encode: {
+                value: dimension,
+                tooltip: dimension
+              }
+            }
+          });
         }
-    });
+      });
       myChart.setOption(option);
     };
     /**
@@ -154,8 +159,6 @@ $alanysisMinHeight_Bottom: 227px;
     right: 0;
     width: 80%;
     height: 60%;
-    min-width: $mapMinWidth;
-    min-height: $mapMinHeight;
     @include webkit("transition", all 0.5s);
   }
 }
@@ -197,8 +200,6 @@ $alanysisMinHeight_Bottom: 227px;
   .alanysis_top {
     height: 60%;
     width: 20%;
-    min-width: $alanysisMinWidth_Top;
-    min-height: $alanysisMinHeight_Top;
     .alanysis_top_a {
       width: 100%;
       height: 50%;
@@ -211,8 +212,6 @@ $alanysisMinHeight_Bottom: 227px;
   .alanysis_bottom {
     height: 40%;
     width: 100%;
-    min-width: $alanysisMinWidth_Bottom;
-    min-height: $alanysisMinHeight_Bottom;
     .alanysis_bottom_L {
       width: 20%;
       height: 100%;

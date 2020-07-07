@@ -1,7 +1,7 @@
 <template>
   <footer class="frame_bottom">
     <nav class="frame_bottom_nav">
-      <a href="javascript:;">关于如泰</a>
+      <a href="http://www.chinautech.com/">关于如泰</a>
       <span class="frame_operation_dep">|</span>
       <a href="javascript:;">用户协议</a>
       <span class="frame_operation_dep">|</span>
@@ -12,8 +12,10 @@
       <a href="javascript:;">更新日志</a>
       <span class="frame_operation_dep">|</span>
       <a href="javascript:;">帮助中心</a>
+      <!--
       <span class="frame_operation_dep">|</span>
       <a href="javascript:;">中文</a>
+      -->
     </nav>
     <p>© 2009&nbsp;-&nbsp;2020&nbsp;Utech Inc. All Rights Reserved</p>
   </footer>
