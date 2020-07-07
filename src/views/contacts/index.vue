@@ -679,7 +679,8 @@ export default {
     onMounted(() => {
       console.log("挂载完成"); //addMemberFn selectNodepart
       /**在挂载完成之后在执行侦听器 */
-      watchEffect(
+      // 只能使用 watch, 不能使用 watchEffect
+      watch(
         () => filterText.value,
         val => {
           refs.tree.filter(val);
@@ -821,7 +822,7 @@ $contactsHeight: 592px;
         }
         .el-tree-node__children {
           max-width: 257px;
-          overflow: hidden;
+          //overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
