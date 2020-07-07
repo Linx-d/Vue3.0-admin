@@ -53,4 +53,7 @@ $corporationHeight: 655px;
     }
   }
 }
+.chunk_cnt {
+  padding: 0;
+}
 </style>
