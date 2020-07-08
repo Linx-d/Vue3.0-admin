@@ -135,9 +135,6 @@
     height: 14px;
   }
 }
-.mm_tabel th:last-child:before {
-  width: 0;
-}
 .mm_tabel td:last-child {
   width: 20px;
 }
@@ -190,4 +187,12 @@ tbody {
 
 .BMap_cpyCtrl, .anchorBL { // 隐藏百度地图商标
   display: none;
+}
+
+
+//* pagingConfig 分页配置
+.pagingConfig {
+  position: absolute;
+  right: 10px;
+  top: 20px;
 }
