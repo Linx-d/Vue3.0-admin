@@ -43,3 +43,20 @@ export function selectEmpDepRoleByEmpId(id){
         url:"/deptM/selectEmpDepRoleByEmpId?empId="+id
     })
 }
+
+
+export function editEmployee(data){
+    return service.request({
+        method:"POST",
+        url:"/employee/editEmployee",
+        data:data
+    })
+}
+
+export function editAdmin(data){
+    return service.request({
+        method:"POST",
+        url:"/employee/editAdmin",
+        data:data
+    })
+}
