@@ -20,10 +20,10 @@
           <el-input v-model="modifyData.railName"></el-input>
         </el-form-item>
         <el-form-item label="围栏地址" prop="railAddr" class="form-item">
-          <el-input v-model="modifyData.railAddr" disabled></el-input>
+          <el-input v-model="modifyData.railAddr"></el-input>
         </el-form-item>
-        <el-form-item label="围栏半径" prop="radius" class="form-item">
-          <el-input v-model="modifyData.radius" disabled></el-input>
+        <el-form-item label="围栏半径" class="form-item">
+          <p>{{ modifyData.radius }}&nbsp;m</p>
         </el-form-item>
         <el-form-item class="modifyBtn">
           <el-button type="primary" @click="submitForm('modifyData')">修改围栏</el-button>
@@ -93,7 +93,7 @@
                   <td :title="rail.railAddr">{{ rail.railAddr }}</td>
                   <td class="tdTool">
                     <a href="javascript:;" @click.stop="modifyRailFn(rail, index)">修改</a>
-                    <a href="javascript:;" @click.stop="delRailFn(rail.id, index)">删除</a>
+                    <a href="javascript:;" @click.stop="delRailFn(rail, index)">删除</a>
                   </td>
                 </tr>
               </tbody>
@@ -124,7 +124,9 @@ import {
   listRail,
   addRail,
   deleteRail,
-  listUserInfoByRail
+  listUserInfoByRail,
+  queryRailByName,
+  updateRail
 } from "@/api/railApi";
 import { reactive, ref, onMounted, watchEffect } from "@vue/composition-api";
 import { Message } from "element-ui";
@@ -148,7 +150,7 @@ export default {
     const addRailData = reactive({
       latitude: "29.490295",
       longitude: "106.48665",
-      radius: "200",
+      radius: 200,
       railName: "围栏6",
       railAddr: "万寿福居"
     });
@@ -173,57 +175,72 @@ export default {
     const modifyData = reactive({
       latitude: "",
       longitude: "",
-      radius: "",
+      radius: 0,
       railName: "",
       id: null,
       railAddr: ""
     });
     const modifyRailFn = (data, index) => {
       cloneObject(modifyData, data);
-      modifyBaiduMap();
       let id = data.id;
       modifyDrawer.value = true; // 显示修改围栏模块
       currentRailData.index = index; // 当前围栏的索引
-      listUserInfoByRail(id).then(res => {
-        let data = res.data.list ? res.data.list : res.data;
-        // 深拷贝数组
-        cloneArray(listByRailData, data);
+      listUserInfoByRail(id)
+        .then(res => {
+          let data = res.data.list ? res.data.list : res.data;
+          // 深拷贝数组
+          cloneArray(listByRailData, data);
+          return res;
+        })
+        .then(res => {
+          modifyBaiduMap();
+        });
+    };
+    // 自定义校验规则, 围栏名称不能重复
+    const validateRailName = (rule, value, callback) => {
+      queryRailByName(value).then(res => {
+        let code = res.code;
+        if (code != 0) {
+          callback(new Error("已经有这个围栏，请重新设置"));
+        } else {
+          callback(); // required 成功的回调
+        }
       });
     };
     const rules = reactive({
       railName: [
-        { required: true, message: "请输入围栏名称", trigger: "blur" },
-        { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+        { required: true, message: "请输入围栏名称" },
+        { min: 3, max: 7, message: "长度在 3 到 7 个字符" },
+        { validator: validateRailName }
       ],
-      railAddr: [{ required: true }],
-      radius: [{ required: true }]
+      railAddr: [
+        { required: true, message: "请输入围栏地址" },
+        { min: 1, max: 25, message: "长度在 1 到 25 个字符" }
+      ]
     });
     // 删除围栏
-    const delRailFn = (id, index) => {
-      let params = {
-        id
-      };
-      deleteRail(params).then(response => {
-        let code = response.code;
-        if (code === 0) {
-          railData.data.splice(index, 1);
-          selectRailList(railListPaging);
-          Message.success("删除成功");
-        } else {
-          Message.error(response.msg);
-        }
-      });
+    const delData = reactive({
+      latitude: "",
+      longitude: "",
+      radius: 0,
+      railName: "",
+      id: null
+    });
+    const delRailFn = (data, index) => {
+      cloneObject(delData, data);
+      delOpen(index);
     };
 
     // 提交
     const submitForm = formName => {
       refs[formName].validate(valid => {
-        if (valid) {
-          console.log(modifyData);
-          alert("submit!");
-        } else {
+        if (!valid) {
           console.log("error submit!!");
           return false;
+        } else {
+          console.log("success submit!!");
+          modifyOpen();
+          return true;
         }
       });
     };
@@ -284,27 +301,84 @@ export default {
       railListPaging.pageSize = val;
       selectRailList(railListPaging);
     };
-
     let modifyBaiduMap = () => {
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
-        return BMap;
-      }).then((BMap) => {
         // 百度地图API功能
         let map = new BMap.Map("modifyMap");
-        let poi = new BMap.Point(modifyData.longitude, modifyData.latitude);
-        map.centerAndZoom(poi, 16);
+        let point = new BMap.Point(modifyData.longitude, modifyData.latitude);
+        let geoc = new BMap.Geocoder();
+        let overlays = []; // 围栏
+        let markers = []; // 点聚合
+        map.centerAndZoom(point, 16);
         map.enableScrollWheelZoom();
-        let overlays = [];
+
+        /**点聚合
+         *
+         */
+        // 窗口配置
+        let opts = {
+          width: 250,
+          height: 80,
+          title: "个人信息",
+          enableMessage: true //设置允许信息窗发送短息
+        };
+        listByRailData.forEach(item => {
+          let point = new BMap.Point(item.longitude, item.latitude);
+          let marker = new BMap.Marker(point);
+          let content = item.userName;
+          map.addOverlay(marker);
+          addClickHandler(content, marker);
+          markers.push(marker);
+        });
+        function addClickHandler(content, marker) {
+          marker.addEventListener("click", function(e) {
+            openInfo(content, e);
+          });
+        }
+        function openInfo(content, e) {
+          let p = e.target;
+          let point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+          let infoWindow = new BMap.InfoWindow(content, opts); // 创建信息窗口对象
+          map.openInfoWindow(infoWindow, point); //开启信息窗口
+        }
+        //map.setViewport(markers);
+        // let markerClusterer = new BMapLib.MarkerClusterer(map, {
+        //   markers: markers
+        // });
+
+        var radius = modifyData.radius || 100;
+        var circle = new BMap.Circle(point, radius, {
+          strokeColor: "blue",
+          strokeWeight: 1,
+          strokeOpacity: 0.01,
+          fillColor: "#53aeff",
+          fillOpacity: 0.4
+        });
+        map.addOverlay(circle);
+        overlays.push(circle);
         let overlaycomplete = function(e) {
+          clearAll();
+          let point = e.overlay.point;
+          let radius = parseInt(e.overlay.xa);
+          modifyData.radius = radius;
+          geoc.getLocation(point, function(rs) {
+            let addComp = rs.addressComponents;
+            modifyData.railAddr =
+              addComp.province +
+              addComp.city +
+              addComp.district +
+              addComp.street +
+              addComp.streetNumber;
+          });
           overlays.push(e.overlay);
         };
         let styleOptions = {
-          strokeColor: "red", //边线颜色。
-          fillColor: "red", //填充颜色。当参数为空时，圆形将没有填充效果。
-          strokeWeight: 3, //边线的宽度，以像素为单位。
-          strokeOpacity: 0.8, //边线透明度，取值范围0 - 1。
-          fillOpacity: 0.6, //填充的透明度，取值范围0 - 1。
-          strokeStyle: "solid" //边线的样式，solid或dashed。
+          strokeColor: "blue", //边线颜色。
+          fillColor: "#53aeff", //填充颜色。当参数为空时，圆形将没有填充效果。
+          strokeWeight: 1, //边线的宽度，以像素为单位。
+          strokeOpacity: 0.01, //边线透明度，取值范围0 - 1。
+          fillOpacity: 0.4 //填充的透明度，取值范围0 - 1。
+          //strokeStyle: "solid" //边线的样式，solid或dashed。
         };
         //实例化鼠标绘制工具
         let drawingManager = new BMapLib.DrawingManager(map, {
@@ -313,7 +387,7 @@ export default {
           drawingToolOptions: {
             anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
             offset: new BMap.Size(5, 5), //偏离值
-            drawingModes: [BMAP_DRAWING_CIRCLE] 
+            drawingModes: [BMAP_DRAWING_CIRCLE]
           },
           circleOptions: styleOptions, //圆的样式
           polylineOptions: styleOptions, //线的样式
@@ -322,12 +396,12 @@ export default {
         });
         //添加鼠标绘制工具监听事件，用于获取绘制结果
         drawingManager.addEventListener("overlaycomplete", overlaycomplete);
-        function clearAll() {
+        const clearAll = () => {
           for (let i = 0; i < overlays.length; i++) {
             map.removeOverlay(overlays[i]);
           }
           overlays.length = 0;
-        }
+        };
       });
     };
 
@@ -341,6 +415,114 @@ export default {
         map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
         map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
       });
+    };
+
+    /**
+     * 弹出框
+     */
+    // 修改围栏确认框
+    const modifyOpen = () => {
+      const h = root.$createElement;
+      root
+        .$msgbox({
+          title: "修改围栏",
+          message: h("p", null, [
+            h("span", null, "修改围栏信息")
+            //h("i", { style: "color: teal" }, "VNode")
+          ]),
+          showCancelButton: true,
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "执行中...";
+              setTimeout(() => {
+                done();
+                setTimeout(() => {
+                  instance.confirmButtonLoading = false;
+                }, 300);
+              }, 1000);
+            } else {
+              done();
+            }
+          }
+        })
+        .then(action => {
+          updateRail(modifyData).then(res => {
+            let code = res.code;
+            if (code === 0) {
+              selectRailList(railListPaging);
+              root.$message({
+                type: "success",
+                message: "修改成功"
+              });
+            } else {
+              root.$message({
+                type: "error",
+                message: res.msg
+              });
+            }
+          });
+        }).catch(() => {
+          root.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });;
+    };
+
+    // 删除围栏确认框
+    const delOpen = (index) => {
+      const h = root.$createElement;
+      root
+        .$msgbox({
+          title: "删除围栏",
+          message: h("p", null, [
+            h("span", null, `删除"${delData.railName}"围栏信息`)
+            //h("i", { style: "color: teal" }, "VNode")
+          ]),
+          showCancelButton: true,
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "执行中...";
+              setTimeout(() => {
+                done();
+                setTimeout(() => {
+                  instance.confirmButtonLoading = false;
+                }, 300);
+              }, 1000);
+            } else {
+              done();
+            }
+          }
+        })
+        .then(action => {
+          deleteRail(delData).then(res => {
+            let code = res.code;
+            if (code === 0) {
+              railData.data.splice(index, 1);
+              selectRailList(railListPaging);
+              root.$message({
+                type: "success",
+                message: "删除成功"
+              });
+            } else {
+              root.$message({
+                type: "error",
+                message: res.msg
+              });
+            }
+          });
+        }).catch(() => {
+          root.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });;
     };
 
     onMounted(() => {});
@@ -360,7 +542,8 @@ export default {
       rules, // 校验规则
       submitForm, // 提交表单
       resetForm, // 重置表单
-      handleClose // 点击覆盖层触发事件
+      handleClose, // 点击覆盖层触发事件
+      modifyOpen
     };
   }
 };
