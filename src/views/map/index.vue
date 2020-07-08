@@ -55,7 +55,7 @@ export default {
         map.centerAndZoom(point, 13); // 添加初始化中心点及地图层级
         map.enableScrollWheelZoom(); // 开启鼠标滚轮缩放功能。仅对PC上有效
         map.enableContinuousZoom(); // 启用连续缩放效果，默认禁用
-        map.setMapStyleV2({ styleJson: individuaction }); // 个性化地图
+        //map.setMapStyleV2({ styleJson: individuaction }); // 个性化地图
       });
     };
     /**
