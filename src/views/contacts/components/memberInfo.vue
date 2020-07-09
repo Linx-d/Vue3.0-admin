@@ -130,7 +130,7 @@ export default {
                 optionToContent: function(opt) {
                   let axisData = opt.xAxis[0].data;
                   let table =
-                    '<table style="width:70%;text-align:left"><tbody><tr>' +
+                    '<table style="width:70%;text-align:left" class="tmp_table"><tbody><tr>' +
                     "<td>时间</td>" +
                     "<td>温度</td>" +
                     //+ '<td>' + series[1].name + '</td>'
@@ -139,7 +139,7 @@ export default {
                     if (newArr_tmp[i] >= 37.3) {
                       table += '<tr style="color: red;">';
                     } else {
-                      table += '<tr">';
+                      table += '<tr>';
                     }
                     table +=
                       "<td>" +
@@ -419,5 +419,9 @@ $contactsHeight: 592px;
 }
 .weui-cell_access .weui-cell__ft {
   padding-right: 0;
+}
+.tmp_table {
+  width: 70%;
+  text-align: left;
 }
 </style>
