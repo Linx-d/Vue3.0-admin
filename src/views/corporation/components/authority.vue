@@ -3,8 +3,39 @@
     <div class="list">
       <div class="toolbar">
         <el-row>
-          <el-button style="width:70%;" size="mini">添加管理员</el-button>
+          <el-button style="width:70%;" size="mini" @click="showEmployees()">添加管理员</el-button>
         </el-row>
+        <el-dialog width="900px" title="选择用户" :visible.sync="dialogTableVisible" center>
+          <el-table :data="employeesNotRole.list">
+            <el-table-column property="name" label="姓名" width="150"></el-table-column>
+            <el-table-column property="tel" label="电话" width="200"></el-table-column>
+            <el-table-column property="gmtCreate" label="创建时间"></el-table-column>
+            <el-table-column
+              fixed="right"
+              label="操作"
+              width="100">
+              <template slot-scope="scope">
+                <el-button
+                  @click.native.prevent="chooseEmployee(scope.row.id)"
+                  type="text"
+                  size="small">
+                  选择
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div slot="footer" class="dialog-footer">
+            <el-pagination
+              background
+              layout="prev, pager, next"
+              :current-page.sync="employeesNotRole.pageNum"
+              :page-size.sync="employeesNotRole.pageSize"
+              :total="employeesNotRole.total"
+              @current-change="showEmployees()"
+              >
+            </el-pagination>
+          </div>
+        </el-dialog>
       </div>
       <el-menu >
         <el-submenu
@@ -31,7 +62,8 @@
     </div>
     <div class="detail" v-if="employee.id !=null">
       <div class="cnt_tool">
-        <a href="javascript:;" class="memberLink"  @click="edit()" v-if="!isEdit&&employee.role.id!=1">编辑用户</a>
+        <a href="javascript:;" class="memberLink"  @click="edit()" v-if="!isEdit&&employee.role.id!=1">编辑管理员</a>
+        <a href="javascript:;" class="memberLink"  @click="delManager()" v-if="!isEdit&&employee.role.id!=1">删除管理员</a>
       </div>
       <el-image :src="employee.photo" class="photo">
       </el-image>
@@ -97,6 +129,7 @@
 </template>
 <script>
 import { reactive, ref, watchEffect } from "@vue/composition-api";
+import { cloneObjectToNull } from "@/utils/common";
 import {
   listEmployee,
   listAllRole,
@@ -105,19 +138,19 @@ import {
   selectEmpDepRoleByEmpId,
   listAllDepartment,
   editAdmin,
-  editEmployee
+  editEmployee,
+  listNotRoleEmployee
 } from "@/api/employeeApi";
 import { all } from 'cookie_js';
 export default {
   name: "authority",
   setup(props, { root }) {
     /**
-     * 修改后的role
+     * 员工列表窗口
      */
-    let roleId = ref('2');
-
+    let dialogTableVisible = ref(false);
     /**
-     * 部门列表显示
+     * 部门列表窗口
      */
     let dialogVisible = ref(false);
     /**
@@ -132,16 +165,19 @@ export default {
       pageSize: 50,
     });
     /**
+     * 修改后的role
+     */
+    let roleId = ref('2');
+    /**
      * 角色集合
      */
     let roleList = reactive([]);
-
     /**
      * 拥有的部门
      */
     let departmentList = reactive([]) ;
     /**
-     * 部门集合
+     * 所有集合
      */
     let allDepartment =reactive([
       {
@@ -156,10 +192,21 @@ export default {
       }
     ]);
     /**
-     * 员工信息集合
+     * 员工集合
      */
-    let employees = reactive({});
-
+    let employees = reactive([]);
+    /**
+     * 无角色员工集合
+     */
+    let employeesNotRole = reactive({
+      pageNum:1,
+      pageSize:2,
+      list:[
+        {
+          id:null
+        }
+      ]
+    });
     
     /**
      * 员工信息详情
@@ -185,22 +232,24 @@ export default {
     };
 
 
-    
+    /**
+     * 查询所有部门  
+     */    
     const queryAllDepartment=()=>{
-      console.log("================================queryAllDepartment===============================")
       allDepartment.splice(0,allDepartment.length);
       listAllDepartment().then((res)=>{
         if(res.code==0){
           let data = res.data;
           let existDepartments = employee.departments;
-            data.forEach(department => {
+          data.forEach(department => {
+            if(department.pid!=null&&department.pid!=0){
               let dept = {
-                 key:department.id.toString(),
-                 label:department.name
+                  key:department.id.toString(),
+                  label:department.name
               }
               allDepartment.push(dept);
-            });
-            console.log(allDepartment,"allDepartment");
+            }
+          });
         }
       })
     }
@@ -210,6 +259,8 @@ export default {
      * 查询所有角色及拥有该角色的员工
      */
     const queryAllRole = () => {
+      roleList.splice(0,roleList.length);
+      employee.id=null;
       listAllRole()
         .then((res) => {
           return res.data;
@@ -223,38 +274,6 @@ export default {
           });
         });
     };
-    /**
-     * 提交修改
-     */
-    const submit=()=>{
-      const that = this;
-      if(confirm("确定提交修改？")){
-        let data = {
-            id:employee.id,
-            roleId:roleId.value,
-            departments:departmentList
-          }
-          console.log(roleId.value==2||employee.role.id==2,roleId,"roleId",employee.role.id)
-        if(roleId.value==2||employee.role.id==2){
-          editAdmin(data).then(res=>{
-            if(res.code==0){
-              root.$alert('提交成功。', '成功', {confirmButtonText: '确定'});
-            }else{
-              root.$alert(res.msg, '失败', {confirmButtonText: '确定'});
-            }
-          })
-        }else{
-          editEmployee(data).then(res=>{
-            if(res.code==0){
-              root.$alert('提交成功。', '成功', {confirmButtonText: '确定'});
-            }else{
-              root.$alert(res.msg, '失败', {confirmButtonText: '确定'});
-            }
-          })
-        }
-        isEdit.value=!isEdit.value;
-      }
-    }
     /**
      * 切换为修改界面
      */
@@ -293,7 +312,11 @@ export default {
               });
             });
             data.departments = departments;
-            roleId.value = data.role.id.toString();
+            let role =  data.role;
+            if(data.role==null){
+              data.role={id:3};
+            }
+            roleId.value=data.role.id.toString(); 
             for (const key in data) {
               if (data.hasOwnProperty(key)) {
                 employee[key] = data[key];
@@ -311,7 +334,6 @@ export default {
     const chooseDepartments =(arg)=>{
       departmentList = arg;
       employee.departments.splice(0,employee.departments.length);
-      console.log(departmentList,"departmentList")
       departmentList.forEach(key=>{
         allDepartment.forEach(department=>{
             if(department.key==key){
@@ -321,12 +343,114 @@ export default {
       })
       dialogVisible.value=false;
     }
+    /**
+     * 显示部门列表
+     */
     const showDepartments=()=>{
       dialogVisible.value=!dialogVisible.value;
     }
+    /**
+     * 查询所有角色
+     */
     queryAllRole();
+    /**
+     * 取消修改
+     */
     const cancel=()=>{
        isEdit.value=false;
+    }
+    /**
+     * 显示没有角色的员工集合
+     */
+    const showEmployees=()=>{
+      listNotRoleEmployee(employeesNotRole.pageNum, employeesNotRole.pageSize).then(res=>{
+          if(res.code==0){
+              let notRoleEmployees = res.data;
+              cloneObjectToNull(notRoleEmployees,employeesNotRole);
+              // notRoleEmployees.forEach(notRoleEmployee=>{
+              //   employeesNotRole.push(notRoleEmployees);
+              // })
+              // employeesNotRole =reactive(res.data.list)
+              dialogTableVisible.value =true;
+          }else{
+            root.$alert(res.msg, '错误', {confirmButtonText: '确定'});
+          }
+      })
+      
+    }
+
+    /**
+     * 选择员工
+     */
+    const chooseEmployee =(id)=>{
+      if(confirm("确定将该用户添加为管理员？")){
+        dialogTableVisible.value= false;
+        choose(id);
+        isEdit.value=true;
+      }
+    }
+    /**
+     * 提交修改
+     */
+    const submit=()=>{
+      const that = this;
+      if(confirm("确定提交修改？")){
+        let data = {
+            id:employee.id,
+            roleId:roleId.value,
+            departments:departmentList
+          }
+        if(roleId.value==2||employee.role.id==2){
+          editAdmin(data).then(res=>{
+            if(res.code==0){
+              root.$alert('提交成功。', '成功', {confirmButtonText: '确定'});
+              queryAllRole()
+            }else{
+              root.$alert(res.msg, '失败', {confirmButtonText: '确定'});
+            }
+          })
+        }else{
+          editEmployee(data).then(res=>{
+            if(res.code==0){
+              root.$alert('提交成功。', '成功', {confirmButtonText: '确定'});
+              queryAllRole()
+            }else{
+              root.$alert(res.msg, '失败', {confirmButtonText: '确定'});
+            }
+          })
+        }
+        isEdit.value=!isEdit.value;
+      }
+    }
+    /**
+     * 删除管理员
+     */
+    const delManager = ()=>{
+      if(confirm("确定删除该管理员？")){
+        let data = {
+            id:employee.id,
+          }
+        if(roleId.value==2||employee.role.id==2){
+          editAdmin(data).then(res=>{
+            if(res.code==0){
+              root.$alert('删除成功。', '成功', {confirmButtonText: '确定'});
+              queryAllRole()
+            }else{
+              root.$alert(res.msg, '失败', {confirmButtonText: '确定'});
+            }
+          })
+        }else{
+          editEmployee(data).then(res=>{
+            if(res.code==0){
+              root.$alert('删除成功。', '成功', {confirmButtonText: '确定'});
+              queryAllRole()
+            }else{
+              root.$alert(res.msg, '失败', {confirmButtonText: '确定'});
+            }
+          })
+        }
+        isEdit.value=!isEdit.value;
+      }
     }
     return {
       employees,
@@ -342,6 +466,11 @@ export default {
       departmentList,
       cancel,
       chooseDepartments,
+      dialogTableVisible,
+      employeesNotRole,
+      showEmployees,
+      chooseEmployee,
+      delManager,
       roleId
     };
   },
