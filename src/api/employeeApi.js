@@ -60,3 +60,13 @@ export function editAdmin(data){
         data:data
     })
 }
+
+export function listNotRoleEmployee(pageNum,pageSize){
+    let data = new URLSearchParams();
+    data.append("pageNum",pageNum);
+    data.append("pageSize",pageSize);
+    return service.request({
+        method:"GET",
+        url:"/employee/listNotRoleEmployee?pageNum="+pageNum+"&pageSize="+pageSize
+    })
+}
