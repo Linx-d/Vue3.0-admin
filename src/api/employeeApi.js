@@ -53,3 +53,29 @@ export function getLoginEmployee(){
         url:"/employee/getLoginEmployee"
     })
 }
+
+export function editEmployee(data){
+    return service.request({
+        method:"POST",
+        url:"/employee/editEmployee",
+        data:data
+    })
+}
+
+export function editAdmin(data){
+    return service.request({
+        method:"POST",
+        url:"/employee/editAdmin",
+        data:data
+    })
+}
+
+export function listNotRoleEmployee(pageNum,pageSize){
+    let data = new URLSearchParams();
+    data.append("pageNum",pageNum);
+    data.append("pageSize",pageSize);
+    return service.request({
+        method:"GET",
+        url:"/employee/listNotRoleEmployee?pageNum="+pageNum+"&pageSize="+pageSize
+    })
+}

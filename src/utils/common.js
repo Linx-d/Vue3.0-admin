@@ -121,3 +121,34 @@ export function cloneObject(obj, data) {
     obj[key] = data[key];
   }
 }
+
+/**
+ * 拷贝对象
+ * @parms source: 原对象,
+ * @parms target: 目标对象
+ */
+export function cloneObjectToNull(source, target) {
+  let key = '';
+  for(key in source) {
+    target[key] = source[key];
+  }
+}
+
+export function getParemter(key){
+    const url =  window.location.href;
+    if(url.indexOf(key)==-1){
+      return null;
+    }
+    if(url.indexOf("?")!=-1){
+      let str = url.substr(url.indexOf("?")+1);
+      let params = str.split("&");
+      let value =null;
+      params.forEach(param=>{
+        if(param.split("=")[0]==key){
+          value =  param.split("=")[1];
+          return;
+        }
+      })
+      return value;
+    }
+}
