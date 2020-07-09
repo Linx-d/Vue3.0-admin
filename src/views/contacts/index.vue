@@ -4,7 +4,7 @@
       <div class="chunk_title">
         <div class="chunk_title_top">
           <el-input class="search" placeholder="搜索部门" v-model="filterText"></el-input>
-          <a href="javascript:;" class="addChildMember">
+          <a href="javascript:;" class="addChildMember" v-show="false">
             <i>+</i>
           </a>
         </div>
@@ -187,7 +187,8 @@ export default {
     let contactsModule = reactive({
       memberList: true, // 成员列表
       memberInfo: false, // 成员信息
-      memberModify: false // 修改信息
+      memberModify: false, // 修改信息
+      status: false
     });
     let currentMemberInfo = reactive({
       address: "山西省太原市万柏林区a",
@@ -290,21 +291,29 @@ export default {
     const append = data => {
       addDepart(form.name, data.id).then(res => {
         let resData = res.data;
-        const newChild = {
-          id: resData.id,
-          pid: resData.pid,
-          label: resData.name,
-          displayOrder: resData.displayOrder,
-          children: []
-        };
-        if (!data.children) {
-          set(data, "children", []);
+        let code = res.code;
+        if (code === 0) {
+          const newChild = {
+            id: resData.id,
+            pid: resData.pid,
+            label: resData.name,
+            displayOrder: resData.displayOrder,
+            children: []
+          };
+          if (!data.children) {
+            set(data, "children", []);
+          }
+          data.children.push(newChild);
+          root.$message({
+            message: "成功添加部门",
+            type: "success"
+          });
+        } else {
+          root.$message({
+            message: res.msg,
+            type: "error"
+          });
         }
-        data.children.push(newChild);
-        root.$message({
-          message: "成功添加部门",
-          type: "success"
-        });
       });
     };
 
@@ -409,33 +418,6 @@ export default {
     selectAllDepart();
 
     /**
-     * 查询未分组用户
-     */
-    let ungrouped = reactive({
-      pageNum: 1,
-      pageSize: 20,
-      value: false,
-      data: []
-    });
-    const noDepart = () => {
-      selectNodepart(ungrouped.pageNum, ungrouped.pageSize).then(res => {
-        let data = res.data.list ? res.data.list : res.data,
-          len = data.length;
-        if (len !== 0) {
-          let i = 0;
-          for (i; i < len; i++) {
-            let user = data[i];
-          }
-          ungrouped.data = data; // 将未分组用户存入 ungrouped.data 中
-        } else {
-          //暂无为分组用户
-          return;
-        }
-      });
-    };
-    noDepart();
-
-    /**
      * 添加部门
      */
     const addDepart = (name, pid) => {
@@ -523,7 +505,6 @@ export default {
      * type: 添加部门
      */
     const dialogShow = (data, node) => {
-      console.log(data, node);
       let len = node.level;
       if (len > 14) {
         root.$message({
@@ -542,9 +523,15 @@ export default {
     const dialogHide = () => {
       let inputTxt = form.name,
         len = inputTxt.length;
-      if (len !== 0) {
+      if (len > 0) {
         dialogFormVisible.value = false;
         append(childData);
+      } else if (len > 7) {
+        addStatus.value = true;
+        root.$message({
+          message: "部门名称长度不能大于7",
+          type: "warning"
+        });
       } else {
         addStatus.value = true;
         root.$message({

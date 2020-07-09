@@ -65,8 +65,7 @@ export function updateDepartment(data) {
 export function addMember(data) {
   return service.request({
     method: "post",
-    url: "/dept/addMember", //url: "/dept/addMember?userId="+data.userId+"&depId="+data.depId
-    data,
+    url: "/dept/addMember?userId="+data.userId+"&depId="+data.depId //url: "/dept/addMember",
   });
 }
 
