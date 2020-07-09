@@ -52,9 +52,6 @@ import { reactive, onMounted, watchEffect } from "@vue/composition-api";
 export default {
   name: "corporationInfo",
   setup() {
-    let params = reactive({
-      corpId: "ww2e7b5f3c87c34c17"
-    });
     let companyInfo = reactive({
       id: "ww2e7b5f3c87c34c17",
       name: "测试",

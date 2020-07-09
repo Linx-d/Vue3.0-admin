@@ -99,7 +99,7 @@ export function updateRail(data) {
   return service.request({
     method: "post",
     url: "/rail/updateRail",
-    data,
+    data
   });
 }
 
@@ -167,14 +167,13 @@ export function listUserByNoRail(data) {
  * 查询围栏名称是否可用
  *
  * @export
- * @param {railName: '围栏1'}
+ * @param railName: 围栏1
  * @returns data
  */
 export function queryRailByName(data) {
-  let railName = data.railName;
   return service.request({
     method: "post",
-    url: "/rail/queryRailByName?railName=" + railName
+    url: "/rail/queryRailByName?railName=" + data
   });
 }
 

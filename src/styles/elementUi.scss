@@ -31,11 +31,6 @@
       position: relative;
       
     }
-    .el-tree-node__children {
-      .is-current {
-        //background-color: red !important;
-      }
-     }
     .tree-text {
       display: inline-block;
       max-width: 150px;
@@ -77,12 +72,12 @@
  * rail
  */
  .modifyRailModule {
-   height: 950px;
+   //height: 950px;
  }
 // modify form表单
 .modify_ruleForm {
   padding: 20px 20px 0 0;
-  .modifyBtn {
+  .railBtn {
     margin-top: 20px;
   }
 }

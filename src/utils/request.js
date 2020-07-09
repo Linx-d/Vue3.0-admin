@@ -36,7 +36,7 @@ service.interceptors.response.use(
     let data = response.data;
     if (data.code !== 0) {
       //console.log(data);
-      //Message.error(data.msg);
+      Message.error(data.msg);
       return Promise.resolve(data);  //return Promise.reject(data);
     } else {
       //return response; //所有相应数据
@@ -49,6 +49,7 @@ service.interceptors.response.use(
     let status = error.response.status;
     if(status==403){
       const url = window.location.href;
+      Message.error("请先登录！");
       window.location.href="http://utech.teacha.top/api/qywx/login?redirectUrl="+url;
     }
     // 对响应错误做点什么

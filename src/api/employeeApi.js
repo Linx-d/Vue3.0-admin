@@ -44,6 +44,15 @@ export function selectEmpDepRoleByEmpId(id){
     })
 }
 
+/**获取当前登录的员工信息
+ * 
+ */
+export function getLoginEmployee(){
+    return service.request({
+        method:"GET",
+        url:"/employee/getLoginEmployee"
+    })
+}
 
 export function editEmployee(data){
     return service.request({

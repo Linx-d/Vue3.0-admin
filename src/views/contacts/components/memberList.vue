@@ -3,7 +3,18 @@
     <div class="cnt_top">
       <div class="cnt_top_l">
         <span>{{ currentDepart.label }}</span>
-        <span>({{ currentDepart.length }}人)</span>
+        <span>({{ memberData.total }}人)</span>
+      </div>
+      <div class="block" v-show="changeModule.status">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :page-sizes="[15, 20, 30, 40]"
+          :page-size="memberListPaging.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="memberData.total"
+          class="pagingConfig"
+        ></el-pagination>
       </div>
       <div class="cnt_top_r">
         <a href="javascript:;"></a>
@@ -11,31 +22,38 @@
       </div>
     </div>
     <div class="cnt_bottom">
-      <div class="has_member" v-if="changeModule.status">
+      <div class="has_member" v-show="changeModule.status">
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;" @click="addMember">添加成员</a>
-          <a class="memberLink" href="javascript:;" @click="delMember">删除</a>
+          <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
         </div>
         <table class="memberTable mm_tabel">
           <thead>
             <tr>
+              <!--
               <th>
                 <input type="checkbox" name="memberChooseAll" class="memberAllSlect" />
               </th>
+              -->
               <th>姓名</th>
               <th>性别</th>
               <th>年龄</th>
               <th>温度</th>
               <th>电话</th>
               <th>地址</th>
-              <th></th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="member in memberData" :key="member.id" @click="compileTool(member)">
+            <tr
+              v-for="(member, index) in memberData.data"
+              :key="member.id"
+              @click.stop="compileTool(member)"
+            >
+              <!--
               <td @click.stop="checkChild">
                 <input type="checkbox" name="memberChoose" class="memberSelect" />
               </td>
+              -->
               <td :title="member.name">{{ member.name }}</td>
               <td :title="member.sex">{{ member.sex }}</td>
               <td :title="member.age">{{ member.age }}</td>
@@ -43,17 +61,17 @@
               <td :title="member.tel">{{ member.tel }}</td>
               <td :title="member.address">{{ member.address }}</td>
               <td class="tdTool">
-                <svg-icon class="tdmenu_right" iconClass="compile_info"></svg-icon>
+                <a href="javascript:;" @click.stop="compileTool(member)">修改</a>
+                <a href="javascript:;" @click.stop="delMember(member.userId, index)">移除</a>
               </td>
             </tr>
           </tbody>
         </table>
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;" @click="addMember">添加成员</a>
-          <a class="memberLink" href="javascript:;" @click="delMember">删除</a>
+          <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
         </div>
       </div>
-      <div class="no_member" v-if="changeModule.null">
+      <div class="no_member" v-show="!changeModule.status">
         <div class="no_member_top">
           <svg-icon iconClass="member" class="member"></svg-icon>
           <p>当前部门无任何成员</p>
@@ -63,16 +81,42 @@
         </div>
       </div>
     </div>
+    <el-dialog title="未分组成员" :visible.sync="dialogTableVisible.status">
+      <el-table
+        ref="multipleTable"
+        :data="ungrouped.data"
+        tooltip-effect="dark"
+        style="width: 100%"
+        height="300px"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="70"></el-table-column>
+        <el-table-column label="姓名" width="150">
+          <template slot-scope="scope">{{ scope.row.name }}</template>
+        </el-table-column>
+        <el-table-column prop="tel" label="电话" width="150"></el-table-column>
+        <el-table-column prop="address" label="地址" show-overflow-tooltip></el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="toggleSelection()">取 消</el-button>
+        <el-button type="primary" @click="addMemberList">添 加</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { onMounted, computed, ref, watchEffect } from "@vue/composition-api";
+import { onMounted, reactive, watchEffect } from "@vue/composition-api";
 import { switchModule } from "@/utils/common";
 import {
   listUserLocationById,
-  listDeviceAlarmInfoByUserId
+  listDeviceAlarmInfoByUserId,
+  removeMember,
+  listUserByDepartment,
+  listUserByNoDepartment,
+  addMember
 } from "@/api/contactsApi";
 import { Message } from "element-ui";
+import { cloneArray } from "@/utils/common";
 export default {
   name: "memberList",
   props: {
@@ -82,8 +126,8 @@ export default {
       default: () => {} // default值 需要使用箭头函数回调
     },
     memberData: {
-      type: Array,
-      default: () => []
+      type: Object,
+      default: () => {}
     },
     contactsModule: {
       type: Object,
@@ -96,29 +140,46 @@ export default {
     tmpHistory: {
       type: Object,
       default: () => {}
+    },
+    memberListPaging: {
+      type: Object,
+      default: () => {}
     }
   },
-  setup(props, { root }) {
-    let currentDepart = props.currentDepart; // 当前部门信息
-    let changeModule = computed({
-      get: () => {
-        // 有无成员显示不同模块
-        let len = props.memberData.length;
-        if (len !== 0) {
-          return { status: true, null: false };
-        } else {
-          return { status: false, null: true };
-        }
-      },
-      set: () => {}
+  setup(props, { root, refs }) {
+    let changeModule = reactive({
+      status: true
+    });
+    const dialogTableVisible = reactive({
+      status: false
+    });
+    let multipleSelection = reactive([]);
+    const toggleSelection = rows => {
+      dialogTableVisible.status = false;
+      if (rows) {
+        rows.forEach(row => {
+          refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        refs.multipleTable.clearSelection();
+      }
+    };
+    const handleSelectionChange = val => {
+      multipleSelection = val;
+    };
+    watchEffect(() => {
+      if (props.memberData.total === 0) {
+        changeModule.status = false;
+      } else {
+        changeModule.status = true;
+      }
     });
     /**
      *  tr click事件
      */
     const compileTool = data => {
       // 切换模块
-      let contactsModule = props.contactsModule;
-      switchModule(contactsModule, "memberInfo");
+      switchModule(props.contactsModule, "memberInfo");
 
       // 获得成员个人信息
       let currentMemberInfo = props.currentMemberInfo;
@@ -132,9 +193,7 @@ export default {
         userId: currentMemberInfo.userId
       };
       listUserLocationById(currentObj).then(response => {
-        let array = Array.isArray(response.data.list)
-          ? response.data.list
-          : response.data; // 服务器与local切换
+        let array = response.data.list ? response.data.list : response.data; // 服务器与local切换
         let newArr_time = [],
           newArr_tmp = [];
         array.forEach(item => {
@@ -149,12 +208,15 @@ export default {
       let currentArray = [currentMemberInfo.userId];
       listDeviceAlarmInfoByUserId(currentArray).then(response => {
         let data = response.data[0] ? response.data[0] : [];
-        for(let key in data) {
+        for (let key in data) {
           currentMemberInfo[key] = data[key];
         }
-        for(let key in currentMemberInfo) {
-          let verify = currentMemberInfo[key] == null || currentMemberInfo[key] == undefined || currentMemberInfo[key] == ''; // 验证值是否为空
-          if(verify) {
+        for (let key in currentMemberInfo) {
+          let verify =
+            currentMemberInfo[key] === null ||
+            currentMemberInfo[key] === undefined ||
+            currentMemberInfo[key] === ""; // 验证值是否为空
+          if (verify) {
             currentMemberInfo[key] = "暂无数据";
           }
         }
@@ -168,28 +230,232 @@ export default {
     /**
      * 添加成员
      */
-    const addMember = () => {
-      let verifyTopDepart = currentDepart.id !== currentDepart.topId; // 验证是否为顶级部门
-      if (!verifyTopDepart) {
-        Message.warning("顶级部门不能添加成员"); // 顶级部门不能添加成员
-      }
+    /**
+     * 查询未分组用户
+     */
+    let ungrouped = reactive({
+      pageNum: 1,
+      pageSize: 15,
+      value: false,
+      data: []
+    });
+    const addMemberBtn = () => {
+      ungrouped.data.splice(0, ungrouped.data.length);
+      dialogTableVisible.status = true;
+      noDepart(ungrouped.pageNum, ungrouped.pageSize);
     };
+    const noDepart = (pageNum, pageSize) => {
+      listUserByNoDepartment(pageNum, pageSize).then(res => {
+        let data = res.data.list ? res.data.list : res.data,
+          len = data.length;
+        if (len !== 0) {
+          data.forEach(item => {
+            ungrouped.data.push(item);
+          });
+        } else {
+          //暂无为分组用户
+          return;
+        }
+      });
+    };
+    const addMemberList = () => {
+      addMemberOpen();
+    };
+
     /**
      * 移除成员
      */
-    const delMember = () => {
-      let verifyTopDepart = currentDepart.id !== currentDepart.topId; // 验证是否为顶级部门
-      if (!verifyTopDepart) {
-        Message.warning("顶级部门不能移除成员"); // 顶级部门不能移除成员
-      }
+    const delMember = (id, index) => {
+      delMemberOpen(id, index);
     };
+
+    /**当前页变动时候触发的事件 */
+    const handleCurrentChange = val => {
+      props.memberListPaging.pageNum = val;
+      selectChildMember(props.memberListPaging);
+    };
+    const handleSizeChange = val => {
+      props.memberListPaging.pageSize = val;
+      selectChildMember(props.memberListPaging);
+    };
+    /**
+     * 查询部门成员
+     */
+    const selectChildMember = memberListPaging => {
+      let params = new URLSearchParams(); // text post 提交
+      params.append("id", memberListPaging.id);
+      params.append("pageNum", memberListPaging.pageNum);
+      params.append("pageSize", memberListPaging.pageSize);
+      listUserByDepartment(params).then(res => {
+        props.memberData.data.splice(0, props.memberData.data.length);
+        let data = res.data.list ? res.data.list : res.data;
+
+        let size = res.data.size,
+          hasPreviousPage = res.data.hasPreviousPage;
+        let verify = res.data.total != 0 ? true : false;
+        if (size === 0) {
+          if (hasPreviousPage) {
+            props.memberListPaging.pageNum--;
+            selectChildMember(props.memberListPaging);
+          } else {
+            changeModule.status = verify;
+          }
+        } else {
+          changeModule.status = verify;
+        }
+
+        props.memberData.data.total = res.data.total;
+        props.currentDepart.length = data.length;
+        props.memberData.total = res.data.total;
+        let i = 0,
+          len = data.length;
+        for (i; i < len; i++) {
+          data[i].temperature = Number(data[i].temperature).toFixed(1);
+          props.memberData.data.push(data[i]);
+        }
+        //[ ... memberData.data] = data;
+      });
+    };
+
+    /**弹出框
+     *
+     */
+
+    // 移除成员确认框
+    const delMemberOpen = (id, index) => {
+      let item = props.memberData.data[index];
+      const h = root.$createElement;
+      root
+        .$msgbox({
+          title: "移除成员",
+          message: h("p", null, [
+            h("span", null, `移除"${item.name}"`)
+            //h("i", { style: "color: teal" }, "VNode")
+          ]),
+          showCancelButton: true,
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "执行中...";
+              setTimeout(() => {
+                done();
+                setTimeout(() => {
+                  instance.confirmButtonLoading = false;
+                }, 300);
+              }, 1000);
+            } else {
+              done();
+            }
+          }
+        })
+        .then(action => {
+          let parmas = {
+            depId: props.currentDepart.id,
+            userIds: [id]
+          };
+          removeMember(parmas).then(res => {
+            let code = res.code;
+            if (code === 0) {
+              props.memberData.data.splice(index, 1);
+              // selectRailList(railListPaging);
+              root.$message({
+                type: "success",
+                message: "移除成功"
+              });
+              selectChildMember(props.memberListPaging);
+            } else {
+              root.$message({
+                type: "error",
+                message: res.msg
+              });
+            }
+          });
+        })
+        .catch(() => {
+          root.$message({
+            type: "info",
+            message: "已取消移除"
+          });
+        });
+    };
+
+    // 增加成员确认框
+    const addMemberOpen = () => {
+      const h = root.$createElement;
+      root
+        .$msgbox({
+          title: "添加成员",
+          message: h("p", null, [
+            h("span", null, `增加成员`)
+            //h("i", { style: "color: teal" }, "VNode")
+          ]),
+          showCancelButton: true,
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "执行中...";
+              setTimeout(() => {
+                done();
+                setTimeout(() => {
+                  instance.confirmButtonLoading = false;
+                }, 300);
+              }, 1000);
+            } else {
+              done();
+            }
+          }
+        })
+        .then(action => {
+          let addMemberData = {
+            userId: [],
+            depId: props.currentDepart.id
+          };
+          multipleSelection.forEach(item => {
+            addMemberData.userId.push(item.userId);
+          });
+          addMember(addMemberData).then(res => {
+            let code = res.code;
+            if (code === 0) {
+              selectChildMember(props.memberListPaging);
+              root.$message({
+                type: "success",
+                message: "添加成功"
+              });
+              dialogTableVisible.status = false;
+            } else {
+              root.$message({
+                type: "error",
+                message: res.msg
+              });
+            }
+          });
+        })
+        .catch(() => {
+          root.$message({
+            type: "info",
+            message: "已取消添加"
+          });
+        });
+    };
+
     onMounted(() => {});
     return {
       compileTool,
       changeModule,
       checkChild,
-      addMember, // Fn 添加部门成员
-      delMember // Fn 移除部门成员
+      addMemberBtn, // Fn 添加部门成员
+      delMember, // Fn 移除部门成员
+      handleCurrentChange,
+      handleSizeChange,
+      ungrouped,
+      toggleSelection,
+      handleSelectionChange,
+      dialogTableVisible,
+      addMemberList
     };
   }
 };
@@ -238,6 +504,9 @@ $contactsHeight: 592px;
           input {
             cursor: pointer;
           }
+          th {
+            padding-top: 4px;
+          }
         }
         tbody {
           input {
@@ -245,9 +514,6 @@ $contactsHeight: 592px;
           }
           tr:hover {
             background: #f5f5f5;
-          }
-          tr:hover .tdTool {
-            opacity: 0;
           }
         }
       }
@@ -281,8 +547,16 @@ $contactsHeight: 592px;
 .member {
   color: #ddd;
 }
-.mm_tabel td:last-child {
-  width: 20px;
-  opacity: 0;
+.tdTool {
+  a {
+    text-decoration: underline;
+    margin-right: 5px;
+    color: #466b96;
+  }
+}
+.tdTool {
+  a:hover {
+    color: $tabNav_color;
+  }
 }
 </style>

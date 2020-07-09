@@ -130,7 +130,7 @@ export default {
                 optionToContent: function(opt) {
                   let axisData = opt.xAxis[0].data;
                   let table =
-                    '<table style="width:70%;text-align:left"><tbody><tr>' +
+                    '<table style="width:70%;text-align:left" class="tmp_table"><tbody><tr>' +
                     "<td>时间</td>" +
                     "<td>温度</td>" +
                     //+ '<td>' + series[1].name + '</td>'
@@ -139,7 +139,7 @@ export default {
                     if (newArr_tmp[i] >= 37.3) {
                       table += '<tr style="color: red;">';
                     } else {
-                      table += '<tr">';
+                      table += '<tr>';
                     }
                     table +=
                       "<td>" +
@@ -282,9 +282,9 @@ export default {
             railInfo.radius == null; // 验证是否绑定围栏 true为未绑定围栏
           if (verify) {
             Message.warning("用户没有设置围栏");
-            map.centerAndZoom(point, 18); // 将个人作为地图中心点
+            map.centerAndZoom(point, 16); // 将个人作为地图中心点
           } else {
-            map.centerAndZoom(railPoint, 18); // 将围栏作为地图中心点
+            map.centerAndZoom(railPoint, 16); // 将围栏作为地图中心点
           }
           let circle = new BMap.Circle(railPoint, railInfo.radius, {
             strokeColor: "blue",
@@ -419,5 +419,9 @@ $contactsHeight: 592px;
 }
 .weui-cell_access .weui-cell__ft {
   padding-right: 0;
+}
+.tmp_table {
+  width: 70%;
+  text-align: left;
 }
 </style>

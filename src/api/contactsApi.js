@@ -65,8 +65,7 @@ export function updateDepartment(data) {
 export function addMember(data) {
   return service.request({
     method: "post",
-    url: "/dept/addMember", //url: "/dept/addMember?userId="+data.userId+"&depId="+data.depId
-    data,
+    url: "/dept/addMember?userId="+data.userId+"&depId="+data.depId //url: "/dept/addMember",
   });
 }
 
@@ -88,7 +87,7 @@ export function removeDepartment(data) {
 }
 
 /**
- * 查询部门成员
+ * 查询部门成员 form 提交 可以使用 new URLSearchParams()对象
  *
  * @export
  * @param {
@@ -128,8 +127,7 @@ export function listUserByNoDepartment(pageNum, pageSize) {
 export function removeMember(data) {
   return service.request({
     method: "post",
-    url: "/dept/removeMember",
-    data,
+    url: "/dept/removeMember?depId="+data.depId+"&userIds="+data.userIds
   });
 }
 
