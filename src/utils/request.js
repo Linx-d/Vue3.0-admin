@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Message } from 'element-ui';
+import { getParemter } from "@/utils/common" 
 //使用自定义配置新建一个 axios 实例
 const service = axios.create({
   baseURL: "http://192.168.0.192:8888/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api
@@ -11,11 +12,17 @@ const service = axios.create({
 
 // 添加请求拦截器
 service.interceptors.request.use(
+  // ,
+  // headers: {
+  //   auth_token: "utechnpaDgB9rVlUX7NZDDuNAZg123"
+  // }
+
   (config) => {
     // 在发送请求之前做些什么
     return config;
   },
   (error) => {
+    console.log(error)
     // 对请求错误做些什么
     return Promise.reject(error);
   }
@@ -38,6 +45,12 @@ service.interceptors.response.use(
     }
   },
   function(error) {
+    let status = error.response.status;
+    if(status==403){
+      const url = window.location.href;
+      console.log(url);
+      // window.location.href="http://utech.teacha.top/api/qywx/login?redirectUrl="+url;
+    }
     // 对响应错误做点什么
     return Promise.reject(error);
   }
