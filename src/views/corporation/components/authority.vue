@@ -67,7 +67,7 @@
       </div>
       <el-image :src="employee.photo" class="photo">
       </el-image>
-      <el-form   label-width="100px">
+      <el-form   label-width="120px">
         <el-form-item label="管理员姓名">
           <label class="label-info">{{employee.name}}</label>
         </el-form-item>
@@ -519,7 +519,7 @@ $corporationHeight: 655px;
   min-width: 80px;
   height: 80px;
   border: 2px rgb(221, 221, 221) solid;
-  margin: 50px 0;
+  margin: 20px 0;
 }
 .image-slot,.el-icon-picture-outline{
   min-width: 80px;

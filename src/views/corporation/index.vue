@@ -30,7 +30,7 @@ export default {
         current: false
       },
       {
-        name: "设置",
+        name: "个人信息",
         path: "/corporation/corporation_set",
         current: false
       }
