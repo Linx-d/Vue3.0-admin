@@ -61,21 +61,26 @@ export default {
       departmentManagers: "",
       gmtCreate: "2020-06-11 16:29:08",
       gmtModified: "2020-06-11T16:29:08",
-      identity: '', // 身份
+      identity: "", // 身份
       corpUserId: 0,
       role: null
     });
     getLoginEmployee().then(res => {
       let data = res.data;
+      let roleId = data.role.id;
+      if (roleId === 1) {
+        employeeInfo.departmentManagers = "所有部门";
+      }else {
+        employeeInfo.departmentManagers = data.departmentManagers || "暂无";
+      }
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
       //employeeInfo.photo = data.photo;
-      employeeInfo.tel = data.tel || '暂无';
-      employeeInfo.departmentManagers = data.departmentManagers || '暂无';
-      employeeInfo.gmtCreate = data.gmtCreate || '暂无';
-      employeeInfo.gmtModified = data.gmtModified || '暂无';
-      employeeInfo.corpUserId = data.corpUserId || '暂无';
-      employeeInfo.identity = data.role.name || '暂无';
+      employeeInfo.tel = data.tel || "暂无";
+      employeeInfo.gmtCreate = data.gmtCreate || "暂无";
+      employeeInfo.gmtModified = data.gmtModified || "暂无";
+      employeeInfo.corpUserId = data.corpUserId || "暂无";
+      employeeInfo.identity = data.role.name || "暂无";
     });
     watchEffect(() => {});
     onMounted(() => {});
