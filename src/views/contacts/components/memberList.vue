@@ -61,7 +61,7 @@
               <td :title="member.tel">{{ member.tel }}</td>
               <td :title="member.address">{{ member.address }}</td>
               <td class="tdTool">
-                <a href="javascript:;" @click.stop="compileTool(member)">修改</a>
+                <a href="javascript:;" @click.stop="compileTool(member)">查看</a>
                 <a href="javascript:;" @click.stop="delMember(member.userId, index)">移除</a>
               </td>
             </tr>
@@ -77,7 +77,7 @@
           <p>当前部门无任何成员</p>
         </div>
         <div class="no_member_bottom">
-          <a class="memberLink">添加成员</a>
+          <a class="memberLink" @click="addMemberBtn">添加成员</a>
         </div>
       </div>
     </div>
@@ -192,8 +192,8 @@ export default {
       let currentObj = {
         userId: currentMemberInfo.userId
       };
-      listUserLocationById(currentObj).then(response => {
-        let array = response.data.list ? response.data.list : response.data; // 服务器与local切换
+      listUserLocationById(currentObj).then(res => {
+        let array = res.data.list ? res.data.list : res.data; // 服务器与local切换
         let newArr_time = [],
           newArr_tmp = [];
         array.forEach(item => {
@@ -206,8 +206,9 @@ export default {
       });
       /**根据用户id获取设备最新数据和告警信息 */
       let currentArray = [currentMemberInfo.userId];
-      listDeviceAlarmInfoByUserId(currentArray).then(response => {
-        let data = response.data[0] ? response.data[0] : [];
+      listDeviceAlarmInfoByUserId(currentArray).then(res => {
+        let data = res.data[0] ? res.data[0] : [];
+        console.log(data);
         for (let key in data) {
           currentMemberInfo[key] = data[key];
         }

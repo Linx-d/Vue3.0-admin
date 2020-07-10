@@ -161,7 +161,7 @@ export default {
                 optionToContent: function(opt) {
                   let axisData = opt.xAxis[0].data;
                   let table =
-                    '<table style="width:70%;text-align:left" class="tmp_table"><tbody><tr>' +
+                    '<table style="width:70%;text-align:left;line-height: 28px;" class="tmp_table"><tbody><tr>' +
                     "<td>时间</td>" +
                     "<td>温度</td>" +
                     //+ '<td>' + series[1].name + '</td>'
