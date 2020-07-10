@@ -25,10 +25,41 @@
             </span>
           </p>
           <div class="info_status">
-            <span>{{ currentMemberInfo.online }}</span>
-            <span>{{ currentMemberInfo.temperature }}</span>
+            <span>
+              <svg-icon iconClass="online1" class="online my_icon" v-if="currentMemberInfo.online"></svg-icon>
+            </span>
+            <span>
+              <svg-icon v-if="!currentMemberInfo.online" iconClass="unline" class="unline"></svg-icon>
+            </span>
+            <span>
+              <svg-icon
+                iconClass="electric0"
+                class="electric my_icon"
+                v-if="currentMemberInfo.electric==='0'"
+              ></svg-icon>
+            </span>
+            <span>
+              <svg-icon
+                iconClass="electric1"
+                class="electric my_icon"
+                v-if="currentMemberInfo.electric==='1'"
+              ></svg-icon>
+            </span>
+            <span>
+              <svg-icon
+                iconClass="electric2"
+                class="electric my_icon"
+                v-if="currentMemberInfo.electric==='2'"
+              ></svg-icon>
+            </span>
+            <span>
+              <svg-icon
+                iconClass="electric3"
+                class="electric my_icon"
+                v-if="currentMemberInfo.electric==='3'"
+              ></svg-icon>
+            </span>
           </div>
-          <span>{{ currentMemberInfo.electric }}</span>
         </div>
       </div>
       <div id="info_personal" class="info_module">
@@ -139,7 +170,7 @@ export default {
                     if (newArr_tmp[i] >= 37.3) {
                       table += '<tr style="color: red;">';
                     } else {
-                      table += '<tr>';
+                      table += "<tr>";
                     }
                     table +=
                       "<td>" +
@@ -280,12 +311,13 @@ export default {
             railInfo.lng == null ||
             railInfo.lat == null ||
             railInfo.radius == null; // 验证是否绑定围栏 true为未绑定围栏
-          if (verify) {
-            Message.warning("用户没有设置围栏");
-            map.centerAndZoom(point, 16); // 将个人作为地图中心点
-          } else {
-            map.centerAndZoom(railPoint, 16); // 将围栏作为地图中心点
-          }
+          // if (verify) {
+          //   Message.warning("用户没有设置围栏");
+          //   map.centerAndZoom(point, 16); // 将个人作为地图中心点
+          // } else {
+          //   map.centerAndZoom(railPoint, 16); // 将围栏作为地图中心点
+          // }
+          map.centerAndZoom(point, 17); // 将个人作为地图中心点
           let circle = new BMap.Circle(railPoint, railInfo.radius, {
             strokeColor: "blue",
             strokeWeight: 1,
@@ -423,5 +455,9 @@ $contactsHeight: 592px;
 .tmp_table {
   width: 70%;
   text-align: left;
+}
+.my_icon {
+  width: 1.2em;
+  height: 1.2em;
 }
 </style>
