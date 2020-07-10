@@ -3,21 +3,22 @@ import { Message } from 'element-ui';
 import { getParemter } from "@/utils/common" 
 //使用自定义配置新建一个 axios 实例
 const service = axios.create({
-  baseURL: "http://192.168.0.180:8888/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api
-  timeout: 15000,
-  headers: {
-    auth_token: "utechnpaDgB9rVlUX7NZDDuNAZg"
-  }
+  baseURL: "http://192.168.0.192:8888/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api
+  timeout: 15000
 });
 
 // 添加请求拦截器
 service.interceptors.request.use(
-  // ,
-  // headers: {
-  //   auth_token: "utechnpaDgB9rVlUX7NZDDuNAZg123"
-  // }
-
   (config) => {
+    let token = getParemter("auth_token");
+    if(token==null){
+      token = sessionStorage.getItem("auth_token");
+    }else{
+      sessionStorage.setItem("auth_token",token);
+    }
+    console.log(token)
+    config.headers.auth_token=token;
+    console.dir(config)
     // 在发送请求之前做些什么
     return config;
   },
@@ -48,8 +49,8 @@ service.interceptors.response.use(
     let status = error.response.status;
     if(status==403){
       const url = window.location.href;
-      console.log(url);
-      // window.location.href="http://utech.teacha.top/api/qywx/login?redirectUrl="+url;
+      Message.error("请先登录！");
+      window.location.href="http://utech.teacha.top/api/qywx/login?redirectUrl="+url;
     }
     // 对响应错误做点什么
     return Promise.reject(error);
