@@ -1,44 +1,44 @@
-const online = {
-  dataset: {
-    source: [
-      ["score", "amount", "product"],
-      [89.3, 58212, "Matcha Latte"],
-      [57.1, 78254, "Milk Tea"],
-      [74.4, 41032, "Cheese Cocoa"],
-      [50.1, 12755, "Cheese Brownie"],
-      [89.7, 20145, "Matcha Cocoa"],
-      [68.1, 79146, "Tea"],
-      [19.6, 91852, "Orange Juice"],
-      [10.6, 101852, "Lemon Juice"],
-      [32.7, 20112, "Walnut Brownie"],
-    ],
+const alarm = {
+  title: {
+      text: '世界人口总量',
+      subtext: '数据来自网络'
   },
-  grid: { containLabel: true },
-  xAxis: { name: "amount" },
-  yAxis: { type: "category" },
-  visualMap: {
-    orient: "horizontal",
-    left: "center",
-    min: 10,
-    max: 100,
-    text: ["High Score", "Low Score"],
-    // Map the score column to color
-    dimension: 0,
-    inRange: {
-      color: ["#D7DA8B", "#E15457"],
-    },
+  tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+          type: 'shadow'
+      }
+  },
+  legend: {
+      data: ['2011年', '2012年']
+  },
+  grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+  },
+  xAxis: {
+      type: 'value',
+      boundaryGap: [0, 0.01]
+  },
+  yAxis: {
+      type: 'category',
+      data: ['巴西', '印尼', '美国', '印度', '中国', '世界人口(万)']
   },
   series: [
-    {
-      type: "bar",
-      encode: {
-        // Map the "amount" column to X axis.
-        x: "amount",
-        // Map the "product" column to Y axis
-        y: "product",
+      {
+          name: '2011年',
+          type: 'bar',
+          data: [18203, 23489, 29034, 104970, 131744, 630230]
       },
-    },
-  ],
+      {
+          name: '2012年',
+          type: 'bar',
+          data: [19325, 23438, 31000, 121594, 134141, 681807]
+      }
+  ]
 };
 
-export default online;
+
+export default alarm;

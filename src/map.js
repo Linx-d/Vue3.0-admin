@@ -47,6 +47,18 @@ export function Map(ak) {
       link.href =
         "http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css";
       document.head.appendChild(link);
+
+      let script3 = document.createElement("script");
+      script2.type = "text/javascript";
+      script2.src =
+        "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js";
+      document.body.appendChild(script3);
+
+      let script4 = document.createElement("script");
+      script2.type = "text/javascript";
+      script2.src =
+        "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
+      document.body.appendChild(script4);
     } else {
       console.log("BMapLib.DrawingManager is loaded!");
     }

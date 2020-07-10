@@ -1,41 +1,59 @@
-const online = {
-  legend: {},
-  tooltip: {
-      trigger: 'axis',
-      showContent: false
-  },
-  dataset: {
-      source: [
-          ['product', '2012', '2013', '2014', '2015', '2016', '2017'],
-          ['Matcha Latte', 41.1, 30.4, 65.1, 53.3, 83.8, 98.7],
-          ['Milk Tea', 86.5, 92.1, 85.7, 83.1, 73.4, 55.1],
-          ['Cheese Cocoa', 24.1, 67.2, 79.5, 86.4, 65.2, 82.5],
-          ['Walnut Brownie', 55.2, 67.1, 69.2, 72.4, 53.9, 39.1]
-      ]
-  },
-  xAxis: {type: 'category'},
-  yAxis: {gridIndex: 0},
-  grid: {top: '55%'},
-  series: [
-      {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-      {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-      {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-      {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-      {
-          type: 'pie',
-          id: 'pie',
-          radius: '30%',
-          center: ['50%', '25%'],
-          label: {
-              formatter: '{b}: {@2012} ({d}%)'
-          },
-          encode: {
-              itemName: 'product',
-              value: '2012',
-              tooltip: '2012'
-          }
-      }
-  ]
+const history = {
+    title: {
+        text: '告警历史统计'
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['告警总数', '总人数', '位置告警', '温度告警']
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    toolbox: {
+        feature: {
+            saveAsImage: {}
+        }
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    },
+    yAxis: {
+        type: 'value'
+    },
+    series: [
+        {
+            name: '告警总数',
+            type: 'line',
+            stack: 'start',
+            data: [120, 132, 101, 134, 90, 230, 210]
+        },
+        {
+            name: '总人数',
+            type: 'line',
+            stack: 'middle',
+            data: [220, 282, 201, 234, 290, 430, 410]
+        },
+        {
+            name: '位置告警',
+            type: 'line',
+            stack: 'end',
+            data: [450, 432, 401, 454, 590, 530, 510]
+        },
+        {
+            name: '温度告警',
+            type: 'line',
+            stack: 'start',
+            data: [450, 432, 401, 454, 590, 530, 510]
+        }
+    ]
 };
 
-export default online;
+
+export default history;

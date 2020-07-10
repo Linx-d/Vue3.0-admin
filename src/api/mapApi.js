@@ -100,7 +100,6 @@ export function getAlarmView() {
   return service.request({
     method: "post",
     url: "/alarm/getAlarmView",
-    data,
   });
 }
 
@@ -115,6 +114,40 @@ export function listAlarmView() {
   return service.request({
     method: "post",
     url: "/alarm/listAlarmView",
-    data,
+  });
+}
+
+/**
+ * 获取用户最新位置信息
+ *
+ * @export
+ * @param null
+ * @returns data
+ */
+export function listUserLocation() {
+  return service.request({
+    method: "post",
+    url: "/deviceData/listUserLocation",
+  });
+}
+/**
+ * 设备上传数据
+ *
+ * @export
+ * @param {
+    "imei": "ut1000001000000",
+    "temperature": "39.8",
+    "latitude": "29.490295",
+    "type":"0",
+    "longitude": "106.486654",
+    "electric": "2"
+}
+ * @returns data
+ */
+export function add(data) {
+  return service.request({
+    method: "post",
+    url: "/deviceData/add",
+    data
   });
 }

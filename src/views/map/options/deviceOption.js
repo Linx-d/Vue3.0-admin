@@ -1,4 +1,4 @@
-const online = {
+const device = {
   title: {
     text: "设备"
   },
@@ -7,7 +7,7 @@ const online = {
     data: ["销量"]
   },
   xAxis: {
-    data: ["1", "2", "3", "4", "5", "6"]
+    data: [1, 2, 3, 4, 5, 6]
   },
   yAxis: {},
   series: [
@@ -19,4 +19,4 @@ const online = {
   ]
 };
 
-export default online;
+export default device;
