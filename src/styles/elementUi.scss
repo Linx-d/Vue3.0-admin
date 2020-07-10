@@ -84,3 +84,21 @@
 .form-item {
   margin-bottom: 20px;
 }
+
+.detail {
+  .el-form-item__label {
+    text-align-last: left;
+    width: 120px;
+    padding-right: 9px;
+    font-size: 14px;
+  }
+  .label-info {
+    font-size: 14px;
+  }
+}
+
+.list {
+  .el-submenu__title {
+    width: 205.84px;
+  }
+}

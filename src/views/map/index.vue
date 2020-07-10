@@ -4,20 +4,72 @@
     <div :class="['tool', { tool_top: full }]">
       <ul>
         <li @click="cutFull">
-          <svg-icon iconClass="menu" class="mapMenu"></svg-icon>
-          <i>菜单</i>
+          <svg-icon iconClass="full_screen" class="mapMenu"></svg-icon>
+          <i>全屏</i>
         </li>
       </ul>
     </div>
     <!-- alanysis 数据分析模块 login -->
     <div class="alanysis">
       <div class="alanysis_top">
-        <div id="online" class="alanysis_top_a"></div>
-        <div id="alarm" class="alanysis_top_b"></div>
+        <div id="online" class="alanysis_top_a echartsIndivi"></div>
+        <div class="alanysis_top_b echartsIndivi">
+          <a href="javascript:;" id="grandTotal">
+            <h1
+              style="color: #222; font-weight: 500; font-size: 18px; margin-left: 15px; margin-top: 20px;margin-bottom: 20px;"
+            >
+              警告统计
+              <span
+                style="color: #cfcfcf; font-size: 12px; text-align: center; display: inline-block;"
+              >
+                更新时间
+                <i
+                  style="color: #cfcfcf; font-size: 12px; font-style: normal;"
+                >{{ alarmData.date }}</i>
+              </span>
+            </h1>
+
+            <table>
+              <tr>
+                <td style="color: #bf4739; font-size: 26px;">{{ alarmData.alarmSum }}</td>
+                <td style="color: #cd6212; font-size: 26px;">{{ alarmData.personSum }}</td>
+                <td style="color: #153147; font-size: 26px;">{{ alarmData.tsum }}</td>
+                <td style="color: #35cbbf; font-size: 26px;">{{ alarmData.psum }}</td>
+              </tr>
+              <tr style="height: 30px; font-weight: 700; color: #2d2d2d; font-size: 13px;">
+                <td class="tdBgc">累计告警</td>
+                <td class="tdBgc">累计人数</td>
+                <td class="tdBgc">温度告警</td>
+                <td class="tdBgc">位置告警</td>
+              </tr>
+              <tr style="font-weight: 700; height: 35px;">
+                <td style="color: #b2b2b2; font-size: 13px;">
+                  <span>新增</span>
+                  <span style="color: #bf4739;">+{{ alarmData.newSum }}</span>
+                </td>
+                <td style="color: #b2b2b2; font-size: 13px;">
+                  <span>新增</span>
+                  <span style="color: #cd6212;">+{{ alarmData.newPersonSum }}</span>
+                </td>
+                <td style="color: #b2b2b2; font-size: 13px;">
+                  <span>新增</span>
+                  <span style="color: #153147;">+{{ alarmData.newTSum }}</span>
+                </td>
+                <td style="color: #b2b2b2; font-size: 13px;">
+                  <span>新增</span>
+                  <span style="color: #35cbbf;">+{{ alarmData.newPSum }}</span>
+                </td>
+              </tr>
+            </table>
+          </a>
+        </div>
       </div>
       <div class="alanysis_bottom">
-        <div id="device" class="alanysis_bottom_L"></div>
-        <div id="history" :class="['alanysis_bottom_R']"></div>
+        <div id="device" class="alanysis_bottom_L echartsIndivi"></div>
+        <div id="history" :class="['alanysis_bottom_R echartsIndivi']"></div>
+      </div>
+      <div class="alanysis_right">
+        <div id="system" class="alanysis_right_content echartsIndivi"></div>
       </div>
     </div>
     <!-- alanysis 数据分析模块 end -->
@@ -25,14 +77,24 @@
 </template>
 
 <script>
-import { Map } from "@/map"
-import { onMounted, computed } from "@vue/composition-api"
-import individuaction from "./custom_map_config/custom_map_config.json" // 个性化地图 所用样式文件
-import { adaptionEchartsV2 } from "@/utils/common" // 图表自适应
-import alarmOption from "./options/alarmOption.js" // 告警模块
-import deviceOption from "./options/deviceOption.js" // 设备模块
-import historyOption from "./options/historyOption.js" // 历史告警模块
-import onlineOption from "./options/onlineOption.js"  // 在线统计模块
+import { Map } from "@/map";
+import { onMounted, computed, reactive } from "@vue/composition-api";
+import {
+  listAlarmView,
+  getAlarmView,
+  listUserLocation,
+  add
+} from "@/api/mapApi";
+import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
+import { adaptionEchartsV2 } from "@/utils/common"; // 图表自适应
+import alarmOption from "./options/alarmOption.js"; // 告警模块
+import deviceOption from "./options/deviceOption.js"; // 设备模块
+import historyOption from "./options/historyOption.js"; // 历史告警模块
+import onlineOption from "./options/onlineOption.js"; // 在线统计模块
+import systemOption from "./options/systemOption.js"; // 系统统计模块
+// import onLineIcon from "../img/marker_online.png";
+// import unLineIcon from "../img/marker_unline.png";
+// import dangerIcon from "../img/marker_danger.png";
 export default {
   name: "mapModule",
   setup(props, { root }) {
@@ -49,13 +111,63 @@ export default {
     let baiduMap = () => {
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
         let map = new BMap.Map("mapShow"); // 创建Map实例
-        let point = new BMap.Point(114.065537, 22.553321); // 创建点坐标
-        let marker = new BMap.Marker(point);
-        map.addOverlay(marker); //添加一个标注
-        map.centerAndZoom(point, 13); // 添加初始化中心点及地图层级
-        map.enableScrollWheelZoom(); // 开启鼠标滚轮缩放功能。仅对PC上有效
-        map.enableContinuousZoom(); // 启用连续缩放效果，默认禁用
-        //map.setMapStyleV2({ styleJson: individuaction }); // 个性化地图
+        //添加地图类型控件
+        map.addControl(
+          new BMap.MapTypeControl({
+            mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
+          })
+        );
+        map.centerAndZoom(new BMap.Point(107.26569, 28.676057), 15); // 初始化地图,设置中心点坐标和地图级别
+        map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
+        map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+        listUserLocation()
+          .then(res => {
+            return res.data;
+          })
+          .then(data => {
+            let markers = [];
+            let pointArray = [];
+            let opts = {
+              width: 250,
+              height: 80,
+              title: "个人信息",
+              enableMessage: true //设置允许信息窗发送短息
+            };
+            data.forEach(item => {
+              //console.log(item);
+              let oline = item.online;
+              let temperature = parseFloat(item.temperature);
+              // unLineIcon,dangerIcon
+              //let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(20,27)); //创键图标
+              let point = new BMap.Point(item.longitude, item.latitude);
+              // let marker = new BMap.Marker(point, {icon: myIcon});
+              let marker = new BMap.Marker(point);
+              let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
+              addClickHandler(content, marker);
+              markers.push(marker);
+              pointArray.push(point);
+            });
+
+            function addClickHandler(content, marker) {
+              marker.addEventListener("click", function(e) {
+                openInfo(content, e);
+              });
+            }
+            function openInfo(content, e) {
+              let p = e.target;
+              let point = new BMap.Point(
+                p.getPosition().lng,
+                p.getPosition().lat
+              );
+              let infoWindow = new BMap.InfoWindow(content, opts); // 创建信息窗口对象
+              map.openInfoWindow(infoWindow, point); //开启信息窗口
+            }
+            //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
+            map.setViewport(pointArray);
+            let markerClusterer = new BMapLib.MarkerClusterer(map, {
+              markers: markers
+            });
+          });
       });
     };
     /**
@@ -72,63 +184,120 @@ export default {
     /**
      * 告警总量 alarm
      */
+    const alarmData = reactive({
+      newPSum: "",
+      newPersonSum: "",
+      newSum: "",
+      newTSum: "",
+      alarmSum: "",
+      personSum: "",
+      psum: "",
+      tsum: "",
+      date: ""
+    });
     const alarm = () => {
-      let myChart = root.$echarts.init(document.getElementById("alarm"));
-      adaptionEchartsV2(myChart);
-      let option = alarmOption;
-      // 使用刚指定的配置项和数据显示图表。
-      myChart.setOption(option);
+      getView();
+    };
+    setInterval(getView, 2000);
+    function getView() {
+      // let randomObj = reactive({
+      //   imei: "ut1000001000000",
+      //   temperature: "39.8",
+      //   latitude: "29.490295",
+      //   type: "0",
+      //   longitude: "106.486654",
+      //   electric: "2"
+      // });
+      // add(randomObj).then(res => {
+      //   console.log(res);
+      // });
+      getAlarmView().then(res => {
+        // console.log(res);
+        let data = res.data;
+        // time
+        alarmData.date = data.date;
+        // new
+        alarmData.newPSum = data.newPSum;
+        alarmData.newPersonSum = data.newPersonSum;
+        alarmData.newSum = data.newSum;
+        alarmData.newTSum = data.newTSum;
+        // static
+        alarmData.alarmSum = data.alarmSum;
+        alarmData.personSum = data.personSum;
+        alarmData.psum = data.psum;
+        alarmData.tsum = data.tsum;
+      });
     };
     /**
      * 设备统计 divice
      */
     const device = () => {
-      let myChart = root.$echarts.init(document.getElementById("device")); 
+      let myChart = root.$echarts.init(document.getElementById("device"));
       adaptionEchartsV2(myChart);
       let option = deviceOption;
 
-      // 使用刚指定的配置项和数据显示图表。
+      let num = 1;
+      option.series[0].data = [num, num, 7, 8, 9, 10];
       myChart.setOption(option);
     };
     /**
      * 告警历史 history
      */
     const history = () => {
-      let myChart = root.$echarts.init(document.getElementById("history"));
-      adaptionEchartsV2(myChart);
-      // 使用刚指定的配置项和数据显示图表。
-      let option = historyOption;
-      myChart.on("updateAxisPointer", function(event) {
-        var xAxisInfo = event.axesInfo[0];
-        if (xAxisInfo) {
-          var dimension = xAxisInfo.value + 1;
-          myChart.setOption({
-            series: {
-              id: "pie",
-              label: {
-                formatter: "{b}: {@[" + dimension + "]} ({d}%)"
-              },
-              encode: {
-                value: dimension,
-                tooltip: dimension
-              }
-            }
+      listAlarmView()
+        .then(res => {
+          return res.data;
+        })
+        .then(data => {
+          let myChart = root.$echarts.init(document.getElementById("history"));
+
+          let alarmSum = [];
+          let personSum = [];
+          let psum = [];
+          let tsum = [];
+          let gmtCreate = [];
+          data.forEach(item => {
+            gmtCreate.push(item.gmtCreate);
+            alarmSum.push(item.alarmSum);
+            personSum.push(item.personSum);
+            psum.push(item.psum);
+            tsum.push(item.tsum);
           });
-        }
-      });
+
+          adaptionEchartsV2(myChart);
+          // 使用刚指定的配置项和数据显示图表。
+          let option = historyOption;
+          option.xAxis.data = gmtCreate;
+          option.series[0].data = alarmSum;
+          option.series[1].data = personSum;
+          option.series[2].data = psum;
+          option.series[3].data = tsum;
+          myChart.setOption(option);
+        });
+    };
+
+    /**
+     * 统计 system
+     */
+    const system = () => {
+      let myChart = root.$echarts.init(document.getElementById("system"));
+      adaptionEchartsV2(myChart);
+      let option = systemOption;
       myChart.setOption(option);
     };
+
     /**
      * 生命周期函数 onMounted
      */
     onMounted(() => {
-      baiduMap(); // 百度地图
       online(); // 在线图表
-      alarm(); // 在线图表
-      device(); // 在线图表
-      history(); // 在线图表
+      alarm(); // 告警图表
+      device(); // 设备图表
+      history(); // 历史图表
+      system(); // 历史图表
+      baiduMap(); // 百度地图
     });
-    return { cutFull, full };
+    return { cutFull, full, alarmData };
   }
 };
 </script>
@@ -157,8 +326,8 @@ $alanysisMinHeight_Bottom: 227px;
     position: absolute;
     top: 0;
     right: 0;
-    width: 80%;
-    height: 60%;
+    width: 100%;
+    height: 100%;
     @include webkit("transition", all 0.5s);
   }
 }
@@ -171,6 +340,7 @@ $alanysisMinHeight_Bottom: 227px;
   width: 40px;
   height: 54px;
   cursor: pointer;
+  z-index: 999;
   @include webkit("box-shadow", 0 1px 2px 0 rgba(0, 0, 0, 0.7));
   li {
     text-align: center;
@@ -200,28 +370,99 @@ $alanysisMinHeight_Bottom: 227px;
   .alanysis_top {
     height: 60%;
     width: 20%;
+    position: relative;
     .alanysis_top_a {
       width: 100%;
       height: 50%;
+      left: 0;
+      top: 0;
     }
     .alanysis_top_b {
       width: 100%;
       height: 50%;
+      right: 0;
+      bottom: 0;
     }
   }
   .alanysis_bottom {
     height: 40%;
     width: 100%;
+    position: relative;
     .alanysis_bottom_L {
       width: 20%;
       height: 100%;
       float: left;
+      left: 0;
+      bottom: 0;
     }
     .alanysis_bottom_R {
       width: 80%;
       height: 100%;
       float: right;
+      right: 0;
+      bottom: 0;
+    }
+  }
+  .alanysis_right {
+    height: 60%;
+    width: 20%;
+    .alanysis_right_content {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 60%;
+      width: 20%;
     }
   }
 }
+.echartsIndivi {
+  background: #fff;
+  position: absolute;
+  @include webkit("box-sizing", boder-box);
+}
+
+/*---------------------table login-----------------------*/
+.tdBgc {
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  min-width: 72px;
+}
+
+.tdcolor {
+}
+
+#grandTotal {
+  display: block;
+  width: 94%;
+  background-color: #fff;
+  margin-top: 10px;
+  border: 1px solid #fff;
+  margin: 9.2px auto;
+  @include webkit("box-shadow", rgba(0, 0, 0, 0.1) 0 0 8px);
+  min-height: 168.5px;
+  min-width: 303px;
+  height: 90%;
+}
+
+#grandTotal table {
+  color: #000;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  padding-bottom: 0;
+  line-height: 39px;
+}
+
+/*---------------------table end-----------------------*/
+
+/*---------------------userHistory login-----------------------*/
+#userHistory {
+  height: 40px;
+  width: 90%;
+  border-top: 1px solid #efefef;
+  margin: 0 auto;
+}
+
+/*---------------------userHistory end-----------------------*/
 </style>

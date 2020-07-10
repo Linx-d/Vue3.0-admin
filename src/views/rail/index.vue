@@ -389,9 +389,9 @@ export default {
           map.openInfoWindow(infoWindow, point); //开启信息窗口
         }
         //map.setViewport(markers);
-        // let markerClusterer = new BMapLib.MarkerClusterer(map, {
-        //   markers: markers
-        // });
+        let markerClusterer = new BMapLib.MarkerClusterer(map, {
+          markers: markers
+        });
 
         var radius = modifyRailData.radius || 100;
         var circle = new BMap.Circle(point, radius, {
