@@ -117,7 +117,7 @@ export default {
             mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
           })
         );
-        map.centerAndZoom(new BMap.Point(107.26569, 28.676057), 15); // 初始化地图,设置中心点坐标和地图级别
+        map.centerAndZoom(new BMap.Point(107.26569, 28.676057), 17); // 初始化地图,设置中心点坐标和地图级别
         map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
         map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
         listUserLocation()
@@ -133,10 +133,26 @@ export default {
               title: "个人信息",
               enableMessage: true //设置允许信息窗发送短息
             };
+            let status = {
+              personStatic: data.length,
+              eletricStatic: 0,
+              temperatureStatic: 0,
+              onlineStatic: 0
+            };
             data.forEach(item => {
               //console.log(item);
               let oline = item.online;
               let temperature = parseFloat(item.temperature);
+               let electric = item.electric;
+              if (temperature > 37.3) {
+                status.temperatureStatic++;
+              }
+              if (oline) {
+                status.onlineStatic++;
+              }
+              if(electric<2) {
+                status.eletricStatic++;
+              }
               // unLineIcon,dangerIcon
               //let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(20,27)); //创键图标
               let point = new BMap.Point(item.longitude, item.latitude);
@@ -147,7 +163,7 @@ export default {
               markers.push(marker);
               pointArray.push(point);
             });
-
+            online(status);
             function addClickHandler(content, marker) {
               marker.addEventListener("click", function(e) {
                 openInfo(content, e);
@@ -173,10 +189,14 @@ export default {
     /**
      * 在线率 online
      */
-    const online = () => {
+    const online = (status) => {
       let myChart = root.$echarts.init(document.getElementById("online"));
       adaptionEchartsV2(myChart);
       let option = onlineOption;
+      onlineOption.series[0].data[0].value = status.temperatureStatic;
+      onlineOption.series[0].data[1].value = status.personStatic;
+      onlineOption.series[0].data[2].value = status.onlineStatic;
+      onlineOption.series[0].data[3].value = status.eletricStatic;
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
     };
@@ -198,7 +218,7 @@ export default {
     const alarm = () => {
       getView();
     };
-    setInterval(getView, 2000);
+    setInterval(getView, 6000000);
     function getView() {
       // let randomObj = reactive({
       //   imei: "ut1000001000000",
@@ -227,7 +247,7 @@ export default {
         alarmData.psum = data.psum;
         alarmData.tsum = data.tsum;
       });
-    };
+    }
     /**
      * 设备统计 divice
      */
@@ -267,11 +287,11 @@ export default {
           adaptionEchartsV2(myChart);
           // 使用刚指定的配置项和数据显示图表。
           let option = historyOption;
-          option.xAxis.data = gmtCreate;
-          option.series[0].data = alarmSum;
-          option.series[1].data = personSum;
-          option.series[2].data = psum;
-          option.series[3].data = tsum;
+          // option.xAxis.data = gmtCreate;
+          // option.series[0].data = alarmSum;
+          // option.series[1].data = personSum;
+          // option.series[2].data = psum;
+          // option.series[3].data = tsum;
           myChart.setOption(option);
         });
     };
@@ -290,7 +310,6 @@ export default {
      * 生命周期函数 onMounted
      */
     onMounted(() => {
-      online(); // 在线图表
       alarm(); // 告警图表
       device(); // 设备图表
       history(); // 历史图表
@@ -451,7 +470,7 @@ $alanysisMinHeight_Bottom: 227px;
   width: 100%;
   text-align: center;
   padding-bottom: 0;
-  line-height: 39px;
+  line-height: 47px;
 }
 
 /*---------------------table end-----------------------*/
