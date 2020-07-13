@@ -3,9 +3,8 @@ import { Message } from 'element-ui';
 import { getParemter } from "@/utils/common" 
 //使用自定义配置新建一个 axios 实例
 const service = axios.create({
-  baseURL: "http://192.168.0.192:8888/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api
-  timeout: 15000
-});
+  baseURL: "http://192.168.0.192:8888/api", // http://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api 林
+  timeout: 15000});
 
 // 添加请求拦截器
 service.interceptors.request.use(

@@ -9,11 +9,22 @@
     <div class="info">
       <div class="info_item">
         <div class="info_item_a">管理员名称</div>
-        <div class="info_item_b">{{ employeeInfo.name }}</div>
+        <div class="info_item_b">
+          <i>{{ employeeInfo.name }}</i>
+          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifyStaffName">
+            <span>修改</span>
+          </a>
+        </div>
       </div>
       <div class="info_item_center">
         <div class="info_item_center_a">联系电话</div>
-        <div class="info_item_center_b">{{ employeeInfo.tel }}</div>
+        <div class="info_item_center_b">
+          <i>{{ employeeInfo.tel }}</i>
+          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifyStaffTel">
+            <span v-if="employeeInfo.tel">修改</span>
+            <span v-else>添加</span>
+          </a>
+        </div>
       </div>
       <div class="info_item">
         <div class="info_item_a">管理员身份</div>
@@ -44,20 +55,67 @@
         <div class="tail_item_b">{{ employeeInfo.gmtModified }}</div>
       </div>
     </div>
+
+    <!-- 修改名称 弹出框 -->
+    <el-dialog
+      title="修改名称"
+      :visible.sync="modifyStaffData.dialogNameVisible"
+      :before-close="modifyBefore"
+    >
+      <el-form
+        :model="employeeInfo"
+        :rules="rules"
+        ref="employeeInfo"
+        label-width="100px"
+        class="employeeInfoClass"
+      >
+        <el-form-item label="名称" :label-width="modifyStaffData.formLabelWidth" prop="name">
+          <el-input v-model="employeeInfo.name" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="modifyNameCancle()">取 消</el-button>
+        <el-button type="primary" @click="confirmNameOpen('employeeInfo')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 修改电话 弹出框 -->
+    <el-dialog
+      title="修改电话"
+      :visible.sync="modifyStaffData.dialogTelVisible"
+      :before-close="modifyBefore"
+    >
+      <el-form
+        :model="employeeInfo"
+        :rules="rules"
+        ref="employeeInfo"
+        label-width="100px"
+        class="employeeInfoClass"
+      >
+        <el-form-item label="电话" :label-width="modifyStaffData.formLabelWidth" prop="tel">
+          <el-input v-model="employeeInfo.tel" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="modifyTelCancle()">取 消</el-button>
+        <el-button type="primary" @click="confirmTelOpen('employeeInfo')">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { getLoginEmployee } from "@/api/employeeApi";
+import { getLoginEmployee, updateEmployee } from "@/api/employeeApi";
 import { reactive, onMounted, watchEffect } from "@vue/composition-api";
 export default {
   name: "corporationInfo",
-  setup() {
+  setup(props, { root, refs }) {
     let employeeInfo = reactive({
+      id: null,
       corpId: "ww2e7b5f3c87c34c17",
       name: "测试",
       photo:
         "https://p.qlogo.cn/bizmail/x9CrcRIuFWvA8VQcstTibfPAsrpcpFulOZwapfGCNwjkJMVUibNl0kWA/0",
-      tel: "",
+      tel: null,
       departmentManagers: "",
       gmtCreate: "2020-06-11 16:29:08",
       gmtModified: "2020-06-11T16:29:08",
@@ -70,21 +128,130 @@ export default {
       let roleId = data.role.id;
       if (roleId === 1) {
         employeeInfo.departmentManagers = "所有部门";
-      }else {
+      } else {
         employeeInfo.departmentManagers = data.departmentManagers || "暂无";
       }
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
       //employeeInfo.photo = data.photo;
-      employeeInfo.tel = data.tel || "暂无";
+      employeeInfo.tel = data.tel;
       employeeInfo.gmtCreate = data.gmtCreate || "暂无";
       employeeInfo.gmtModified = data.gmtModified || "暂无";
       employeeInfo.corpUserId = data.corpUserId || "暂无";
       employeeInfo.identity = data.role.name || "暂无";
     });
+
+    const modifyStaffData = reactive({
+      dialogNameVisible: false,
+      dialogTelVisible: false,
+      formLabelWidth: "120px"
+    });
+    const rules = reactive({
+      name: [
+        { required: true, message: "请输入名称" },
+        { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
+      ],
+      tel: [
+        { required: true, message: "请输入联系方式" },
+        { min: 11, max: 11, message: "长度为 11 个字符" }
+      ]
+    });
+    const submitNameForm = formName => {
+      refs[formName].validate(valid => {
+        if (valid) {
+          let modifyData = new URLSearchParams();
+          modifyData.append("name", employeeInfo.name);
+          modifyData.append("id", employeeInfo.id);
+          updateEmployee(modifyData).then(res => {
+            let code = res.code;
+            if (code === 0) {
+              root.$message({
+                type: "success",
+                message: "修改成功"
+              });
+              modifyStaffData.dialogNameVisible = false;
+            } else {
+              root.$message({
+                type: "warning",
+                message: res.msg
+              });
+            }
+          });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    };
+    const submitTelForm = formName => {
+      refs[formName].validate(valid => {
+        if (valid) {
+          let modifyData = new URLSearchParams();
+          modifyData.append("tel", employeeInfo.tel);
+          modifyData.append("id", employeeInfo.id);
+          updateEmployee(modifyData).then(res => {
+            let code = res.code;
+            if (code === 0) {
+              root.$message({
+                type: "success",
+                message: "修改成功"
+              });
+              modifyStaffData.dialogTelVisible = false;
+            } else {
+              root.$message({
+                type: "warning",
+                message: res.msg
+              });
+            }
+          });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    };
+    const resetForm = formName => {
+      refs[formName].resetFields();
+    };
+
+    const modifyStaffName = () => {
+      modifyStaffData.dialogNameVisible = true;
+    };
+    const modifyStaffTel = () => {
+      modifyStaffData.dialogTelVisible = true;
+    };
+    const confirmNameOpen = data => {
+      submitNameForm(data);
+    };
+    const confirmTelOpen = data => {
+      submitTelForm(data);
+    };
+    const modifyNameCancle = () => {
+      resetForm("employeeInfo");
+      modifyStaffData.dialogNameVisible = false;
+    };
+    const modifyTelCancle = () => {
+      resetForm("employeeInfo");
+      modifyStaffData.dialogTelVisible = false;
+    };
+    const modifyBefore = () => {
+      resetForm("employeeInfo");
+      modifyStaffData.dialogNameVisible = false;
+    };
     watchEffect(() => {});
     onMounted(() => {});
-    return { employeeInfo };
+    return {
+      employeeInfo,
+      modifyStaffData,
+      modifyStaffName,
+      modifyStaffTel,
+      confirmNameOpen,
+      rules,
+      modifyNameCancle,
+      modifyBefore,
+      modifyTelCancle,
+      confirmTelOpen
+    };
   }
 };
 </script>
@@ -156,6 +323,10 @@ $mainWidth: 705px;
         color: rgb(0, 0, 0);
         float: right;
       }
+    }
+    i {
+      font-style: normal;
+      margin-right: 10px;
     }
   }
   .tail {

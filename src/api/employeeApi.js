@@ -79,3 +79,20 @@ export function listNotRoleEmployee(pageNum,pageSize){
         url:"/employee/listNotRoleEmployee?pageNum="+pageNum+"&pageSize="+pageSize
     })
 }
+
+/**
+ * 修改员工
+ *
+ * @export
+ * @param {
+ * name: 'name'
+}
+* @returns data
+*/
+export function updateEmployee(data) {
+  return service.request({
+    method: "post",
+    url: "/employee/updateEmployee",
+    data
+  });
+}
