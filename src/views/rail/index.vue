@@ -196,6 +196,7 @@ export default {
       currentRailData.index = index; // 当前围栏的索引
       listUserInfoByRail(id)
         .then(res => {
+          console.log(res);
           let data = res.data.list ? res.data.list : res.data;
           // 深拷贝数组
           cloneArray(listByRailData, data);

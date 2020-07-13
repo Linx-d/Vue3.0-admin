@@ -36,6 +36,9 @@ export default {};
       color: #9e9e9e;
       line-height: 1.5;
     }
+    a:hover {
+      text-decoration: underline;
+    }
     .frame_operation_dep {
       color: #9e9e9e;
       height: 10px;

@@ -13,3 +13,19 @@ export function getCorpInfo() {
     url: "/corp/getCorpInfo"
   });
 }
+
+/**
+ * 修改企业
+ *
+ * @export
+ * @param {
+  name: 'name'}
+ * @returns data
+ */
+export function updateCorporation(data) {
+  return service.request({
+    method: "post",
+    url: "/corp/updateCorporation",
+    data
+  });
+}
