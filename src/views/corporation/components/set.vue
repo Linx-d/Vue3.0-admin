@@ -10,7 +10,7 @@
       <div class="info_item">
         <div class="info_item_a">管理员名称</div>
         <div class="info_item_b">
-          <i>{{ employeeInfo.name }}</i>
+          <i v-show="employeeInfo.name">{{ employeeInfo.name }}</i>
           <a hefr="javascript:;" class="modifyInfoBtn" @click="modifyStaffName">
             <span>修改</span>
           </a>
@@ -19,7 +19,7 @@
       <div class="info_item_center">
         <div class="info_item_center_a">联系电话</div>
         <div class="info_item_center_b">
-          <i>{{ employeeInfo.tel }}</i>
+          <i v-show="employeeInfo.tel">{{ employeeInfo.tel }}</i>
           <a hefr="javascript:;" class="modifyInfoBtn" @click="modifyStaffTel">
             <span v-if="employeeInfo.tel">修改</span>
             <span v-else>添加</span>
@@ -152,7 +152,7 @@ export default {
         { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
       tel: [
-        { required: true, message: "请输入联系方式" },
+        // { required: true, message: "请输入联系方式" },
         { min: 11, max: 11, message: "长度为 11 个字符" }
       ]
     });

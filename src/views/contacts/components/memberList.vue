@@ -359,8 +359,7 @@ export default {
           removeMember(parmas).then(res => {
             let code = res.code;
             if (code === 0) {
-              props.memberData.data.splice(index, 1);
-              // selectRailList(railListPaging);
+              //props.memberData.data.splice(index, 1);
               root.$message({
                 type: "success",
                 message: "移除成功"
