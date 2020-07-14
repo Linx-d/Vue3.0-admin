@@ -164,7 +164,8 @@ import {
   listUserByDepartment,
   listUserByNoDepartment,
   removeMember,
-  listDepartmentByPid
+  listDepartmentByPid,
+  getMaxDepartmentId
 } from "@/api/contactsApi";
 import { translateDataToTree, switchModule } from "@/utils/common";
 import sha1 from "sha1"; //前台加密 使用:  sha1(value);
@@ -224,13 +225,11 @@ export default {
     let companyData = reactive({
       companyId: 6
     }); // 顶级部门 id
-    const getCompanyId = () => {
-      listAllDepartment().then(res => {
-        let data = res.data.list ? res.data.list : res.data;
-        return data[0].id;
-      });
+    // 同步执行
+    const getCompanyId = async () => {
+      const { data } = await getMaxDepartmentId();
+      return data;
     };
-
     let treeData = reactive({
       status: false
     });
@@ -239,13 +238,17 @@ export default {
       {
         label: "",
         displayOrder: 10001,
-        id: getCompanyId() || 6,
+        id: null,
         pid: 0,
         children: [],
         childrenLen: 0
       }
     ]);
-    watchEffect(() => departData);
+    // getCompanyId();
+    getCompanyId().then( res => {
+      departData[0].id = res;
+    });
+    // watchEffect(() => departData);
     // 当前部门信息
     let currentDepart = reactive({
       label: "",
@@ -353,7 +356,6 @@ export default {
           i = 0;
         for (i; i < len; i++) {
           let currentMember = data[i];
-          console.log(currentMember);
         }
       });
     };
@@ -367,7 +369,6 @@ export default {
       params.append("userId", userIdArr); // [1, 2, 7]
       params.append("depId", depId); // 7
       //console.log(params);
-      console.log(params);
       return addMember(params);
     };
 
@@ -672,7 +673,7 @@ export default {
 
     /**---------------------------------- 生命周期 onMounted login ---------------------------------- */
     onMounted(() => {
-      console.log("挂载完成"); //addMemberFn selectNodepart
+      console.log("挂载完成");
       /**在挂载完成之后在执行侦听器 */
       // 只能使用 watch, 不能使用 watchEffect
       watch(
@@ -846,6 +847,13 @@ $contactsHeight: 592px;
     position: absolute;
     right: 5px;
     top: 5px;
+    width: 30px;
+    height: 100%;
+    .menu_right_svg {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
     .departOperation {
       position: absolute;
       left: 8px;
