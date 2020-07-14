@@ -13,7 +13,10 @@
     <div class="alanysis">
       <div class="alanysis_top">
         <div id="online" class="alanysis_top_a echartsIndivi"></div>
-        <div class="alanysis_top_b echartsIndivi">
+        <div id="device" class="alanysis_top_b echartsIndivi"></div>
+      </div>
+      <div class="alanysis_bottom">
+        <div class="alanysis_bottom_L echartsIndivi">
           <a href="javascript:;" id="grandTotal">
             <h1
               style="color: #222; font-weight: 500; font-size: 18px; margin-left: 15px; margin-top: 20px;margin-bottom: 20px;"
@@ -63,10 +66,9 @@
             </table>
           </a>
         </div>
-      </div>
-      <div class="alanysis_bottom">
-        <div id="device" class="alanysis_bottom_L echartsIndivi"></div>
-        <div id="history" :class="['alanysis_bottom_R echartsIndivi']"></div>
+        <div :class="['alanysis_bottom_R echartsIndivi']">
+          <div id="history"></div>
+        </div>
       </div>
       <div class="alanysis_right">
         <div id="system" class="alanysis_right_content echartsIndivi"></div>
@@ -143,14 +145,14 @@ export default {
               //console.log(item);
               let oline = item.online;
               let temperature = parseFloat(item.temperature);
-               let electric = item.electric;
+              let electric = item.electric;
               if (temperature > 37.3) {
                 status.temperatureStatic++;
               }
               if (oline) {
                 status.onlineStatic++;
               }
-              if(electric<2) {
+              if (electric < 2) {
                 status.eletricStatic++;
               }
               // unLineIcon,dangerIcon
@@ -189,7 +191,7 @@ export default {
     /**
      * 在线率 online
      */
-    const online = (status) => {
+    const online = status => {
       let myChart = root.$echarts.init(document.getElementById("online"));
       adaptionEchartsV2(myChart);
       let option = onlineOption;
@@ -256,8 +258,8 @@ export default {
       adaptionEchartsV2(myChart);
       let option = deviceOption;
 
-      let num = 1;
-      option.series[0].data = [num, num, 7, 8, 9, 10];
+      //let num = 1;
+      //option.series[0].data = [num, num, 7, 8, 9, 10];
       myChart.setOption(option);
     };
     /**
@@ -287,11 +289,11 @@ export default {
           adaptionEchartsV2(myChart);
           // 使用刚指定的配置项和数据显示图表。
           let option = historyOption;
-          // option.xAxis.data = gmtCreate;
-          // option.series[0].data = alarmSum;
-          // option.series[1].data = personSum;
-          // option.series[2].data = psum;
-          // option.series[3].data = tsum;
+          option.xAxis.data = gmtCreate;
+          option.series[0].data = alarmSum;
+          option.series[1].data = personSum;
+          option.series[2].data = psum;
+          option.series[3].data = tsum;
           myChart.setOption(option);
         });
     };
@@ -420,17 +422,26 @@ $alanysisMinHeight_Bottom: 227px;
       float: right;
       right: 0;
       bottom: 0;
+      padding-top: 20px;
+      @include webkit('box-sizing', border-box);
+      #history {
+        height: 100%;
+        width: 100%;
+      }
     }
   }
   .alanysis_right {
     height: 60%;
     width: 20%;
+    position: absolute;
+    right: 0;
+    top: 0;
     .alanysis_right_content {
       position: absolute;
       right: 0;
       top: 0;
-      height: 60%;
-      width: 20%;
+      width: 100%;
+      height: 100%;
     }
   }
 }
@@ -461,27 +472,17 @@ $alanysisMinHeight_Bottom: 227px;
   min-height: 168.5px;
   min-width: 303px;
   height: 90%;
-}
-
-#grandTotal table {
-  color: #000;
-  padding: 0;
+  padding-top: 30px;
   box-sizing: border-box;
-  width: 100%;
-  text-align: center;
-  padding-bottom: 0;
-  line-height: 47px;
+  table {
+    color: #000;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    text-align: center;
+    padding-bottom: 0;
+    line-height: 47px;
+  }
 }
-
 /*---------------------table end-----------------------*/
-
-/*---------------------userHistory login-----------------------*/
-#userHistory {
-  height: 40px;
-  width: 90%;
-  border-top: 1px solid #efefef;
-  margin: 0 auto;
-}
-
-/*---------------------userHistory end-----------------------*/
 </style>
