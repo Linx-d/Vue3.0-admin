@@ -493,14 +493,14 @@ export default {
       }
     };
     // -------------------------企业微信--------------------------------
-    const wxjs = ()=>{
+    const callSDK = ()=>{
       let jsApiList = [];
       let fun = ()=>{
-        
+        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
       }
       jssdk(jsApiList,fun)
     }
-    wxjs()
+    callSDK()
     const loadWWOpenData =()=>{
         WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
     }
