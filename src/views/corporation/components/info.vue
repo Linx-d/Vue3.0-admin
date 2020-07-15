@@ -171,7 +171,7 @@ export default {
         { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
       tel: [
-        { required: true, message: "请输入联系方式" },
+        { required: true, message: "请输入联系电话" },
         { min: 2, max: 25, message: "长度在 2 到 25 个字符" }
       ],
       address: [

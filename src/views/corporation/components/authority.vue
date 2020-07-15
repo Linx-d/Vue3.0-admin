@@ -257,7 +257,7 @@ export default {
       allDepartment.splice(0, allDepartment.length);
       listAllDepartment().then(res => {
         if (res.code == 0) {
-          let data = res.data;
+          let data = res.data.list ?  res.data.list : res.data;
           let existDepartments = employee.departments;
           data.forEach(department => {
             if (department.pid != null && department.pid != 0) {
@@ -284,7 +284,6 @@ export default {
           return res.data;
         })
         .then(data => {
-          1;
           data.forEach(item => {
             listEmployeeByRole(item.id).then(res => {
               item.employees = res.data.list;

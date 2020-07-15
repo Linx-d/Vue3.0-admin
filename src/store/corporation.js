@@ -1,20 +1,23 @@
-const fullBollean = sessionStorage.getItem("full") === 'false' ? false : true;
+import { getLoginEmployee } from "@/api/employeeApi";
+if (!sessionStorage.getItem("adminInfo")) {
+  getLoginEmployee().then((res) => {
+    let data = JSON.stringify(res);
+    sessionStorage.setItem("adminInfo", data);
+  });
+}
+// 使用
+//console.log(JSON.parse(root.$store.state.corporation.adminInfo));
 const corporation = {
   state: {
-    full: fullBollean
+    adminInfo: sessionStorage.getItem("adminInfo"),
   },
   getters: {
-    full: state => state.full
+    adminInfo: (state) => state.adminInfo,
   },
   mutations: {
-    SET_FULL(state){
-      state.full = !state.full;
-      sessionStorage.setItem('full', state.full);
-    }
+    SET_ADMININFO() {},
   },
-  actions: {
-  },
-  modules: {
-  }
-}
+  actions: {},
+  modules: {},
+};
 export default corporation;
