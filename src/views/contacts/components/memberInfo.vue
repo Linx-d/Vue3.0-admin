@@ -79,8 +79,8 @@
           <li>
             <span>围栏：</span>
             <i v-if="tmpHistory.railName" class="railText">{{ tmpHistory.railName }}</i>
-            <strong v-if="!tmpHistory.railName" class="modifyInfoBtn" @click="bindRail">添加</strong>
-            <strong v-else class="modifyInfoBtn" @click="unBindRail">解绑围栏</strong>
+            <strong v-if="!tmpHistory.railName" class="modifyInfoBtn" @click="addRail">添加</strong>
+            <strong v-else class="modifyInfoBtn" @click="unBindOpen">解绑围栏</strong>
           </li>
           <li>
             <span>体温告警：</span>
@@ -96,18 +96,37 @@
       <div class="info_module mapBox">
         <div id="mapShow"></div>
       </div>
+      <el-dialog title="围栏列表" :visible.sync="dialogRailVisible.status" class="railTable">
+        <el-table :data="railList.data" style="width: 100%" max-height="250">
+          <el-table-column fixed prop="gmtCreate" label="日期" width="160"></el-table-column>
+          <el-table-column prop="railName" label="围栏名称" width="120"></el-table-column>
+          <el-table-column prop="personSum" label="人数" width="120"></el-table-column>
+          <el-table-column prop="radius" label="半径" width="120"></el-table-column>
+          <el-table-column prop="railAddr" label="地址" width="300"></el-table-column>
+          <el-table-column fixed="right" label="操作" width="120">
+            <template slot-scope="scope">
+              <el-button
+                @click.native.prevent="selectRow(scope.$index, railList.data)"
+                type="text"
+                size="small"
+              >选择</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-dialog>
     </div>
   </div>
 </template>
 <script>
 import { Map } from "@/map"; // 导入map.js文件
 import { onMounted, watchEffect, reactive } from "@vue/composition-api";
-import { switchModule, cloneObject } from "@/utils/common";
+import { switchModule, cloneArray } from "@/utils/common";
 import {
   batchDeleteRailUser,
   listDeviceAlarmInfoByUserId,
   batchUpdateUser
 } from "@/api/contactsApi";
+import { listRail } from "@/api/railApi";
 export default {
   name: "memberList",
   props: {
@@ -131,21 +150,150 @@ export default {
   },
   setup(props, { root }) {
     let contactsModule = props.contactsModule; // contacts 模块
-    const bindRail = () => {
-      let data = {
-        railId: 831,
-        userId: [props.currentMemberInfo.userId]
-      };
-      batchUpdateUser(data).then(res => {
-        props.tmpHistory.railName = "围栏";
+    const dialogRailVisible = reactive({
+      status: false
+    });
+    /**
+     * 查询围栏列表
+     */
+    let railList = reactive({
+      pageNum: 1,
+      pageSize: 15,
+      value: false,
+      data: []
+    });
+    const addRail = () => {
+      dialogRailVisible.status = true;
+      listRail().then(res => {
+        console.log(res);
+        cloneArray(railList.data, res.data.list);
       });
     };
+    const selectRow = (index, rows) => {
+      let railId = rows[index].id;
+      let railName = rows[index].railName;
+      bindOpen(railId, railName);
+    };
+    // 绑定围栏确认框
+    const bindOpen = (railId, railName) => {
+      const h = root.$createElement;
+      root
+        .$msgbox({
+          title: "绑定围栏",
+          message: h("p", null, [
+            h(
+              "span",
+              null,
+              `将 ${props.currentMemberInfo.name} 绑定到${railName}`
+            )
+            //h("i", { style: "color: teal" }, "VNode")
+          ]),
+          showCancelButton: true,
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "执行中...";
+              setTimeout(() => {
+                done();
+                setTimeout(() => {
+                  instance.confirmButtonLoading = false;
+                }, 300);
+              }, 1000);
+            } else {
+              done();
+            }
+          }
+        })
+        .then(action => {
+          let data = {
+            railId: railId,
+            userId: [props.currentMemberInfo.userId]
+          };
+          batchUpdateUser(data).then(res => {
+            let code = res.code;
+            if (code === 0) {
+              root.$message({
+                type: "success",
+                message: "绑定成功"
+              });
+              props.tmpHistory.railName = railName;
+              dialogRailVisible.status = false;
+            } else {
+              root.$message({
+                type: "error",
+                message: "绑定失败"
+              });
+            }
+          });
+        })
+        .catch(() => {
+          root.$message({
+            type: "info",
+            message: "已取消绑定"
+          });
+        });
+    };
+
+    // 解绑围栏确认框
+    const unBindOpen = () => {
+      const h = root.$createElement;
+      root
+        .$msgbox({
+          title: "解绑围栏",
+          message: h("p", null, [
+            h(
+              "span",
+              null,
+              `将 ${props.currentMemberInfo.name} 从 “${props.tmpHistory.railName}” 中解绑`
+            )
+            //h("i", { style: "color: teal" }, "VNode")
+          ]),
+          showCancelButton: true,
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "执行中...";
+              setTimeout(() => {
+                done();
+                setTimeout(() => {
+                  instance.confirmButtonLoading = false;
+                }, 300);
+              }, 1000);
+            } else {
+              done();
+            }
+          }
+        })
+        .then(action => {
+          unBindRail();
+        })
+        .catch(() => {
+          root.$message({
+            type: "info",
+            message: "已取消解绑"
+          });
+        });
+    };
+
     const unBindRail = () => {
       let userId = [props.currentMemberInfo.userId];
       batchDeleteRailUser(userId).then(res => {
         let code = res.code;
         if (code === 0) {
           props.tmpHistory.railName = null;
+          root.$message({
+            type: "success",
+            message: "解绑成功"
+          });
+        }else {
+          root.$message({
+            type: "error",
+            message: "解绑失败"
+          });
         }
       });
     };
@@ -361,7 +509,11 @@ export default {
     });
     return {
       memberInfoBack,
-      bindRail,
+      bindOpen, unBindOpen,
+      addRail,
+      selectRow,
+      railList,
+      dialogRailVisible,
       unBindRail
     };
   }

@@ -8,12 +8,19 @@ import service from "@/utils/request";
  * @returns data
  */
 export function listRail(data) {
-  let pageNum = data.pageNum,
-    pageSize = data.pageSize;
-  return service.request({
-    method: "post",
-    url: "/rail/listRail?pageNum=" + pageNum + "&pageSize=" + pageSize,
-  });
+  if (data) {
+    let pageNum = data.pageNum,
+      pageSize = data.pageSize;
+    return service.request({
+      method: "post",
+      url: "/rail/listRail?pageNum=" + pageNum + "&pageSize=" + pageSize,
+    });
+  } else {
+    return service.request({
+      method: "post",
+      url: "/rail/listRail"
+    });
+  }
 }
 
 /**
@@ -99,7 +106,7 @@ export function updateRail(data) {
   return service.request({
     method: "post",
     url: "/rail/updateRail",
-    data
+    data,
   });
 }
 
@@ -115,7 +122,7 @@ export function batchUpdateUser(data) {
     userId = data.userId;
   return service.request({
     method: "post",
-    url: "/rail/batchUpdateUser?railId=" + railId + "&userId=" + userId
+    url: "/rail/batchUpdateUser?railId=" + railId + "&userId=" + userId,
   });
 }
 
@@ -129,7 +136,7 @@ export function batchUpdateUser(data) {
 export function queryRailByUserId(data) {
   return service.request({
     method: "post",
-    url: "/rail/queryRailByUserId?userId=" + data
+    url: "/rail/queryRailByUserId?userId=" + data,
   });
 }
 
@@ -143,7 +150,7 @@ export function queryRailByUserId(data) {
 export function listUserByRail(data) {
   return service.request({
     method: "post",
-    url: "/rail/listUserByRail?railId=" + data
+    url: "/rail/listUserByRail?railId=" + data,
   });
 }
 
@@ -156,10 +163,10 @@ export function listUserByRail(data) {
  */
 export function listUserByNoRail(data) {
   let pageNum = data.pageNum,
-  pageSize = data.pageSize;
+    pageSize = data.pageSize;
   return service.request({
     method: "post",
-    url: "/rail/listUserByNoRail?pageNum=" + pageNum + "&pageSize=" + pageSize
+    url: "/rail/listUserByNoRail?pageNum=" + pageNum + "&pageSize=" + pageSize,
   });
 }
 
@@ -173,7 +180,7 @@ export function listUserByNoRail(data) {
 export function queryRailByName(data) {
   return service.request({
     method: "post",
-    url: "/rail/queryRailByName?railName=" + data
+    url: "/rail/queryRailByName?railName=" + data,
   });
 }
 
@@ -187,6 +194,6 @@ export function queryRailByName(data) {
 export function listUserInfoByRail(data) {
   return service.request({
     method: "post",
-    url: "/rail/listUserInfoByRail?railId=" + data
+    url: "/rail/listUserInfoByRail?railId=" + data,
   });
 }
