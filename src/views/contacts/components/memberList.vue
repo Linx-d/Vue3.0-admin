@@ -208,11 +208,13 @@ export default {
       let currentArray = [currentMemberInfo.userId];
       listDeviceAlarmInfoByUserId(currentArray).then(res => {
         let data = res.data[0] ? res.data[0] : [];
-        console.log(data);
         for (let key in data) {
           currentMemberInfo[key] = data[key];
         }
         for (let key in currentMemberInfo) {
+          if (key === "railName") {
+            continue;
+          }
           let verify =
             currentMemberInfo[key] === null ||
             currentMemberInfo[key] === undefined ||

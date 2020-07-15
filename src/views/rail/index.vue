@@ -196,7 +196,6 @@ export default {
       currentRailData.index = index; // 当前围栏的索引
       listUserInfoByRail(id)
         .then(res => {
-          console.log(res);
           let data = res.data.list ? res.data.list : res.data;
           // 深拷贝数组
           cloneArray(listByRailData, data);
@@ -224,7 +223,7 @@ export default {
         { validator: validateRailName }
       ],
       railAddr: [
-        { required: true, message: "请输入围栏地址" },
+        { required: true, message: "请设置围栏地址" },
         { min: 1, max: 25, message: "长度在 1 到 25 个字符" }
       ],
       radius: [{ required: true, message: "请在地图中选取设置围栏半径" }]

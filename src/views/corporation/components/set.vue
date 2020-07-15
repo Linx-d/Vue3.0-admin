@@ -126,6 +126,7 @@ export default {
     getLoginEmployee().then(res => {
       let data = res.data;
       let roleId = data.role.id;
+      console.log(data);
       if (roleId === 1) {
         employeeInfo.departmentManagers = "所有部门";
       } else {
@@ -152,7 +153,7 @@ export default {
         { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
       tel: [
-        // { required: true, message: "请输入联系方式" },
+        { required: true, message: "请输入联系电话" },
         { min: 11, max: 11, message: "长度为 11 个字符" }
       ]
     });

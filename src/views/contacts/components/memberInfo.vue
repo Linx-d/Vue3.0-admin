@@ -25,11 +25,11 @@
             </span>
           </p>
           <div class="info_status">
-            <span>
-              <svg-icon iconClass="online1" class="online my_icon" v-if="currentMemberInfo.online"></svg-icon>
+            <span v-if="currentMemberInfo.online">
+              <svg-icon iconClass="online1" class="online my_icon"></svg-icon>
             </span>
-            <span>
-              <svg-icon v-if="!currentMemberInfo.online" iconClass="unline" class="unline"></svg-icon>
+            <span v-if="!currentMemberInfo.online">
+              <svg-icon iconClass="unline" class="unline"></svg-icon>
             </span>
             <span>
               <svg-icon
@@ -78,7 +78,9 @@
           </li>
           <li>
             <span>围栏：</span>
-            <i>{{ currentMemberInfo.railName }}</i>
+            <i v-if="tmpHistory.railName" class="railText">{{ tmpHistory.railName }}</i>
+            <strong v-if="!tmpHistory.railName" class="modifyInfoBtn" @click="bindRail">添加</strong>
+            <strong v-else class="modifyInfoBtn" @click="unBindRail">解绑围栏</strong>
           </li>
           <li>
             <span>体温告警：</span>
@@ -99,10 +101,13 @@
 </template>
 <script>
 import { Map } from "@/map"; // 导入map.js文件
-import { onMounted, watchEffect } from "@vue/composition-api";
-import { switchModule } from "@/utils/common";
-import { listUserLocationById } from "@/api/contactsApi";
-import { Message } from "element-ui";
+import { onMounted, watchEffect, reactive } from "@vue/composition-api";
+import { switchModule, cloneObject } from "@/utils/common";
+import {
+  batchDeleteRailUser,
+  listDeviceAlarmInfoByUserId,
+  batchUpdateUser
+} from "@/api/contactsApi";
 export default {
   name: "memberList",
   props: {
@@ -126,6 +131,24 @@ export default {
   },
   setup(props, { root }) {
     let contactsModule = props.contactsModule; // contacts 模块
+    const bindRail = () => {
+      let data = {
+        railId: 831,
+        userId: [props.currentMemberInfo.userId]
+      };
+      batchUpdateUser(data).then(res => {
+        props.tmpHistory.railName = "围栏";
+      });
+    };
+    const unBindRail = () => {
+      let userId = [props.currentMemberInfo.userId];
+      batchDeleteRailUser(userId).then(res => {
+        let code = res.code;
+        if (code === 0) {
+          props.tmpHistory.railName = null;
+        }
+      });
+    };
     /**
      *  成员个人信息温度变化图表
      */
@@ -320,7 +343,7 @@ export default {
           // } else {
           //   map.centerAndZoom(railPoint, 16); // 将围栏作为地图中心点
           // }
-          map.centerAndZoom(point, 17); // 将个人作为地图中心点
+          map.centerAndZoom(point, 13); // 将个人作为地图中心点
           let circle = new BMap.Circle(railPoint, railInfo.radius, {
             strokeColor: "blue",
             strokeWeight: 1,
@@ -332,13 +355,14 @@ export default {
         });
       });
     };
-
     onMounted(() => {
       baiduMap();
       memberInfoEcharts();
     });
     return {
-      memberInfoBack
+      memberInfoBack,
+      bindRail,
+      unBindRail
     };
   }
 };
@@ -425,6 +449,9 @@ $contactsHeight: 592px;
           font-style: normal;
         }
         margin-bottom: 15px;
+        .railText {
+          margin-right: 10px;
+        }
       }
     }
   }

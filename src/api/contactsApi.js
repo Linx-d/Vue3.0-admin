@@ -192,3 +192,37 @@ export function getMaxDepartmentId() {
     url: "/dept/getMaxDepartmentId"
   });
 }
+
+/**
+ * 绑定用户围栏
+ *
+ * @export
+ * @param {
+    "latitude": "1212.21",
+    "longitude": "32125.2134",
+    "radius": "200",
+    "railName": "围栏3",
+    "railAddr": "万寿福居"
+}
+ * @returns
+ */
+export function batchUpdateUser(data) {
+  return service.request({
+    method: "post",
+    url: "/rail/batchUpdateUser?railId=" + data.railId + "&userId=" + data.userId
+  });
+}
+
+/**
+ * 解绑用户围栏
+ *
+ * @export
+ * @param userId = [10002, 10003]
+ * @returns
+ */
+export function batchDeleteRailUser(data) {
+  return service.request({
+    method: "post",
+    url: "/rail/batchDeleteRailUser?userId=" + data
+  });
+}
