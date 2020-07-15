@@ -7,7 +7,11 @@
         </el-row>
         <el-dialog width="900px" title="选择用户" :visible.sync="dialogTableVisible" center>
           <el-table :data="employeesNotRole.list">
-            <el-table-column property="name" label="姓名" width="150"></el-table-column>
+            <el-table-column property="name" label="姓名" width="150">
+                <template slot-scope="scope">
+                  <p v-html='scope.row.name'></p>
+                </template>
+            </el-table-column>
             <el-table-column property="tel" label="电话" width="200"></el-table-column>
             <el-table-column property="gmtCreate" label="创建时间"></el-table-column>
             <el-table-column fixed="right" label="操作" width="100">
@@ -146,6 +150,7 @@
 <script>
 import { reactive, ref, watchEffect } from "@vue/composition-api";
 import { cloneObjectToNull } from "@/utils/common";
+import { jssdk } from "@/utils/wxwork";
 import {
   listEmployee,
   listAllRole,
@@ -161,6 +166,7 @@ import { all } from "cookie_js";
 export default {
   name: "authority",
   setup(props, { root }) {
+    // -------------------------------------变量-------------------------------------------
     /**
      * 员工列表窗口
      */
@@ -239,6 +245,8 @@ export default {
       tel: "",
       gmtCreate: ""
     });
+// -------------------------------------变量-------------------------------------------
+
 
     /**
      * 查询所有员工
@@ -272,7 +280,6 @@ export default {
       });
     };
     // queryEmployees(pageInfo);
-
     /**
      * 查询所有角色及拥有该角色的员工
      */
@@ -480,6 +487,15 @@ export default {
         isEdit.value = !isEdit.value;
       }
     };
+    // -------------------------企业微信--------------------------------
+    const wxjs = ()=>{
+      let jsApiList = [];
+      let fun = ()=>{
+        WWOpenData.bind(document.querySelector('ww-open-data'));
+      }
+      jssdk(jsApiList,fun)
+    }
+    wxjs()
     return {
       employees,
       roleList,

@@ -96,3 +96,12 @@ export function updateEmployee(data) {
     data
   });
 }
+
+export function getJsSdk(){
+    let url = window.location.href;
+    console.log(url,"url");
+    return service.request({
+      method:"POST",
+      url:"/qywx/getJSSDK?url="+url
+    });
+}
