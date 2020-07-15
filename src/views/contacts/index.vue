@@ -30,15 +30,12 @@
                 <el-button type="text" size="mini" @click="() => append(data)">Append</el-button>
                 <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>
                 -->
-                <div
-                  class="menu_right"
-                  @click.stop="showDepartClick"
-                  @mouseleave.stop="hideDepartLeave"
-                >
+                <div class="menu_right" @click.stop="showDepartClick">
                   <svg-icon iconClass="menu_link" class="menu_right_svg"></svg-icon>
                   <div
                     v-show="showDepartOperation"
                     :class="['departOperation', {'showDepartOperation': showDepartOperation}]"
+                    @mouseleave.stop="hideDepartLeave"
                   >
                     <ul>
                       <li>
@@ -238,14 +235,14 @@ export default {
       {
         label: "",
         displayOrder: 10001,
-        id: null,
+        id: 0,
         pid: 0,
         children: [],
         childrenLen: 0
       }
     ]);
     // getCompanyId();
-    getCompanyId().then( res => {
+    getCompanyId().then(res => {
       departData[0].id = res;
     });
     // watchEffect(() => departData);
@@ -856,7 +853,7 @@ $contactsHeight: 592px;
     }
     .departOperation {
       position: absolute;
-      left: 8px;
+      left: 24px;
       top: 8px;
       opacity: none;
       background: #fff;
