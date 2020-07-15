@@ -63,6 +63,7 @@ module.exports = {
     https: false, // 编译失败时刷新页面
     hot: true, // 开启热加载
     hotOnly: false,
+    disableHostCheck:true,//host检查
     // 跨域
     proxy: {
       [process.env.VUE_APP_BASE_API]: {
