@@ -10,7 +10,7 @@
       <div class="info_item">
         <div class="info_item_a">管理员名称</div>
         <div class="info_item_b">
-          <i v-show="employeeInfo.name">{{ employeeInfo.name }}</i>
+          <i v-show="employeeInfo.name" v-html="employeeInfo.name"></i>
           <a hefr="javascript:;" class="modifyInfoBtn" @click="modifyStaffName">
             <span>修改</span>
           </a>
@@ -105,6 +105,7 @@
 </template>
 <script>
 import { getLoginEmployee, updateEmployee } from "@/api/employeeApi";
+import { jssdk } from "@/utils/wxwork";
 import { reactive, onMounted, watchEffect } from "@vue/composition-api";
 export default {
   name: "corporationInfo",
@@ -241,6 +242,18 @@ export default {
     };
     watchEffect(() => {});
     onMounted(() => {});
+    // -------------------------企业微信--------------------------------
+    const callSDK = ()=>{
+      let jsApiList = [];
+      let fun = ()=>{
+        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
+      }
+      jssdk(jsApiList,fun)
+    }
+    callSDK()
+    const loadWWOpenData =()=>{
+        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
+    }
     return {
       employeeInfo,
       modifyStaffData,
@@ -251,7 +264,8 @@ export default {
       modifyNameCancle,
       modifyBefore,
       modifyTelCancle,
-      confirmTelOpen
+      confirmTelOpen,
+      loadWWOpenData
     };
   }
 };
