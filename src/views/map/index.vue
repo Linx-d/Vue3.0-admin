@@ -94,9 +94,9 @@ import deviceOption from "./options/deviceOption.js"; // 设备模块
 import historyOption from "./options/historyOption.js"; // 历史告警模块
 import onlineOption from "./options/onlineOption.js"; // 在线统计模块
 import systemOption from "./options/systemOption.js"; // 系统统计模块
-// import onLineIcon from "../img/marker_online.png";
-// import unLineIcon from "../img/marker_unline.png";
-// import dangerIcon from "../img/marker_danger.png";
+import onLineIcon from "./images/marker_online.png";
+import unLineIcon from "./images/marker_unline.png";
+import dangerIcon from "./images/marker_danger.png";
 export default {
   name: "mapModule",
   setup(props, { root }) {
@@ -146,20 +146,21 @@ export default {
               let oline = item.online;
               let temperature = parseFloat(item.temperature);
               let electric = item.electric;
+              let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32,32));
               if (temperature > 37.3) {
                 status.temperatureStatic++;
+                myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32,32));
               }
               if (oline) {
                 status.onlineStatic++;
+                myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32,32));
               }
               if (electric < 2) {
                 status.eletricStatic++;
               }
-              // unLineIcon,dangerIcon
-              //let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(20,27)); //创键图标
               let point = new BMap.Point(item.longitude, item.latitude);
-              // let marker = new BMap.Marker(point, {icon: myIcon});
-              let marker = new BMap.Marker(point);
+              let marker = new BMap.Marker(point, {icon: myIcon});
+              // let marker = new BMap.Marker(point);
               let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
               addClickHandler(content, marker);
               markers.push(marker);
