@@ -36,7 +36,10 @@
           </div>
         </el-dialog>
       </div>
-      <el-menu>
+      <el-menu 
+      :default-openeds="['1','2','3']"
+      @open="loadWWOpenData()"
+        >
         <el-submenu
           :index="role.id + ''"
           v-for="(role, index) in roleList"
@@ -53,7 +56,8 @@
               :key="employee.id"
               :value="employee.id"
               @click="choose(employee.id)"
-            >{{ employee.name }}</el-menu-item>
+              v-html="employee.name"
+            ></el-menu-item>
           </el-menu-item-group>
         </el-submenu>
       </el-menu>
@@ -76,7 +80,7 @@
       <el-image :src="employee.photo" class="photo"></el-image>
       <el-form label-width="120px" style="position: relative;">
         <el-form-item label="管理员姓名">
-          <label class="label-info">{{employee.name}}</label>
+          <label class="label-info" v-html="employee.name"></label>
         </el-form-item>
         <el-form-item label="联系电话">
           <label class="label-info">{{employee.tel}}</label>
@@ -265,7 +269,7 @@ export default {
       allDepartment.splice(0, allDepartment.length);
       listAllDepartment().then(res => {
         if (res.code == 0) {
-          let data = res.data;
+          let data = res.data.list;
           let existDepartments = employee.departments;
           data.forEach(department => {
             if (department.pid != null && department.pid != 0) {
@@ -291,14 +295,15 @@ export default {
           return res.data;
         })
         .then(data => {
-          1;
           data.forEach(item => {
             listEmployeeByRole(item.id).then(res => {
               item.employees = res.data.list;
               roleList.push(item);
             });
           });
+          
         });
+        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
     };
     /**
      * 切换为修改界面
@@ -491,11 +496,14 @@ export default {
     const wxjs = ()=>{
       let jsApiList = [];
       let fun = ()=>{
-        WWOpenData.bind(document.querySelector('ww-open-data'));
+        
       }
       jssdk(jsApiList,fun)
     }
     wxjs()
+    const loadWWOpenData =()=>{
+        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
+    }
     return {
       employees,
       roleList,
@@ -515,7 +523,8 @@ export default {
       showEmployees,
       chooseEmployee,
       delManager,
-      roleId
+      roleId,
+      loadWWOpenData
     };
   }
 };
