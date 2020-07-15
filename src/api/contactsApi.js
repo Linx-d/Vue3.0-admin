@@ -178,3 +178,17 @@ export function listDeviceAlarmInfoByUserId(data) {
     data
   });
 }
+
+/**
+ * 查询当前企业顶级部门Id
+ *
+ * @export
+ * @param null
+ * @returns
+ */
+export function getMaxDepartmentId() {
+  return service.request({
+    method: "get",
+    url: "/dept/getMaxDepartmentId"
+  });
+}

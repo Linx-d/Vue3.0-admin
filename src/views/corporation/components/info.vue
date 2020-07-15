@@ -10,7 +10,7 @@
       <div class="info_item">
         <div class="info_item_a">企业名称</div>
         <div class="info_item_b">
-          <i>{{ corpInfo.name }}</i>
+          <i v-show="corpInfo.name">{{ corpInfo.name }}</i>
           <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpName">
             <span v-if="corpInfo.name">修改</span>
             <span v-else>添加</span>
@@ -20,7 +20,7 @@
       <div class="info_item_center">
         <div class="info_item_center_a">企业地址</div>
         <div class="info_item_center_b">
-          <i>{{ corpInfo.address }}</i>
+          <i v-show="corpInfo.address">{{ corpInfo.address }}</i>
           <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpAddress">
             <span v-if="corpInfo.address">修改</span>
             <span v-else>添加</span>
@@ -30,7 +30,7 @@
       <div class="info_item">
         <div class="info_item_a">联系电话</div>
         <div class="info_item_b">
-          <i>{{ corpInfo.tel }}</i>
+          <i v-show="corpInfo.tel">{{ corpInfo.tel }}</i>
           <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpTel">
             <span v-if="corpInfo.tel">修改</span>
             <span v-else>添加</span>
@@ -122,7 +122,7 @@
         label-width="100px"
         class="corpInfoClass"
       >
-        <el-form-item label="企业地址" :label-width="modifyCorpData.formLabelWidth" prop="name">
+        <el-form-item label="企业地址" :label-width="modifyCorpData.formLabelWidth" prop="address">
           <el-input v-model="corpInfo.address" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -171,7 +171,8 @@ export default {
         { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
       tel: [
-        { required: true, message: "请输入联系方式" }
+        { required: true, message: "请输入联系方式" },
+        { min: 2, max: 25, message: "长度在 2 到 25 个字符" }
       ],
       address: [
         { required: true, message: "请输入地址" },

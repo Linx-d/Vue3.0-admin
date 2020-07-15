@@ -81,11 +81,11 @@
             <i>{{ currentMemberInfo.railName }}</i>
           </li>
           <li>
-            <span>体温：</span>
+            <span>体温告警：</span>
             <i>{{ currentMemberInfo.tnumber }}</i>
           </li>
           <li>
-            <span>位置：</span>
+            <span>位置告警：</span>
             <i>{{ currentMemberInfo.pnumber }}</i>
           </li>
         </ul>
@@ -207,6 +207,9 @@ export default {
           },
           yAxis: {
             type: "value",
+            min: 35,
+            max: 40,
+            interval: 1,
             axisLabel: {
               formatter: "{value}°C" //Y坐标
             }
