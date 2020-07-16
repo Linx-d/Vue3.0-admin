@@ -87,6 +87,7 @@ import {
   listUserLocation,
   add
 } from "@/api/mapApi";
+import { listRail, selectRailList, listUserInfoByRail } from "@/api/railApi";
 import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
 import { adaptionEchartsV2 } from "@/utils/common"; // 图表自适应
 import alarmOption from "./options/alarmOption.js"; // 告警模块
@@ -135,6 +136,7 @@ export default {
               title: "个人信息",
               enableMessage: true //设置允许信息窗发送短息
             };
+            // 状态统计
             let status = {
               personStatic: data.length,
               eletricStatic: 0,
@@ -143,30 +145,30 @@ export default {
             };
             data.forEach(item => {
               //console.log(item);
-              let oline = item.online;
+              let deviceOline = item.online;
               let temperature = parseFloat(item.temperature);
               let electric = item.electric;
-              let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32,32));
+              let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
               if (temperature > 37.3) {
                 status.temperatureStatic++;
-                myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32,32));
+                myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
               }
-              if (oline) {
+              if (deviceOline) {
                 status.onlineStatic++;
-                myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32,32));
+                myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
               }
               if (electric < 2) {
                 status.eletricStatic++;
               }
               let point = new BMap.Point(item.longitude, item.latitude);
-              let marker = new BMap.Marker(point, {icon: myIcon});
+              let marker = new BMap.Marker(point, { icon: myIcon });
               // let marker = new BMap.Marker(point);
               let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
               addClickHandler(content, marker);
               markers.push(marker);
               pointArray.push(point);
             });
-            online(status);
+            online(status); // 统计表 比例
             function addClickHandler(content, marker) {
               marker.addEventListener("click", function(e) {
                 openInfo(content, e);
@@ -252,16 +254,57 @@ export default {
       });
     }
     /**
-     * 设备统计 divice
+     * 围栏统计 rail
      */
     const device = () => {
       let myChart = root.$echarts.init(document.getElementById("device"));
       adaptionEchartsV2(myChart);
       let option = deviceOption;
-
-      //let num = 1;
-      //option.series[0].data = [num, num, 7, 8, 9, 10];
-      myChart.setOption(option);
+      let railListPaging = reactive({
+        pageNum: 1,
+        pageSize: 5
+      });
+      // 查询所有围栏信息 selectRailList
+      const selectRailList = railListPaging => {
+        listRail(railListPaging).then(res => {
+          let data = res.data.list ? res.data.list : res.data;
+          let size = res.data.size,
+            hasPreviousPage = res.data.hasPreviousPage;
+          let statistics = {
+            normalArr: [],
+            abnormalArr: [],
+            railNameArr: []
+          }
+          let normalArr = [];
+          let abnormalArr = [];
+          let railNameArr = [];
+          data.forEach(item => {
+            // console.log(item)
+            listUserInfoByRail(item.id).then(res => {
+              let abnormalPerson = 0;
+              let data = res.data;
+              data.forEach(item => {
+                let temperature = parseFloat(item.temperature);
+                if (temperature > 37.3) {
+                  abnormalPerson++;
+                }
+              });
+              item.abnormalPerson = abnormalPerson;
+              statistics.railNameArr.push(item.railName);
+              statistics.normalArr.push(item.personSum);
+              statistics.abnormalArr.push(item.abnormalPerson);
+            });
+          });
+          return statistics;
+        }).then(data => {
+          // option.yAxis.data = data.railNameArr;
+          // option.series[0].data = data.normalArr;
+          // option.series[1].data = data.abnormalArr;
+          // console.log(option);
+          myChart.setOption(option);
+        });
+      };
+      selectRailList();
     };
     /**
      * 告警历史 history
@@ -424,7 +467,7 @@ $alanysisMinHeight_Bottom: 227px;
       right: 0;
       bottom: 0;
       padding-top: 20px;
-      @include webkit('box-sizing', border-box);
+      @include webkit("box-sizing", border-box);
       #history {
         height: 100%;
         width: 100%;
