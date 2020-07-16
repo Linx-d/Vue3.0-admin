@@ -24,7 +24,7 @@ export function jssdk(jsApiList,fun){
                     if(res.errMsg.indexOf('function not exist') > -1){
                         alert('版本过低请升级')
                     }
-                    alert('通过agentConfig注入应用失败' + JSON.stringify(res));
+                    // alert('通过agentConfig注入应用失败' + JSON.stringify(res));
                 }
             });
         }
