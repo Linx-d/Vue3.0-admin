@@ -1,4 +1,7 @@
 const path = require("path");
+const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const productionGzipExtensions = ['js', 'css'];
+const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
   // 基本路径
   publicPath: process.env.NODE_ENV === "production" ? "" : "/",
@@ -30,6 +33,36 @@ module.exports = {
         "@c": path.resolve(__dirname, "./src/components")
       }
     };
+    // 开启gzip压缩
+    if (isProduction) {
+      config.plugins.push(new CompressionWebpackPlugin({
+        algorithm: 'gzip',
+        test: /\.js$|\.html$|\.json$|\.css/,
+        threshold: 10240,
+        minRatio: 0.8
+      }));
+      // 开启分离js
+      config.optimization = {
+        runtimeChunk: 'single',
+        splitChunks: {
+          chunks: 'all',
+          maxInitialRequests: Infinity,
+          minSize: 20000,
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name(module) {
+                // get the name. E.g. node_modules/packageName/not/this/part.js
+                // or node_modules/packageName
+                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
+                // npm package names are URL-safe, but some servers don't like @ symbols
+                return `npm.${packageName.replace('@', '')}`
+              }
+            }
+          }
+        }
+      };
+    }
   },
   // 生产环境是否生成 sourceMap 文件
   productionSourceMap: false,
@@ -63,7 +96,7 @@ module.exports = {
     https: false, // 编译失败时刷新页面
     hot: true, // 开启热加载
     hotOnly: false,
-    disableHostCheck:true,//host检查
+    disableHostCheck: true, //host检查
     // 跨域
     proxy: {
       [process.env.VUE_APP_BASE_API]: {

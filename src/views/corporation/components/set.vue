@@ -70,7 +70,7 @@
         class="employeeInfoClass"
       >
         <el-form-item label="名称" :label-width="modifyStaffData.formLabelWidth" prop="name">
-          <el-input v-model="employeeInfo.name" autocomplete="off"></el-input>
+          <el-input v-model="employeeName" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -124,6 +124,8 @@ export default {
       corpUserId: 0,
       role: null
     });
+    let employeeName = ref(employeeInfo.name);
+    console.log(employeeName)
     getLoginEmployee().then(res => {
       let data = res.data;
       let roleId = data.role.id;
@@ -140,6 +142,7 @@ export default {
       employeeInfo.gmtModified = data.gmtModified || "暂无";
       employeeInfo.corpUserId = data.corpUserId || "暂无";
       employeeInfo.identity = data.role.name || "暂无";
+      employeeName = employeeInfo.name;
     });
 
     const modifyStaffData = reactive({
@@ -170,6 +173,7 @@ export default {
                 type: "success",
                 message: "修改成功"
               });
+              employeeInfo.name = employeeName;
               modifyStaffData.dialogNameVisible = false;
             } else {
               root.$message({
@@ -242,10 +246,6 @@ export default {
     };
     const modifyNameBefore = () => {
       resetForm("employeeInfo");
-      getLoginEmployee().then(res => {
-        let data = res.data;
-        employeeInfo.name = data.name;
-      });
       modifyStaffData.dialogNameVisible = false;
     };
     watchEffect(() => {});
@@ -263,7 +263,7 @@ export default {
       WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
     };
     return {
-      employeeInfo,
+      employeeInfo, employeeName,
       modifyStaffData,
       modifyStaffName,
       modifyStaffTel,
