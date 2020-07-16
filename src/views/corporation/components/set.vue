@@ -60,7 +60,7 @@
     <el-dialog
       title="修改名称"
       :visible.sync="modifyStaffData.dialogNameVisible"
-      :before-close="modifyBefore"
+      :before-close="modifyNameBefore"
     >
       <el-form
         :model="employeeInfo"
@@ -127,7 +127,6 @@ export default {
     getLoginEmployee().then(res => {
       let data = res.data;
       let roleId = data.role.id;
-      console.log(data);
       if (roleId === 1) {
         employeeInfo.departmentManagers = "所有部门";
       } else {
@@ -217,6 +216,7 @@ export default {
     };
 
     const modifyStaffName = () => {
+      employeeInfo.name = '';
       modifyStaffData.dialogNameVisible = true;
     };
     const modifyStaffTel = () => {
@@ -240,20 +240,28 @@ export default {
       resetForm("employeeInfo");
       modifyStaffData.dialogNameVisible = false;
     };
+    const modifyNameBefore = () => {
+      resetForm("employeeInfo");
+      getLoginEmployee().then(res => {
+        let data = res.data;
+        employeeInfo.name = data.name;
+      });
+      modifyStaffData.dialogNameVisible = false;
+    };
     watchEffect(() => {});
     onMounted(() => {});
     // -------------------------企业微信--------------------------------
-    const callSDK = ()=>{
+    const callSDK = () => {
       let jsApiList = [];
-      let fun = ()=>{
-        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
-      }
-      jssdk(jsApiList,fun)
-    }
-    callSDK()
-    const loadWWOpenData =()=>{
-        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
-    }
+      let fun = () => {
+        WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
+      };
+      jssdk(jsApiList, fun);
+    };
+    callSDK();
+    const loadWWOpenData = () => {
+      WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
+    };
     return {
       employeeInfo,
       modifyStaffData,
@@ -262,7 +270,7 @@ export default {
       confirmNameOpen,
       rules,
       modifyNameCancle,
-      modifyBefore,
+      modifyBefore, modifyNameBefore,
       modifyTelCancle,
       confirmTelOpen,
       loadWWOpenData

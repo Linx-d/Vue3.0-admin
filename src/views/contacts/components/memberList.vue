@@ -186,7 +186,6 @@ export default {
       for (let key in currentMemberInfo) {
         currentMemberInfo[key] = data[key];
       }
-
       let tmpHistory = props.tmpHistory;
       /**根据用户id获取历史数据信息 */
       let currentObj = {
@@ -208,6 +207,7 @@ export default {
       let currentArray = [currentMemberInfo.userId];
       listDeviceAlarmInfoByUserId(currentArray).then(res => {
         let data = res.data[0] ? res.data[0] : [];
+        props.tmpHistory.railName = data.railName;
         for (let key in data) {
           currentMemberInfo[key] = data[key];
         }

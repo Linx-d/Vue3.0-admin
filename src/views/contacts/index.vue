@@ -241,7 +241,6 @@ export default {
         childrenLen: 0
       }
     ]);
-    // getCompanyId();
     getCompanyId().then(res => {
       departData[0].id = res;
     });
