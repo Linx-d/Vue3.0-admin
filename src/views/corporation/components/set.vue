@@ -106,7 +106,7 @@
 <script>
 import { getLoginEmployee, updateEmployee } from "@/api/employeeApi";
 import { jssdk } from "@/utils/wxwork";
-import { reactive, onMounted, watchEffect } from "@vue/composition-api";
+import { reactive, onMounted, watchEffect, res } from "@vue/composition-api";
 export default {
   name: "corporationInfo",
   setup(props, { root, refs }) {

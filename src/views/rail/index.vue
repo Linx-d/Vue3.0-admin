@@ -98,6 +98,7 @@
                 <tr>
                   <th>名称</th>
                   <th>人数</th>
+                  <th>温度异常人数</th>
                   <th>创建时间</th>
                   <th>修改时间</th>
                   <th>半径(m)</th>
@@ -110,6 +111,7 @@
                 <tr v-for="(rail, index) in railData.data" :key="rail.id">
                   <td :title="rail.railName">{{ rail.railName }}</td>
                   <td :title="rail.personSum">{{ rail.personSum }}</td>
+                  <td :title="rail.personSum">{{ rail.abnormalPerson }}</td>
                   <td :title="rail.gmtCreate">{{ rail.gmtCreate }}</td>
                   <td :title="rail.gmtModified">{{ rail.gmtModified }}</td>
                   <td :title="rail.radius">{{ rail.radius }}</td>
@@ -154,6 +156,9 @@ import { reactive, ref, onMounted, watchEffect } from "@vue/composition-api";
 import { Message } from "element-ui";
 import { cloneArray, cloneObject } from "@/utils/common";
 import { Map } from "@/map";
+import onLineIcon from "./images/marker_online.png";
+import unLineIcon from "./images/marker_unline.png";
+import dangerIcon from "./images/marker_danger.png";
 export default {
   name: "rail",
   setup(props, { root, refs }) {
@@ -330,7 +335,23 @@ export default {
 
         railData.data.splice(0, railData.data.length);
         data.forEach(item => {
-          railData.data.push(item);
+          // console.log(item)
+          listUserInfoByRail(item.id)
+            .then(res => {
+              let abnormalPerson = 0;
+              let data = res.data;
+              data.forEach(item => {
+                let temperature = parseFloat(item.temperature);
+                if (temperature > 37.3) {
+                  abnormalPerson++;
+                }
+              });
+              item.abnormalPerson = abnormalPerson;
+              return item;
+            })
+            .then(data => {
+              railData.data.push(item);
+            });
         });
       });
     };
@@ -369,9 +390,31 @@ export default {
           title: "个人信息",
           enableMessage: true //设置允许信息窗发送短息
         };
+        // 状态统计
+        let status = {
+          personStatic: listByRailData.length,
+          eletricStatic: 0,
+          temperatureStatic: 0,
+          onlineStatic: 0
+        };
         listByRailData.forEach(item => {
+          let deviceOline = item.online;
+          let temperature = parseFloat(item.temperature);
+          let electric = item.electric;
+          let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
+          if (temperature > 37.3) {
+            status.temperatureStatic++;
+            myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
+          }
+          if (deviceOline) {
+            status.onlineStatic++;
+            myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
+          }
+          if (electric < 2) {
+            status.eletricStatic++;
+          }
           let point = new BMap.Point(item.longitude, item.latitude);
-          let marker = new BMap.Marker(point);
+          let marker = new BMap.Marker(point, { icon: myIcon });
           let content = item.userName;
           map.addOverlay(marker);
           addClickHandler(content, marker);
