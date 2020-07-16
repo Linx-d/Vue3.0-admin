@@ -2,6 +2,9 @@ import service from "@/utils/request";
 
 export function jssdk(jsApiList,fun){
     let url = window.location.href;
+    if(url.indexOf("#")!=-1){
+       url = url.substring(0,url.indexOf("#"));
+    }
     console.log(url,"url");
     service.request({
       method:"POST",
@@ -20,10 +23,8 @@ export function jssdk(jsApiList,fun){
                 fail: function(res) {
                     if(res.errMsg.indexOf('function not exist') > -1){
                         alert('版本过低请升级')
-                        window.location.href = "./empty_page.html";
                     }
                     alert('通过agentConfig注入应用失败' + JSON.stringify(res));
-                    window.location.href = "./empty_page.html";
                 }
             });
         }

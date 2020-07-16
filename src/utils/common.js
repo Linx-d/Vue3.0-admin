@@ -1,4 +1,5 @@
 import { EleResize } from "./esresize"; // 图表自适应
+import { selectEmpDepRoleByEmpId } from "@/api/employeeApi";
 
 /**
  *
@@ -140,7 +141,11 @@ export function getParemter(key){
       return null;
     }
     if(url.indexOf("?")!=-1){
-      let str = url.substr(url.indexOf("?")+1);
+      if(url.indexOf("#")!=-1&&url.indexOf("#")>url.indexOf("?")){
+        var str = url.substring(url.indexOf("?")+1,url.indexOf("#"));
+      }else{
+        var str = url.substring(url.indexOf("?")+1);
+      }
       let params = str.split("&");
       let value =null;
       params.forEach(param=>{
