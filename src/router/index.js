@@ -12,43 +12,43 @@ Vue.use(VueRouter)
   {
     path: "/index",
     name: "Index",
-    component: () => import("../views/index/index.vue")
+    component: resolve => require(["../views/index/index.vue"], resolve)
   },
   {
     path: "/contacts",
     name: "Contacts",
-    component: () => import("../views/contacts/index.vue")
+    component: resolve => require(["../views/contacts/index.vue"], resolve)
   },
   {
     path: "/rail",
     name: "Rail",
-    component: () => import("../views/rail/index.vue")
+    component: resolve => require(["../views/rail/index.vue"], resolve)
   },
   {
     path: "/map",
     name: "Map",
-    component: () => import("../views/map/index.vue")
+    component: resolve => require(["../views/map/index.vue"], resolve)
   },
   {
     path: "/corporation",
     name: "Corporation",
     redirect: "/corporation/corporation_info",
-    component: () => import("@/views/corporation/index.vue"),
+    component: resolve => require(["@/views/corporation/index.vue"], resolve),
     children: [
       {
         path: "/corporation/corporation_info",
         name: "corporation_info",
-        component: () => import("@/views/corporation/components/info.vue")
+        component: resolve => require(["@/views/corporation/components/info.vue"], resolve)
       },
       {
         path: "/corporation/corporation_authority",
         name: "corporation_authority",
-        component: () => import("@/views/corporation/components/authority.vue")
+        component: resolve => require(["@/views/corporation/components/authority.vue"], resolve)
       },
       {
         path: "/corporation/corporation_set",
         name: "corporation_set",
-        component: () => import("@/views/corporation/components/set.vue")
+        component: resolve => require(["@/views/corporation/components/set.vue"], resolve)
       }
     ]
   }
