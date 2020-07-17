@@ -86,9 +86,11 @@
         ref="multipleTable"
         :data="ungrouped.data"
         tooltip-effect="dark"
-        style="width: 100%"
+        style="width: 100%;"
         height="300px"
         @selection-change="handleSelectionChange"
+        @scroll="tableScroll"
+        class="addScroll"
       >
         <el-table-column type="selection" width="70"></el-table-column>
         <el-table-column label="姓名" width="150">
@@ -243,6 +245,7 @@ export default {
       data: []
     });
     const addMemberBtn = () => {
+      ungrouped.pageNum = 1;
       ungrouped.data.splice(0, ungrouped.data.length);
       dialogTableVisible.status = true;
       noDepart(ungrouped.pageNum, ungrouped.pageSize);
@@ -262,7 +265,11 @@ export default {
       });
     };
     const addMemberList = () => {
-      addMemberOpen();
+      if (multipleSelection.length > 0) {
+        addMemberOpen();
+      } else {
+        root.$message({ type: "warning", message: "请选择用户在添加" });
+      }
     };
 
     /**
@@ -382,7 +389,16 @@ export default {
           });
         });
     };
-
+    const tableScroll = () => {
+      let tableHeight = refs.multipleTable.bodyWrapper.offsetHeight;
+      let tableScrollTop = refs.multipleTable.bodyWrapper.scrollTop;
+      let tableScrollHeight = refs.multipleTable.bodyWrapper.scrollHeight;
+      if (tableScrollHeight - tableScrollTop <= tableHeight) {
+        ungrouped.pageNum++;
+        noDepart(ungrouped.pageNum, ungrouped.pageSize);
+      }
+    };
+    window.addEventListener("scroll", tableScroll, true);
     // 增加成员确认框
     const addMemberOpen = () => {
       const h = root.$createElement;
@@ -457,7 +473,8 @@ export default {
       toggleSelection,
       handleSelectionChange,
       dialogTableVisible,
-      addMemberList
+      addMemberList,
+      tableScroll
     };
   }
 };

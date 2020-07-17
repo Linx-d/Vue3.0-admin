@@ -96,7 +96,7 @@
       <div class="info_module mapBox">
         <div id="mapShow"></div>
       </div>
-      <el-dialog title="围栏列表" :visible.sync="dialogRailVisible.status" class="railTable">
+      <el-dialog title="围栏列表" :visible.sync="dialogRailVisible.status" class="railTable" id="memberRailList">
         <el-table :data="railList.data" style="width: 100%" max-height="250">
           <el-table-column fixed prop="gmtCreate" label="日期" width="160"></el-table-column>
           <el-table-column prop="railName" label="围栏名称" width="120"></el-table-column>
