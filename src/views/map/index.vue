@@ -144,8 +144,11 @@ export default {
               onlineStatic: 0
             };
             data.forEach(item => {
-              //console.log(item);
-              let deviceOline = item.online;
+              let gmtTime = new Date().getTime() - new Date(item.gmtCreate).getTime();
+              let deviceOline = false;
+              if(gmtTime<300001) {
+                deviceOline = true;
+              }
               let temperature = parseFloat(item.temperature);
               let electric = item.electric;
               let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));

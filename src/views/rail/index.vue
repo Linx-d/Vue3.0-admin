@@ -51,7 +51,11 @@
         ref="addRailData"
         label-width="100px"
         class="modify_ruleForm"
+      style="margin-top: -52px;"
       >
+        <el-form-item label="围栏地址" prop="railAddr" class="form-item" style="opacity: 0;">
+          <el-input v-model="addRailData.railAddr"></el-input>
+        </el-form-item>
         <el-form-item label="围栏名称" prop="railName" class="form-item">
           <el-input v-model="addRailData.railName"></el-input>
         </el-form-item>
@@ -265,7 +269,6 @@ export default {
           console.log("error submit!!");
           return false;
         } else {
-          console.log("success submit!!");
           modifyOpen();
           return true;
         }
@@ -440,7 +443,12 @@ export default {
           onlineStatic: 0
         };
         listByRailData.forEach(item => {
-          let deviceOline = item.online;
+          let gmtTime =
+            new Date().getTime() - new Date(item.gmtCreate).getTime();
+          let deviceOline = false;
+          if (gmtTime < 300001) {
+            deviceOline = true;
+          }
           let temperature = parseFloat(item.temperature);
           let electric = item.electric;
           let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
