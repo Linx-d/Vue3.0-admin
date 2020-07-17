@@ -15,7 +15,11 @@
         ref="modifyRailData"
         label-width="100px"
         class="modify_ruleForm"
+        style="margin-top: -52px;"
       >
+        <el-form-item label="围栏地址" prop="railAddr" class="form-item" style="opacity: 0;">
+          <el-input v-model="modifyRailData.railAddr"></el-input>
+        </el-form-item>
         <el-form-item label="围栏名称" prop="railName" class="form-item">
           <el-input v-model="modifyRailData.railName"></el-input>
         </el-form-item>
@@ -223,9 +227,9 @@ export default {
     };
     const rules = reactive({
       railName: [
-        { required: true, message: "请输入围栏名称" },
+        { required: true, message: "请输入围栏名称", trigger: "blur" },
         { min: 3, max: 7, message: "长度在 3 到 7 个字符" },
-        { validator: validateRailName }
+        { validator: validateRailName, trigger: "blur" }
       ],
       railAddr: [
         { required: true, message: "请设置围栏地址" },

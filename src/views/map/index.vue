@@ -438,13 +438,13 @@ $alanysisMinHeight_Bottom: 227px;
     position: relative;
     .alanysis_top_a {
       width: 100%;
-      height: 50%;
+      height: 100%;
       left: 0;
       top: 0;
     }
     .alanysis_top_b {
       width: 100%;
-      height: 50%;
+      height: 0%;
       right: 0;
       bottom: 0;
     }
