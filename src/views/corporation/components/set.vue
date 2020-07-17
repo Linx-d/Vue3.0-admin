@@ -144,11 +144,11 @@ export default {
       name: "",
     });
     getLoginEmployee().then((res) => {
-      let data = res.data;
+      let data = res.data;console.log(data);
       let roleId = data.role.id;
-      if (roleId === 1) {
+      if (roleId === 1 || roleId === 2) {
         employeeInfo.departmentManagers = "所有部门";
-      } else {
+      }else {
         employeeInfo.departmentManagers = data.departmentManagers || "暂无";
       }
       employeeInfo.id = data.id;
