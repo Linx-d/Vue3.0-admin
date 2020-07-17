@@ -144,7 +144,7 @@ export default {
       name: "",
     });
     getLoginEmployee().then((res) => {
-      let data = res.data;console.log(data);
+      let data = res.data;
       let roleId = data.role.id;
       if (roleId === 1 || roleId === 2) {
         employeeInfo.departmentManagers = "所有部门";
