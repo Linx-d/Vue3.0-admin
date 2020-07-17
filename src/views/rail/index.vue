@@ -31,7 +31,7 @@
         </el-form-item>
         <el-form-item class="railBtn">
           <el-button type="primary" @click="modifySubmitForm('modifyRailData')">修改围栏</el-button>
-          <el-button @click="resetForm('modifyRailData')">重置</el-button>
+          <el-button @click="closeModifyDrawer">关闭</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>
@@ -63,7 +63,7 @@
         </el-form-item>
         <el-form-item class="railBtn">
           <el-button type="primary" @click="addSubmitForm('addRailData')">增加围栏</el-button>
-          <el-button @click="resetForm('addRailData')">重置</el-button>
+          <el-button @click="closeAddDrawer">关闭</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>
@@ -122,7 +122,7 @@
                   <td :title="rail.latitude">({{ rail.longitude }},{{ rail.latitude }})</td>
                   <td :title="rail.railAddr">{{ rail.railAddr }}</td>
                   <td class="tdTool">
-                    <a href="javascript:;" @click.stop="modifyRailFn(rail, index)">修改</a>
+                    <a href="javascript:;" @click.stop="modifyRailFn(rail, index)">查看</a>
                     <a href="javascript:;" @click.stop="delRailFn(rail, index)">删除</a>
                   </td>
                 </tr>
@@ -178,7 +178,7 @@ export default {
       index: null
     });
     // 增加围栏 data
-    const addRailData = reactive({
+    let addRailData = reactive({
       latitude: "",
       longitude: "",
       radius: null,
@@ -186,6 +186,13 @@ export default {
       railAddr: ""
     });
     const addRailFn = () => {
+      railText = {
+        latitude: "",
+        longitude: "",
+        radius: null,
+        railName: "",
+        railAddr: ""
+      };
       addDrawer.value = true; // 显示新增围栏模块
       addBaiduMap();
     };
@@ -200,6 +207,7 @@ export default {
     });
     const modifyRailFn = (data, index) => {
       cloneObject(modifyRailData, data);
+      cloneObject(railText, modifyRailData); // 判断是否有输入
       let id = data.id;
       modifyDrawer.value = true; // 显示修改围栏模块
       currentRailData.index = index; // 当前围栏的索引
@@ -281,24 +289,54 @@ export default {
       refs[formName].resetFields();
     };
     // 修改围栏点击覆盖层触发事件
+    let railText = reactive({
+      latitude: "",
+      longitude: "",
+      radius: null,
+      railName: "",
+      id: null,
+      railAddr: ""
+    });
     const modifyHandleClose = done => {
-      root
-        .$confirm("确认关闭？")
-        .then(_ => {
-          done();
-          resetForm("modifyRailData");
-        })
-        .catch(_ => {});
+      let status = true;
+      for (let key in railText) {
+        if (railText[key] != modifyRailData[key]) {
+          status = false;
+        }
+      }
+      if (status) {
+        done();
+        resetForm("modifyRailData");
+      } else {
+        root
+          .$confirm("确认关闭？")
+          .then(_ => {
+            done();
+            resetForm("modifyRailData");
+          })
+          .catch(_ => {});
+      }
     };
-    // 修改围栏点击覆盖层触发事件
+    // 增加围栏点击覆盖层触发事件
     const addHandleClose = done => {
-      root
-        .$confirm("确认关闭？")
-        .then(_ => {
-          done();
-          resetForm("addRailData");
-        })
-        .catch(_ => {});
+      let status = true;
+      for (let key in railText) {
+        if (railText[key] != addRailData[key]) {
+          status = false;
+        }
+      }
+      if (status) {
+        done();
+        resetForm("addRailData");
+      } else {
+        root
+          .$confirm("确认关闭？")
+          .then(_ => {
+            done();
+            resetForm("addRailData");
+          })
+          .catch(_ => {});
+      }
     };
     /**查询所有围栏信息 */
     let railListPaging = reactive({
@@ -722,7 +760,14 @@ export default {
           });
         });
     };
-
+    const closeModifyDrawer = () => {
+      resetForm("modifyRailData");
+      modifyDrawer.value = false;
+    };
+    const closeAddDrawer = () => {
+      resetForm("addRailData");
+      addDrawer.value = false;
+    };
     onMounted(() => {});
     return {
       railData, // 围栏信息
@@ -744,7 +789,9 @@ export default {
       resetForm, // 重置表单
       modifyHandleClose, // 修改围栏点击覆盖层触发事件
       addHandleClose, // 增加围栏点击覆盖层触发事件
-      modifyOpen
+      modifyOpen,
+      closeModifyDrawer,
+      closeAddDrawer
     };
   }
 };
