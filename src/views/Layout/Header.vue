@@ -9,7 +9,7 @@
         <span class="frame_operation_separator">|</span>
         <span>联系客服</span>
         <span class="frame_operation_separator">|</span>
-        <a href="javascript:;">退出</a>
+        <a href="javascript:;" @click="logOut">退出</a>
       </aside>
     </div>
     <div class="frame_head_bottom">
@@ -126,6 +126,16 @@ export default {
       stepStyle.value = "transform:" + clickStr.value;
       data.current = true;
     };
+    /***
+     * 退出登录
+     */
+    const logOut = () => {
+      // console.log(sessionStorage.getItem('auth_token'));
+      sessionStorage.clear();
+      const url = window.location.href;
+      window.location.href="http://iot.chinautech.com/api/qywx/login?redirectUrl="+url;
+      // window.location.href="http://www.chinautech.com/";
+    }
     /**监听路由 */
     watchEffect(() => {
       let path = root.$route.path;
@@ -139,7 +149,8 @@ export default {
       navList,
       step,
       stepStyle,
-      navTrigger
+      navTrigger,
+      logOut
     };
   }
 };
