@@ -1,7 +1,7 @@
 const path = require("path");
-const CompressionWebpackPlugin = require('compression-webpack-plugin');
-const productionGzipExtensions = ['js', 'css'];
-const isProduction = process.env.NODE_ENV === 'production';
+const CompressionWebpackPlugin = require("compression-webpack-plugin");
+const productionGzipExtensions = ["js", "css"];
+const isProduction = process.env.NODE_ENV === "production";
 module.exports = {
   // 基本路径
   publicPath: process.env.NODE_ENV === "production" ? "" : "/",
@@ -12,7 +12,7 @@ module.exports = {
   /** vue3.0内置了webpack所有东西，
    * webpack配置,see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
    **/
-  chainWebpack: config => {
+  chainWebpack: (config) => {
     const svgRule = config.module.rule("svg");
     svgRule.uses.clear();
     svgRule
@@ -20,32 +20,41 @@ module.exports = {
       .loader("svg-sprite-loader")
       .options({
         symbolId: "icon-[name]",
-        include: ["./src/icons"]
+        include: ["./src/icons"],
       });
   },
-  configureWebpack: config => {
+  configureWebpack: (config) => {
     config.resolve = {
       // 配置解析别名
       extensions: [".js", ".json", ".vue"], // 自动添加文件名后缀
       alias: {
         vue: "vue/dist/vue.js",
         "@": path.resolve(__dirname, "./src"),
-        "@c": path.resolve(__dirname, "./src/components")
-      }
+        "@c": path.resolve(__dirname, "./src/components"),
+      },
     };
     // 开启gzip压缩
     if (isProduction) {
-      config.plugins.push(new CompressionWebpackPlugin({
-        algorithm: 'gzip',
-        test: /\.js$|\.html$|\.json$|\.css/,
-        threshold: 10240,
-        minRatio: 0.8
-      }));
+      config.plugins.push(
+        new CompressionWebpackPlugin({
+          algorithm: "gzip",
+          test: /\.js$|\.html$|\.json$|\.css/,
+          threshold: 10240,
+          minRatio: 0.8,
+        })
+      );
+      // 修改vue.config.js 分离不常用代码库
+      // 如果不配置webpack也可直接在index.html引入
+      config.externals = {
+        vue: "Vue",
+        "vue-router": "VueRouter",
+        moment: "moment",
+      };
       // 开启分离js
       config.optimization = {
-        runtimeChunk: 'single',
+        runtimeChunk: "single",
         splitChunks: {
-          chunks: 'all',
+          chunks: "all",
           maxInitialRequests: Infinity,
           minSize: 20000,
           cacheGroups: {
@@ -54,13 +63,15 @@ module.exports = {
               name(module) {
                 // get the name. E.g. node_modules/packageName/not/this/part.js
                 // or node_modules/packageName
-                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
+                const packageName = module.context.match(
+                  /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+                )[1];
                 // npm package names are URL-safe, but some servers don't like @ symbols
-                return `npm.${packageName.replace('@', '')}`
-              }
-            }
-          }
-        }
+                return `npm.${packageName.replace("@", "")}`;
+              },
+            },
+          },
+        },
       };
     }
   },
@@ -75,11 +86,11 @@ module.exports = {
     // css预设器配置项
     loaderOptions: {
       sass: {
-        prependData: `@import "./src/styles/main.scss";`
-      }
+        prependData: `@import "./src/styles/main.scss";`,
+      },
     },
     // 启用 CSS modules for all css / pre-processor files.
-    requireModuleExtension: true
+    requireModuleExtension: true,
   },
   // use thread-loader for babel & TS in production build
   // enabled by default if the machine has more than 1 cores
@@ -91,7 +102,7 @@ module.exports = {
   // webpack-dev-server 相关配置
   devServer: {
     open: false, // 编译完成是否打开网页
-    host: '0.0.0.0', // 指定使用地址，默认localhost,0.0.0.0代表可以被外界访问
+    host: "0.0.0.0", // 指定使用地址，默认localhost,0.0.0.0代表可以被外界访问
     port: 8080, // 访问端口
     https: false, // 编译失败时刷新页面
     hot: true, // 开启热加载
@@ -101,25 +112,25 @@ module.exports = {
     proxy: {
       [process.env.VUE_APP_BASE_API]: {
         //target: 'http://60.2.15.152:9113', //外网
-        target: 'http://iot.chinautech.com', // 要访问的接口域名
+        target: "http://iot.chinautech.com", // 要访问的接口域名
         changeOrigin: true, //开启代理：在本地会创建一个虚拟服务端，然后发送请求的数据
         //并同时接收请求的数据，这样服务端和服务端进行数据的交互就不会有跨域问题
         pathRewrite: {
-          ['^' + process.env.VUE_APP_BASE_API]: '', //这里理解成用''代替target里面的地址
+          ["^" + process.env.VUE_APP_BASE_API]: "", //这里理解成用''代替target里面的地址
           // ['^${process.env.VUE_APP_BASE_API}']: '' //es6
-        }
-      }
+        },
+      },
     },
     overlay: {
       // 全屏模式下是否显示脚本错误
       warnings: true,
-      errors: true
+      errors: true,
     },
-    before: app => {}
+    before: (app) => {},
   },
-  
+
   /**
    * 第三方插件配置
    */
-  pluginOptions: {}
+  pluginOptions: {},
 };

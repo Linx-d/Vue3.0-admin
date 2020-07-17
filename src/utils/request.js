@@ -33,7 +33,7 @@ service.interceptors.response.use(
     let data = response.data;
     if (data.code !== 0) {
       //console.log(data);
-      Message.error(data.msg);
+      // Message.error(data.msg);
       return Promise.resolve(data);  //return Promise.reject(data);
     } else {
       //return response; //所有相应数据
