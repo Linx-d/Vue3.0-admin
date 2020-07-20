@@ -125,9 +125,8 @@ export default {
         map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
         listUserLocation()
           .then(res => {
-            return res.data;
-          })
-          .then(data => {
+            let code = res.code;
+            let data = res.data;
             let markers = [];
             let pointArray = [];
             let opts = {

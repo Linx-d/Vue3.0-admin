@@ -132,9 +132,8 @@ export default {
     const logOut = () => {
       // console.log(sessionStorage.getItem('auth_token'));
       sessionStorage.clear();
-      const url = window.location.href;
-      window.location.href="http://iot.chinautech.com/api/qywx/login?redirectUrl="+url;
       // window.location.href="http://www.chinautech.com/";
+      window.location.href="http://iot.chinautech.com/";
     }
     /**监听路由 */
     watchEffect(() => {
