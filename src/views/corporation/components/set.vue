@@ -69,23 +69,13 @@
         label-width="100px"
         class="employeeInfoClass"
       >
-        <el-form-item
-          label="名称"
-          :label-width="modifyStaffData.formLabelWidth"
-          prop="name"
-        >
-          <el-input
-            v-model="employeeName.name"
-            autocomplete="off"
-            maxlength="15"
-          ></el-input>
+        <el-form-item label="名称" :label-width="modifyStaffData.formLabelWidth" prop="name">
+          <el-input v-model="employeeName.name" autocomplete="off" maxlength="15"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyNameCancle()">取 消</el-button>
-        <el-button type="primary" @click="confirmNameOpen('employeeInfo')"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="confirmNameOpen('employeeInfo')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -102,19 +92,13 @@
         label-width="100px"
         class="employeeInfoClass"
       >
-        <el-form-item
-          label="电话"
-          :label-width="modifyStaffData.formLabelWidth"
-          prop="tel"
-        >
+        <el-form-item label="电话" :label-width="modifyStaffData.formLabelWidth" prop="tel">
           <el-input v-model="employeeInfo.tel" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyTelCancle()">取 消</el-button>
-        <el-button type="primary" @click="confirmTelOpen('employeeInfo')"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="confirmTelOpen('employeeInfo')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -138,17 +122,17 @@ export default {
       gmtModified: "2020-06-11T16:29:08",
       identity: "", // 身份
       corpUserId: 0,
-      role: null,
+      role: null
     });
     let employeeName = reactive({
-      name: "",
+      name: ""
     });
-    getLoginEmployee().then((res) => {
+    getLoginEmployee().then(res => {
       let data = res.data;
       let roleId = data.role.id;
       if (roleId === 1 || roleId === 2) {
         employeeInfo.departmentManagers = "所有部门";
-      }else {
+      } else {
         employeeInfo.departmentManagers = data.departmentManagers || "暂无";
       }
       employeeInfo.id = data.id;
@@ -164,38 +148,38 @@ export default {
     const modifyStaffData = reactive({
       dialogNameVisible: false,
       dialogTelVisible: false,
-      formLabelWidth: "120px",
+      formLabelWidth: "120px"
     });
     const rules = reactive({
       name: [
-        { required: true, message: "请输入名称" },
+        { required: true, message: "请输入名称" }
         // { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
       tel: [
         { required: true, message: "请输入联系电话" },
-        { min: 11, max: 11, message: "长度为 11 个字符" },
-      ],
+        { min: 11, max: 11, message: "长度为 11 个字符" }
+      ]
     });
-    const submitNameForm = (formName) => {
-      refs[formName].validate((valid) => {
+    const submitNameForm = formName => {
+      refs[formName].validate(valid => {
         if (valid) {
           let modifyData = new URLSearchParams();
           modifyData.append("name", employeeName.name);
           modifyData.append("id", employeeInfo.id);
-          updateEmployee(modifyData).then((res) => {
+          updateEmployee(modifyData).then(res => {
             let code = res.code;
-            console.log(res)
+            console.log(res);
             if (code === 0) {
               employeeInfo.name = employeeName.name;
               modifyStaffData.dialogNameVisible = false;
               root.$message({
                 type: "success",
-                message: "修改成功",
+                message: "修改成功"
               });
             } else {
               root.$message({
                 type: "warning",
-                message: res.msg,
+                message: res.msg
               });
             }
           });
@@ -205,24 +189,24 @@ export default {
         }
       });
     };
-    const submitTelForm = (formName) => {
-      refs[formName].validate((valid) => {
+    const submitTelForm = formName => {
+      refs[formName].validate(valid => {
         if (valid) {
           let modifyData = new URLSearchParams();
           modifyData.append("tel", employeeInfo.tel);
           modifyData.append("id", employeeInfo.id);
-          updateEmployee(modifyData).then((res) => {
+          updateEmployee(modifyData).then(res => {
             let code = res.code;
             if (code === 0) {
               root.$message({
                 type: "success",
-                message: "修改成功",
+                message: "修改成功"
               });
               modifyStaffData.dialogTelVisible = false;
             } else {
               root.$message({
                 type: "warning",
-                message: res.msg,
+                message: res.msg
               });
             }
           });
@@ -232,20 +216,24 @@ export default {
         }
       });
     };
-    const resetForm = (formName) => {
+    const resetForm = formName => {
       refs[formName].resetFields();
     };
 
     const modifyStaffName = () => {
+      let len = employeeInfo.name.length;
+      if (len < 10) {
+        employeeName.name = employeeInfo.name;
+      }
       modifyStaffData.dialogNameVisible = true;
     };
     const modifyStaffTel = () => {
       modifyStaffData.dialogTelVisible = true;
     };
-    const confirmNameOpen = (data) => {
+    const confirmNameOpen = data => {
       submitNameForm(data);
     };
-    const confirmTelOpen = (data) => {
+    const confirmTelOpen = data => {
       submitTelForm(data);
     };
     const modifyNameCancle = () => {
@@ -291,9 +279,9 @@ export default {
       modifyNameBefore,
       modifyTelCancle,
       confirmTelOpen,
-      loadWWOpenData,
+      loadWWOpenData
     };
-  },
+  }
 };
 </script>
 <style lang="scss" scoped>
