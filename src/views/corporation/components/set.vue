@@ -34,7 +34,7 @@
     <div class="info">
       <div class="info_item">
         <div class="info_item_a">管理的部门</div>
-        <div class="info_item_b">{{ employeeInfo.departmentManagers }}</div>
+        <div class="info_item_b departManagers" :title="employeeInfo.departmentManagers">{{ employeeInfo.departmentManagers }}</div>
       </div>
       <div class="info_item_center">
         <div class="info_item_center_a">企业ID</div>
@@ -104,7 +104,11 @@
   </div>
 </template>
 <script>
-import { getLoginEmployee, updateEmployee } from "@/api/employeeApi";
+import {
+  getLoginEmployee,
+  updateEmployee,
+  selectEmpDepRoleByEmpId
+} from "@/api/employeeApi";
 import { jssdk } from "@/utils/wxwork";
 import { reactive, onMounted, watchEffect, ref } from "@vue/composition-api";
 export default {
@@ -133,7 +137,22 @@ export default {
       if (roleId === 1 || roleId === 2) {
         employeeInfo.departmentManagers = "所有部门";
       } else {
-        employeeInfo.departmentManagers = data.departmentManagers || "暂无";
+        let departManagers = data.departmentManagers;
+        if (departManagers.length > 0) {
+          let str = "";
+          selectEmpDepRoleByEmpId(data.id).then(response => {
+            response.data.forEach((item, index) => {
+              if (index != response.data.length - 1) {
+                str += item.depName + "、";
+              } else {
+                str += item.depName;
+              }
+            });
+            employeeInfo.departmentManagers = str;
+          });
+        } else {
+          employeeInfo.departmentManagers = "暂无";
+        }
       }
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
@@ -401,6 +420,15 @@ $mainWidth: 705px;
         float: right;
       }
     }
+  }
+
+  .departManagers {
+    width: 200px !important;
+    float: left !important;
+    margin-left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 </style>
