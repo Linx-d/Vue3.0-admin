@@ -8,9 +8,9 @@
         <el-dialog width="900px" title="选择用户" :visible.sync="dialogTableVisible" center>
           <el-table :data="employeesNotRole.list">
             <el-table-column property="name" label="姓名" width="150">
-                <template slot-scope="scope">
-                  <p v-html='scope.row.name'></p>
-                </template>
+              <template slot-scope="scope">
+                <p v-html="scope.row.name"></p>
+              </template>
             </el-table-column>
             <el-table-column property="tel" label="电话" width="200"></el-table-column>
             <el-table-column property="gmtCreate" label="创建时间"></el-table-column>
@@ -36,10 +36,7 @@
           </div>
         </el-dialog>
       </div>
-      <el-menu 
-      :default-openeds="['1','2','3']"
-      @open="loadWWOpenData()"
-        >
+      <el-menu :default-openeds="['1','2','3']" @open="loadWWOpenData()">
         <el-submenu
           :index="role.id + ''"
           v-for="(role, index) in roleList"
@@ -92,7 +89,7 @@
           position: absolute;
           top: 111px;
           left: 0;"
-        ></span> -->
+        ></span>-->
         <el-form-item label="管理权限" v-if="!isEdit">
           <label class="label-info">{{employee.role.name}}</label>
         </el-form-item>
@@ -111,7 +108,7 @@
               v-for="department in employee.departments"
               :key="department.id"
             >
-              <i class="el-icon-folder icon"></i>
+              <svg-icon iconClass="depart" class="departSvg"></svg-icon>
               <label class="label-info">{{department.label}}</label>
             </div>
             <br />
@@ -228,7 +225,7 @@ export default {
      */
     let employeesNotRole = reactive({
       pageNum: 1,
-      pageSize: 2,
+      pageSize: 5,
       list: [
         {
           id: null
@@ -249,8 +246,7 @@ export default {
       tel: "",
       gmtCreate: ""
     });
-// -------------------------------------变量-------------------------------------------
-
+    // -------------------------------------变量-------------------------------------------
 
     /**
      * 查询所有员工
@@ -301,9 +297,8 @@ export default {
               roleList.push(item);
             });
           });
-          
         });
-        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
+      WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
     };
     /**
      * 切换为修改界面
@@ -493,17 +488,17 @@ export default {
       }
     };
     // -------------------------企业微信--------------------------------
-    const callSDK = ()=>{
+    const callSDK = () => {
       let jsApiList = [];
-      let fun = ()=>{
-        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
-      }
-      jssdk(jsApiList,fun)
-    }
-    callSDK()
-    const loadWWOpenData =()=>{
-        WWOpenData.bindAll(document.getElementsByTagName('ww-open-data'));
-    }
+      let fun = () => {
+        WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
+      };
+      jssdk(jsApiList, fun);
+    };
+    callSDK();
+    const loadWWOpenData = () => {
+      WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
+    };
     return {
       employees,
       roleList,
@@ -594,6 +589,11 @@ $corporationHeight: 655px;
   line-height: 30px;
   margin-right: 20px;
   padding: 0 8px;
+  cursor: pointer;
+  .departSvg {
+    margin-right: 5px;
+    vertical-align: text-top;
+  }
 }
 .department-icon:hover {
   border: 1px rgb(221, 221, 221) solid;

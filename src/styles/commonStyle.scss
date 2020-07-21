@@ -44,7 +44,7 @@
   display: table-cell;
   vertical-align: top;
   margin-right: 1px;
-  @include webkit('box-sizing', border-box);
+  @include webkit("box-sizing", border-box);
   background: #f9fafc;
 }
 
@@ -185,16 +185,22 @@ tbody {
   top: 1px !important;
 }
 
-.BMap_cpyCtrl, .anchorBL { // 隐藏百度地图商标
+.BMap_cpyCtrl,
+.anchorBL {
+  // 隐藏百度地图商标
   display: none;
 }
 
-
 //* pagingConfig 分页配置
+// .pagingConfig {
+//   position: absolute;
+//   right: 10px;
+//   top: 20px;
+// }
 .pagingConfig {
-  position: absolute;
-  right: 10px;
-  top: 20px;
+  margin-top: 20px;
+  margin-right: 20px;
+  float: right;
 }
 
 /** 
