@@ -32,9 +32,26 @@
       </div>
     </div>
     <div class="info">
-      <div class="info_item">
-        <div class="info_item_a">管理的部门</div>
-        <div class="info_item_b departManagers" :title="employeeInfo.departmentManagers">{{ employeeInfo.departmentManagers }}</div>
+      <div class="departManagersBox" v-if="employeeInfo.roleId!=3">
+        <div class="departManagers_title">管理的部门</div>
+        <div class="departManagers" :title="employeeInfo.departmentManagers">
+          <div>{{ employeeInfo.departmentManagers }}</div>
+        </div>
+      </div>
+      <div class="departManagersBoxAll" v-else>
+        <div class="departManagers_title">管理的部门</div>
+        <div class="departManagers">
+          <div
+            v-for="depart in employeeInfo.departmentManagers"
+            :key="depart.id"
+            class="departContent"
+          >
+            <div class="depart_item item_margin-bottom">
+              <svg-icon iconClass="depart" class="departSvg"></svg-icon>
+              <span>{{ depart }}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="info_item_center">
         <div class="info_item_center_a">企业ID</div>
@@ -107,7 +124,8 @@
 import {
   getLoginEmployee,
   updateEmployee,
-  selectEmpDepRoleByEmpId
+  selectEmpDepRoleByEmpId,
+  updateEmployeeNotAuth
 } from "@/api/employeeApi";
 import { jssdk } from "@/utils/wxwork";
 import { reactive, onMounted, watchEffect, ref } from "@vue/composition-api";
@@ -121,12 +139,14 @@ export default {
       photo:
         "https://p.qlogo.cn/bizmail/x9CrcRIuFWvA8VQcstTibfPAsrpcpFulOZwapfGCNwjkJMVUibNl0kWA/0",
       tel: null,
-      departmentManagers: "",
+      departmentManagers: null,
       gmtCreate: "2020-06-11 16:29:08",
       gmtModified: "2020-06-11T16:29:08",
       identity: "", // 身份
       corpUserId: 0,
-      role: null
+      role: null,
+      roleId: null,
+      managersStatus: true
     });
     let employeeName = reactive({
       name: ""
@@ -134,26 +154,6 @@ export default {
     getLoginEmployee().then(res => {
       let data = res.data;
       let roleId = data.role.id;
-      if (roleId === 1 || roleId === 2) {
-        employeeInfo.departmentManagers = "所有部门";
-      } else {
-        let departManagers = data.departmentManagers;
-        if (departManagers.length > 0) {
-          let str = "";
-          selectEmpDepRoleByEmpId(data.id).then(response => {
-            response.data.forEach((item, index) => {
-              if (index != response.data.length - 1) {
-                str += item.depName + "、";
-              } else {
-                str += item.depName;
-              }
-            });
-            employeeInfo.departmentManagers = str;
-          });
-        } else {
-          employeeInfo.departmentManagers = "暂无";
-        }
-      }
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
       //employeeInfo.photo = data.photo;
@@ -162,6 +162,28 @@ export default {
       employeeInfo.gmtModified = data.gmtModified || "暂无";
       employeeInfo.corpUserId = data.corpUserId || "暂无";
       employeeInfo.identity = data.role.name || "暂无";
+      employeeInfo.role = data.role || "暂无";
+      employeeInfo.roleId = employeeInfo.role.id;
+      employeeInfo.corpId = employeeInfo.corpId;
+      if (roleId === 1 || roleId === 2) {
+        employeeInfo.departmentManagers = "所有部门";
+      } else {
+        let departManagers = data.departmentManagers;
+        employeeInfo.departmentManagers = [];
+        if (departManagers.length > 0) {
+          selectEmpDepRoleByEmpId(data.id).then(response => {
+            let len = response.data.length;
+            if (len > 5) {
+              employeeInfo.managersStatus = true;
+            }
+            response.data.forEach((item, index) => {
+              employeeInfo.departmentManagers.push(item.depName);
+            });
+          });
+        } else {
+          employeeInfo.departmentManagers = "暂无";
+        }
+      }
     });
 
     const modifyStaffData = reactive({
@@ -185,9 +207,8 @@ export default {
           let modifyData = new URLSearchParams();
           modifyData.append("name", employeeName.name);
           modifyData.append("id", employeeInfo.id);
-          updateEmployee(modifyData).then(res => {
+          updateEmployeeNotAuth(modifyData).then(res => {
             let code = res.code;
-            console.log(res);
             if (code === 0) {
               employeeInfo.name = employeeName.name;
               modifyStaffData.dialogNameVisible = false;
@@ -214,7 +235,7 @@ export default {
           let modifyData = new URLSearchParams();
           modifyData.append("tel", employeeInfo.tel);
           modifyData.append("id", employeeInfo.id);
-          updateEmployee(modifyData).then(res => {
+          updateEmployeeNotAuth(modifyData).then(res => {
             let code = res.code;
             if (code === 0) {
               root.$message({
@@ -330,7 +351,6 @@ $mainWidth: 705px;
     }
   }
   .info {
-    height: 94px;
     border-bottom: 1px solid #e4e6e9;
     padding: 20px 0;
     .info_item {
@@ -421,14 +441,66 @@ $mainWidth: 705px;
       }
     }
   }
-
+  .departManagersBox {
+    height: 21px;
+    .departManagers_title {
+      padding-top: 0;
+    }
+  }
+  .departManagersBoxAll {
+    overflow: auto;
+  }
+  .departManagers_title {
+    width: 120px;
+    height: 100%;
+    padding-right: 9px;
+    color: #787878;
+    font-size: 14px;
+    float: left;
+    padding-top: 9px;
+  }
   .departManagers {
-    width: 200px !important;
+    width: 400px !important;
     float: left !important;
     margin-left: 10px;
-    overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    width: $mainWidth;
+    height: 100%;
+    font-size: 14px;
+    color: rgb(0, 0, 0);
+    float: right;
   }
+}
+.departContent {
+  display: inline-block;
+}
+.depart_item {
+  border: 1px solid #ddd;
+  height: 30px;
+  line-height: 20px;
+  width: 67px;
+  margin-right: 10px;
+  color: #000;
+  padding: 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  @include webkit("box-sizing", border-box);
+  .departSvg {
+    vertical-align: text-top;
+  }
+  span {
+    font-size: 12px;
+    margin-left: 5px;
+  }
+}
+.item_margin-bottom {
+  margin-bottom: 1px;
+}
+.depart_item:hover {
+  background: #f0f0f0;
 }
 </style>

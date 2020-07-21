@@ -17,7 +17,7 @@
             :filter-node-method="filterNode"
             @node-click="handleNodeClick"
             :expand-on-click-node="false"
-            :default-expanded-keys="[1]"
+            default-expandedAll
             ref="tree"
           >
             <span :class="['custom-tree-node']" slot-scope="{ node, data }">
@@ -164,6 +164,7 @@ import {
   listDepartmentByPid,
   getMaxDepartmentId
 } from "@/api/contactsApi";
+import { getLoginEmployee, selectEmpDepRoleByEmpId } from "@/api/employeeApi";
 import { translateDataToTree, switchModule } from "@/utils/common";
 import sha1 from "sha1"; //前台加密 使用:  sha1(value);
 import cookie from "cookie_js";
@@ -278,6 +279,47 @@ export default {
     const modifyData = reactive({ name: "", visibel: false, status: false }); // 修改部门名称 data
     const formLabelWidth = ref("100px");
 
+    /**
+     * 部门管理员、超级管理员
+     */
+    let employeeInfo = reactive({
+      id: null,
+      corpId: "ww2e7b5f3c87c34c17",
+      name: "",
+      departmentManagers: null,
+      identity: "", // 身份
+      corpUserId: 0,
+      role: null,
+      roleId: null,
+    });
+    getLoginEmployee().then(res => {
+      let data = res.data;
+      let roleId = data.role.id;
+      employeeInfo.id = data.id;
+      employeeInfo.name = data.name;
+      employeeInfo.corpUserId = data.corpUserId || "暂无";
+      employeeInfo.identity = data.role.name || "暂无";
+      employeeInfo.role = data.role || "暂无";
+      employeeInfo.roleId = employeeInfo.role.id;
+      employeeInfo.corpId = employeeInfo.corpId;
+      if (roleId === 1 || roleId === 2) {
+        employeeInfo.departmentManagers = "所有部门";
+      } else {
+        let departManagers = data.departmentManagers;
+        employeeInfo.departmentManagers = [];
+        if (departManagers.length > 0) {
+          selectEmpDepRoleByEmpId(data.id).then(response => {
+            let len = response.data.length;
+            response.data.forEach((item, index) => {
+              employeeInfo.departmentManagers.push(item.depName);
+            });
+          });
+        } else {
+          employeeInfo.departmentManagers = "暂无";
+        }
+      }
+    });
+    console.log(employeeInfo);
     /**---------------------------------- 部门 end---------------------------------- */
     /**
      * 函数
@@ -547,6 +589,8 @@ export default {
         data: data,
         node: node
       };
+      console.log(data, "data");
+      console.log(node, "node");
       let id = removeData.data.id || 0;
       memberLabel.value = `是否移除'${removeData.data.label}'`;
       if (companyData.companyId == id) {
