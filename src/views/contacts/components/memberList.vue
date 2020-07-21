@@ -5,17 +5,6 @@
         <span>{{ currentDepart.label }}</span>
         <span>({{ memberData.total }}人)</span>
       </div>
-      <div class="block" v-show="changeModule.status">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :page-sizes="[15, 20, 30, 40]"
-          :page-size="memberListPaging.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="memberData.total"
-          class="pagingConfig"
-        ></el-pagination>
-      </div>
       <div class="cnt_top_r">
         <a href="javascript:;"></a>
         <!--<span class="frame_operation_separator" v-if="currentDepart.id!==currentDepart.topId">|</span>-->
@@ -69,6 +58,17 @@
         </table>
         <div class="cnt_tool">
           <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
+        </div>
+        <div class="block" v-show="changeModule.status">
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :page-sizes="[15, 20, 30, 40]"
+            :page-size="memberListPaging.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="memberData.total"
+            class="pagingConfig"
+          ></el-pagination>
         </div>
       </div>
       <div class="no_member" v-show="!changeModule.status">
@@ -483,7 +483,7 @@ export default {
 $contactsHeight: 592px;
 .chunk_cnt {
   height: $contactsHeight;
-  padding-bottom: 45px !important;
+  // padding-bottom: 45px !important;
   .cnt_top {
     font-weight: 700;
     overflow: hidden;

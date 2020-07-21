@@ -51,7 +51,7 @@
         ref="addRailData"
         label-width="100px"
         class="modify_ruleForm"
-      style="margin-top: -52px;"
+        style="margin-top: -52px;"
       >
         <el-form-item label="围栏地址" prop="railAddr" class="form-item" style="opacity: 0;">
           <el-input v-model="addRailData.railAddr"></el-input>
@@ -80,17 +80,6 @@
             <span>&nbsp;共({{railData.total}})个围栏</span>
           </div>
 
-          <div class="block">
-            <el-pagination
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :page-sizes="[15, 20, 30, 40]"
-              :page-size="railListPaging.pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="railData.total"
-              class="pagingConfig"
-            ></el-pagination>
-          </div>
           <div class="cnt_top_r">
             <a href="javascript:;"></a>
             <!--<span class="frame_operation_separator" v-if="currentDepart.id!==currentDepart.topId">|</span>-->
@@ -116,7 +105,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(rail, index) in railData.data" :key="rail.id">
+                <tr
+                  v-for="(rail, index) in railData.data"
+                  :key="rail.id"
+                  @click.stop="modifyRailFn(rail, index)"
+                >
                   <td :title="rail.railName">{{ rail.railName }}</td>
                   <td :title="rail.personSum">{{ rail.personSum }}</td>
                   <td :title="rail.personSum">{{ rail.abnormalPerson }}</td>
@@ -134,6 +127,17 @@
             </table>
             <div class="cnt_tool">
               <a class="memberLink" href="javascript:;" @click="addRailFn">增加围栏</a>
+            </div>
+            <div class="block">
+              <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-sizes="[15, 20, 30, 40]"
+                :page-size="railListPaging.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="railData.total"
+                class="pagingConfig"
+              ></el-pagination>
             </div>
           </div>
           <div class="no_depart" v-show="!railData.status">
