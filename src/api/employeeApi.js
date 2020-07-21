@@ -96,3 +96,21 @@ export function updateEmployee(data) {
     data
   });
 }
+
+/**
+ * 修改员工信息（无权限验证）
+ *
+ * @export
+ * @param {
+            id: 'id',
+            name: 'name'
+            }
+* @returns data
+*/
+export function updateEmployeeNotAuth(data) {
+  return service.request({
+    method: "post",
+    url: "/employee/updateEmployeeNotAuth",
+    data
+  });
+}

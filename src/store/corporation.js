@@ -6,7 +6,7 @@ if (!sessionStorage.getItem("adminInfo")) {
   });
 }
 // 使用
-//console.log(JSON.parse(root.$store.state.corporation.adminInfo));
+// console.log(JSON.parse(root.$store.state.corporation.adminInfo));
 const corporation = {
   state: {
     adminInfo: sessionStorage.getItem("adminInfo"),

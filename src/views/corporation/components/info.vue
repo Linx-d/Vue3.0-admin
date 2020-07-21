@@ -11,7 +11,7 @@
         <div class="info_item_a">企业名称</div>
         <div class="info_item_b">
           <i v-show="corpInfo.name">{{ corpInfo.name }}</i>
-          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpName">
+          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpName" v-if="employeeInfo.roleId!=3">
             <span v-if="corpInfo.name">修改</span>
             <span v-else>添加</span>
           </a>
@@ -21,7 +21,7 @@
         <div class="info_item_center_a">企业地址</div>
         <div class="info_item_center_b">
           <i v-show="corpInfo.address">{{ corpInfo.address }}</i>
-          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpAddress">
+          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpAddress" v-if="employeeInfo.roleId!=3">
             <span v-if="corpInfo.address">修改</span>
             <span v-else>添加</span>
           </a>
@@ -31,7 +31,7 @@
         <div class="info_item_a">联系电话</div>
         <div class="info_item_b">
           <i v-show="corpInfo.tel">{{ corpInfo.tel }}</i>
-          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpTel">
+          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpTel" v-if="employeeInfo.roleId!=3">
             <span v-if="corpInfo.tel">修改</span>
             <span v-else>添加</span>
           </a>
@@ -135,10 +135,45 @@
 </template>
 <script>
 import { getCorpInfo, updateCorporation } from "@/api/corporationApi";
+import { getLoginEmployee } from "@/api/employeeApi";
 import { reactive, onMounted, watchEffect } from "@vue/composition-api";
 export default {
   name: "corporationInfo",
   setup(props, { root, refs }) {
+    /**登录人员信息
+     * 
+     */
+    let employeeInfo = reactive({
+      id: null,
+      corpId: "ww2e7b5f3c87c34c17",
+      name: "",
+      photo:
+        "https://p.qlogo.cn/bizmail/x9CrcRIuFWvA8VQcstTibfPAsrpcpFulOZwapfGCNwjkJMVUibNl0kWA/0",
+      tel: null,
+      gmtCreate: "2020-06-11 16:29:08",
+      gmtModified: "2020-06-11T16:29:08",
+      identity: "", // 身份
+      corpUserId: 0,
+      role: null,
+      roleId: null
+    });
+    getLoginEmployee().then(res => {
+      let data = res.data;
+      let roleId = data.role.id;
+      employeeInfo.id = data.id;
+      employeeInfo.name = data.name;
+      //employeeInfo.photo = data.photo;
+      employeeInfo.tel = data.tel;
+      employeeInfo.gmtCreate = data.gmtCreate || "暂无";
+      employeeInfo.gmtModified = data.gmtModified || "暂无";
+      employeeInfo.corpUserId = data.corpUserId || "暂无";
+      employeeInfo.identity = data.role.name || "暂无";
+      employeeInfo.role = data.role || "暂无";
+      employeeInfo.roleId = employeeInfo.role.id;
+    });
+    /**企业信息
+     * 
+     */
     let corpInfo = reactive({
       id: "ww2e7b5f3c87c34c17",
       name: "测试",
@@ -253,7 +288,8 @@ export default {
       modifyBefore,
       modifyNameCancle, modifyTelCancle, modifyAddressCancle,
       modifycorpName, modifycorpTel, modifycorpAddress,
-      confirmNameOpen, confirmTelOpen, confirmAddressOpen
+      confirmNameOpen, confirmTelOpen, confirmAddressOpen,
+      employeeInfo
     };
   }
 };
