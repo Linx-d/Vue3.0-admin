@@ -17,7 +17,7 @@
             :filter-node-method="filterNode"
             @node-click="handleNodeClick"
             :expand-on-click-node="false"
-            default-expandedAll
+            default-expand-all
             ref="tree"
           >
             <span :class="['custom-tree-node']" slot-scope="{ node, data }">

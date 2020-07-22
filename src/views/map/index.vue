@@ -10,7 +10,7 @@
       </ul>
     </div>
     <!-- alanysis 数据分析模块 login -->
-    <div class="alanysis">
+    <div :class="['alanysis', {'alanysisToggle': alanysisStatus.status}]">
       <div class="alanysis_top">
         <div id="online" class="alanysis_top_a echartsIndivi"></div>
         <div id="device" class="alanysis_top_b echartsIndivi"></div>
@@ -98,15 +98,21 @@ import systemOption from "./options/systemOption.js"; // 系统统计模块
 import onLineIcon from "./images/marker_online.png";
 import unLineIcon from "./images/marker_unline.png";
 import dangerIcon from "./images/marker_danger.png";
+import custom_map_config from "./custom_map_config/custom_map_config2.json";
 export default {
   name: "mapModule",
   setup(props, { root }) {
     const cutFull = () => {
+      alanysisStatus.status = !alanysisStatus.status;
       // 切换
       root.$store.commit("SET_FULL"); // commit 不用指向 map模块
     };
     const full = computed(() => {
       return root.$store.state.map.full;
+    });
+    // 隐藏图表
+    const alanysisStatus = reactive({
+      status: false
     });
     /**
      * 百度地图方法
@@ -123,74 +129,82 @@ export default {
         map.centerAndZoom(new BMap.Point(107.26569, 28.676057), 17); // 初始化地图,设置中心点坐标和地图级别
         map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
         map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
-        listUserLocation()
-          .then(res => {
-            let code = res.code;
-            let data = res.data;
-            let markers = [];
-            let pointArray = [];
-            let opts = {
-              width: 250,
-              height: 80,
-              title: "个人信息",
-              enableMessage: true //设置允许信息窗发送短息
-            };
-            // 状态统计
-            let status = {
-              personStatic: data.length,
-              eletricStatic: 0,
-              temperatureStatic: 0,
-              onlineStatic: 0
-            };
-            data.forEach(item => {
-              let gmtTime = new Date().getTime() - new Date(item.gmtCreate).getTime();
-              let deviceOline = false;
-              if(gmtTime<300001) {
-                deviceOline = true;
-              }
-              let temperature = parseFloat(item.temperature);
-              let electric = item.electric;
-              let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
-              if (temperature > 37.3) {
-                status.temperatureStatic++;
-                myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
-              }
-              if (deviceOline) {
-                status.onlineStatic++;
-                myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
-              }
-              if (electric < 2) {
-                status.eletricStatic++;
-              }
-              let point = new BMap.Point(item.longitude, item.latitude);
-              let marker = new BMap.Marker(point, { icon: myIcon });
-              // let marker = new BMap.Marker(point);
-              let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
-              addClickHandler(content, marker);
-              markers.push(marker);
-              pointArray.push(point);
-            });
-            online(status); // 统计表 比例
-            function addClickHandler(content, marker) {
-              marker.addEventListener("click", function(e) {
-                openInfo(content, e);
-              });
+        // map.setMapStyleV2({ styleJson: custom_map_config });
+        listUserLocation().then(res => {
+          let code = res.code;
+          let data = res.data;
+          let markers = [];
+          let pointArray = [];
+          let opts = {
+            width: 250,
+            height: 80,
+            title: "个人信息",
+            enableMessage: true //设置允许信息窗发送短息
+          };
+          // 状态统计
+          let status = {
+            personStatic: data.length,
+            eletricStatic: 0,
+            temperatureStatic: 0,
+            onlineStatic: 0
+          };
+          data.forEach(item => {
+            let gmtTime =
+              new Date().getTime() - new Date(item.gmtCreate).getTime();
+            let deviceOline = false;
+            if (gmtTime < 300001) {
+              deviceOline = true;
             }
-            function openInfo(content, e) {
-              let p = e.target;
-              let point = new BMap.Point(
-                p.getPosition().lng,
-                p.getPosition().lat
-              );
-              let infoWindow = new BMap.InfoWindow(content, opts); // 创建信息窗口对象
-              map.openInfoWindow(infoWindow, point); //开启信息窗口
+            let temperature = parseFloat(item.temperature);
+            let electric = item.electric;
+            let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
+            if (temperature > 37.3) {
+              status.temperatureStatic++;
+              myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
             }
-            //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
-            map.setViewport(pointArray);
-            let markerClusterer = new BMapLib.MarkerClusterer(map, {
-              markers: markers
-            });
+            if (deviceOline) {
+              status.onlineStatic++;
+              myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
+            }
+            if (electric < 2) {
+              status.eletricStatic++;
+            }
+            let point = new BMap.Point(item.longitude, item.latitude);
+            let marker = new BMap.Marker(point, { icon: myIcon });
+            // let marker = new BMap.Marker(point);
+            let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
+            addClickHandler(content, marker);
+            markers.push(marker);
+            pointArray.push(point);
           });
+          online(status); // 统计表 比例
+          function addClickHandler(content, marker) {
+            marker.addEventListener("click", function(e) {
+              openInfo(content, e);
+            });
+          }
+          function openInfo(content, e) {
+            let p = e.target;
+            let point = new BMap.Point(
+              p.getPosition().lng,
+              p.getPosition().lat
+            );
+            let infoWindow = new BMap.InfoWindow(content, opts); // 创建信息窗口对象
+            map.openInfoWindow(infoWindow, point); //开启信息窗口
+          }
+          //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
+          map.setViewport(pointArray);
+          let markerClusterer = new BMapLib.MarkerClusterer(map, {
+            markers: markers,
+            minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
+            // styles: [
+            //   {
+            //     url: "img/info.png",
+            //     size: new BMap.Size(0, 0)
+            //   }
+            // ]
+          });
+        });
       });
     };
     /**
@@ -268,43 +282,45 @@ export default {
       });
       // 查询所有围栏信息 selectRailList
       const selectRailList = railListPaging => {
-        listRail(railListPaging).then(res => {
-          let data = res.data.list ? res.data.list : res.data;
-          let size = res.data.size,
-            hasPreviousPage = res.data.hasPreviousPage;
-          let statistics = {
-            normalArr: [],
-            abnormalArr: [],
-            railNameArr: []
-          }
-          let normalArr = [];
-          let abnormalArr = [];
-          let railNameArr = [];
-          data.forEach(item => {
-            // console.log(item)
-            listUserInfoByRail(item.id).then(res => {
-              let abnormalPerson = 0;
-              let data = res.data;
-              data.forEach(item => {
-                let temperature = parseFloat(item.temperature);
-                if (temperature > 37.3) {
-                  abnormalPerson++;
-                }
+        listRail(railListPaging)
+          .then(res => {
+            let data = res.data.list ? res.data.list : res.data;
+            let size = res.data.size,
+              hasPreviousPage = res.data.hasPreviousPage;
+            let statistics = {
+              normalArr: [],
+              abnormalArr: [],
+              railNameArr: []
+            };
+            let normalArr = [];
+            let abnormalArr = [];
+            let railNameArr = [];
+            data.forEach(item => {
+              // console.log(item)
+              listUserInfoByRail(item.id).then(res => {
+                let abnormalPerson = 0;
+                let data = res.data;
+                data.forEach(item => {
+                  let temperature = parseFloat(item.temperature);
+                  if (temperature > 37.3) {
+                    abnormalPerson++;
+                  }
+                });
+                item.abnormalPerson = abnormalPerson;
+                statistics.railNameArr.push(item.railName);
+                statistics.normalArr.push(item.personSum);
+                statistics.abnormalArr.push(item.abnormalPerson);
               });
-              item.abnormalPerson = abnormalPerson;
-              statistics.railNameArr.push(item.railName);
-              statistics.normalArr.push(item.personSum);
-              statistics.abnormalArr.push(item.abnormalPerson);
             });
+            return statistics;
+          })
+          .then(data => {
+            // option.yAxis.data = data.railNameArr;
+            // option.series[0].data = data.normalArr;
+            // option.series[1].data = data.abnormalArr;
+            // console.log(option);
+            myChart.setOption(option);
           });
-          return statistics;
-        }).then(data => {
-          // option.yAxis.data = data.railNameArr;
-          // option.series[0].data = data.normalArr;
-          // option.series[1].data = data.abnormalArr;
-          // console.log(option);
-          myChart.setOption(option);
-        });
       };
       selectRailList();
     };
@@ -364,7 +380,7 @@ export default {
       system(); // 历史图表
       baiduMap(); // 百度地图
     });
-    return { cutFull, full, alarmData };
+    return { cutFull, full, alarmData, alanysisStatus };
   }
 };
 </script>
@@ -426,6 +442,9 @@ $alanysisMinHeight_Bottom: 227px;
 }
 .cutFullClass {
   height: $mapHeight !important;
+}
+.alanysisToggle {
+  display: none;
 }
 .tool_top {
   top: 16px;
