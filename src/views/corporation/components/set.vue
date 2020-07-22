@@ -129,6 +129,9 @@ import {
 } from "@/api/employeeApi";
 import { jssdk } from "@/utils/wxwork";
 import { reactive, onMounted, watchEffect, ref } from "@vue/composition-api";
+import departPng from "@/views/images/departManager.png";
+import superPng from "@/views/images/superManager.png";
+import normalPng from "@/views/images/normalManager.png";
 export default {
   name: "corporationInfo",
   setup(props, { root, refs }) {
@@ -151,12 +154,12 @@ export default {
     let employeeName = reactive({
       name: ""
     });
+    
     getLoginEmployee().then(res => {
       let data = res.data;
       let roleId = data.role.id;
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
-      //employeeInfo.photo = data.photo;
       employeeInfo.tel = data.tel;
       employeeInfo.gmtCreate = data.gmtCreate || "暂无";
       employeeInfo.gmtModified = data.gmtModified || "暂无";
@@ -165,9 +168,14 @@ export default {
       employeeInfo.role = data.role || "暂无";
       employeeInfo.roleId = employeeInfo.role.id;
       employeeInfo.corpId = employeeInfo.corpId;
-      if (roleId === 1 || roleId === 2) {
+      if (roleId === 1) {
         employeeInfo.departmentManagers = "所有部门";
+        employeeInfo.photo = superPng;
+      }else if(roleId === 2){
+        employeeInfo.departmentManagers = "所有部门";
+        employeeInfo.photo = normalPng;
       } else {
+        employeeInfo.photo = departPng;
         let departManagers = data.departmentManagers;
         employeeInfo.departmentManagers = [];
         if (departManagers.length > 0) {
