@@ -3,7 +3,7 @@
     <div class="cnt_top">
       <div class="cnt_top_l">
         <span>{{ currentDepart.label }}</span>
-        <span>({{ memberData.total }}人)</span>
+        <!-- <span>({{ memberData.total }}人)</span> -->
       </div>
       <div class="cnt_top_r">
         <a href="javascript:;"></a>
@@ -196,14 +196,21 @@ export default {
       listUserLocationById(currentObj).then(res => {
         let array = res.data.list ? res.data.list : res.data; // 服务器与local切换
         let newArr_time = [],
-          newArr_tmp = [];
+          newArr_tmp = [],
+          newArr_position = [];
         array.forEach(item => {
           newArr_time.push(item.gmtCreate);
           let temperature = Number(item.temperature).toFixed(1);
           newArr_tmp.push(temperature); //Number().toFiexd(1)
+          let positionObj = {
+            lng: item.longitude,
+            lat: item.latitude
+          }
+          newArr_position.push(positionObj);
         });
         tmpHistory.newArr_time = newArr_time;
         tmpHistory.newArr_tmp = newArr_tmp;
+        tmpHistory.newArr_position = newArr_position;
       });
       /**根据用户id获取设备最新数据和告警信息 */
       let currentArray = [currentMemberInfo.userId];
