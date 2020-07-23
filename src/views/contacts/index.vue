@@ -31,37 +31,39 @@
                 <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>
                 -->
                 <div class="menu_right" @click.stop="showDepartClick">
-                  <svg-icon iconClass="menu_link" class="menu_right_svg"></svg-icon>
-                  <div
-                    v-show="showDepartOperation"
-                    :class="['departOperation', {'showDepartOperation': showDepartOperation}]"
-                    @mouseleave.stop="hideDepartLeave"
-                  >
-                    <ul>
-                      <li>
-                        <el-button
-                          type="text"
-                          @click.stop="dialogShow(data, node)"
-                          class="addMemberBtn"
-                        >添加子部门</el-button>
-                      </li>
-                      <li>
-                        <el-button
-                          type="text"
-                          @click.stop="dialogmodify(data, node)"
-                          class="modifyMemberBtn"
-                        >修改部门名称</el-button>
-                      </li>
-                      <li>
-                        <el-button
-                          type="text"
-                          @click.stop="dialogDel(data, node)"
-                          class="delMemberBtn"
-                        >删除部门</el-button>
-                      </li>
-                      <li>id:{{data.id}}</li>
-                    </ul>
-                  </div>
+                  <el-col :span="12">
+                    <el-dropdown>
+                      <span class="el-dropdown-link">
+                        <svg-icon iconClass="menu_link" class="menu_right_svg"></svg-icon>
+                      </span>
+                      <el-dropdown-menu slot="dropdown">
+                        <ul class="contactSlowdown">
+                          <li>
+                            <el-button
+                              type="text"
+                              @click.stop="dialogShow(data, node)"
+                              class="addMemberBtn"
+                            >添加子部门</el-button>
+                          </li>
+                          <li>
+                            <el-button
+                              type="text"
+                              @click.stop="dialogmodify(data, node)"
+                              class="modifyMemberBtn"
+                            >修改部门名称</el-button>
+                          </li>
+                          <li>
+                            <el-button
+                              type="text"
+                              @click.stop="dialogDel(data, node)"
+                              class="delMemberBtn"
+                            >删除部门</el-button>
+                          </li>
+                          <li>id:{{data.id}}</li>
+                        </ul>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </el-col>
                 </div>
 
                 <el-dialog title="添加部门" :visible.sync="dialogFormVisible" class="addDialog">
@@ -208,6 +210,7 @@ export default {
     let tmpHistory = reactive({
       newArr_time: [],
       newArr_tmp: [],
+      newArr_position: [],
       online: false,
       temperature: "33.78",
       electric: "2",
@@ -290,7 +293,7 @@ export default {
       identity: "", // 身份
       corpUserId: 0,
       role: null,
-      roleId: null,
+      roleId: null
     });
     getLoginEmployee().then(res => {
       let data = res.data;
@@ -704,6 +707,7 @@ export default {
      */
     let showDepartOperation = ref(false);
     const showDepartClick = () => {
+      console.log("1");
       showDepartOperation.value = true;
     };
     const hideDepartLeave = () => {
@@ -885,8 +889,8 @@ $contactsHeight: 592px;
   .menu_right {
     opacity: 0;
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: -14px;
+    top: -6px;
     width: 30px;
     height: 100%;
     .menu_right_svg {
@@ -900,28 +904,6 @@ $contactsHeight: 592px;
       top: 8px;
       opacity: none;
       background: #fff;
-      ul {
-        @include webkit("box-shadow", 0 0 3px 0 #c8c8c8);
-        li {
-          width: 98px;
-          height: 26px;
-          padding: 4px 9px;
-          line-height: 18px;
-          @include webkit("box-sizing", border-box);
-          .addMemberBtn,
-          .modifyMemberBtn,
-          .delMemberBtn {
-            padding: 0;
-            color: #000;
-          }
-        }
-        li:hover {
-          background-color: #f5f7fa;
-        }
-        li:last-child:hover {
-          background-color: #fff;
-        }
-      }
     }
     .showDepartOperation {
       display: block;
@@ -931,6 +913,33 @@ $contactsHeight: 592px;
 .el-tree-node__content:hover {
   .menu_right {
     opacity: 1;
+  }
+}
+
+ul.contactSlowdown {
+  @include webkit("box-shadow", 0 0 3px 0 #c8c8c8);
+  li {
+    width: 98px;
+    height: 26px;
+    padding: 4px 9px;
+    line-height: 18px;
+    @include webkit("box-sizing", border-box);
+    .addMemberBtn,
+    .modifyMemberBtn,
+    .delMemberBtn {
+      padding: 0;
+      color: #000;
+    }
+  }
+  li:hover {
+    background-color: #f5f7fa;
+  }
+  li:last-child:hover {
+    background-color: #fff;
+  }
+  li:last-child {
+    font-size: 12px;
+    color: #bbb5b5;
   }
 }
 </style>
