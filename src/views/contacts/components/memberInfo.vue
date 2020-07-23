@@ -96,9 +96,14 @@
       <div class="info_module mapBox">
         <div id="mapShow"></div>
       </div>
-      <el-dialog title="围栏列表" :visible.sync="dialogRailVisible.status" class="railTable" id="memberRailList">
+      <el-dialog
+        title="围栏列表"
+        :visible.sync="dialogRailVisible.status"
+        class="railTable"
+        id="memberRailList"
+      >
         <el-table :data="railList.data" style="width: 100%" max-height="250">
-          <el-table-column fixed prop="gmtCreate" label="日期" width="160"></el-table-column>
+          <el-table-column fixed prop="gmtCreate" label="日期" width="220"></el-table-column>
           <el-table-column prop="railName" label="围栏名称" width="120"></el-table-column>
           <el-table-column prop="personSum" label="人数" width="120"></el-table-column>
           <el-table-column prop="radius" label="半径" width="120"></el-table-column>
@@ -127,6 +132,10 @@ import {
   batchUpdateUser
 } from "@/api/contactsApi";
 import { listRail } from "@/api/railApi";
+import personTravel from "@/views/images/personTravel.png";
+import onLineIcon from "@/views/images/marker_online.png";
+import unLineIcon from "@/views/images/marker_unline.png";
+import dangerIcon from "@/views/images/marker_danger.png";
 export default {
   name: "memberList",
   props: {
@@ -165,7 +174,6 @@ export default {
     const addRail = () => {
       dialogRailVisible.status = true;
       listRail().then(res => {
-        console.log(res);
         cloneArray(railList.data, res.data.list);
       });
     };
@@ -289,7 +297,7 @@ export default {
             type: "success",
             message: "解绑成功"
           });
-        }else {
+        } else {
           root.$message({
             type: "error",
             message: "解绑失败"
@@ -378,9 +386,9 @@ export default {
           },
           yAxis: {
             type: "value",
-            min: 35,
+            min: 24,
             max: 40,
-            interval: 1,
+            interval: 2,
             axisLabel: {
               formatter: "{value}°C" //Y坐标
             }
@@ -459,10 +467,11 @@ export default {
     const baiduMap = () => {
       watchEffect(() => {
         // 成员坐标
-        let location = {
-          lng: props.currentMemberInfo.userLongitude, // 注意经纬度的对应 userLongitude
-          lat: props.currentMemberInfo.userLatitude // 注意经纬度的对应 userLatitude
-        };
+        // let location = {
+        //   lng: props.currentMemberInfo.userLongitude, // 注意经纬度的对应 userLongitude
+        //   lat: props.currentMemberInfo.userLatitude // 注意经纬度的对应 userLatitude
+        // };
+        // console.log(location);
         // 围栏信息
         let railInfo = {
           lng: props.currentMemberInfo.railLongitude,
@@ -470,14 +479,54 @@ export default {
           radius: props.currentMemberInfo.radius
         };
         Map("ak").then(BMap => {
+          let newArr_position = props.tmpHistory.newArr_position;
+          let len = newArr_position.length;
+          let lastPoint = newArr_position[len - 1];
           let map = new BMap.Map("mapShow"); // 创建Map实例
           let pointArray = [];
-          let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
+          let point = new BMap.Point(lastPoint.lng, lastPoint.lat); // 创建点坐标
           pointArray.push(point);
-          let marker = new BMap.Marker(point);
+          let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32), {
+            offset: new BMap.Size(32, 64) // 图标中央下端的尖角位置。
+          });
+          let temperature = props.currentMemberInfo.temperature;
+          let online = props.currentMemberInfo.online;
+          let electric = props.currentMemberInfo.electric;
+          if (temperature > 37.3) {
+            myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
+          }
+          if (online) {
+            myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
+          }
+          if (electric < 2) {
+            //
+          }
+          let marker = new BMap.Marker(point, { icon: myIcon });
           map.addOverlay(marker); //添加一个标注
           map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
           map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
+
+          let sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+            scale: 0.6, //图标缩放大小
+            strokeColor: "#fff", //设置矢量图标的线填充颜色
+            strokeWeight: "2" //设置线宽
+          });
+          let icons = new BMap.IconSequence(sy, "10", "30");
+          // 创建polyline对象
+          let pois = [];
+          props.tmpHistory.newArr_position.forEach(item => {
+            pois.push(new BMap.Point(item.lng, item.lat));
+          });
+          let polyline = new BMap.Polyline(pois, {
+            enableEditing: false, //是否启用线编辑，默认为false
+            enableClicking: true, //是否响应点击事件，默认为true
+            icons: [icons],
+            strokeWeight: "8", //折线的宽度，以像素为单位
+            strokeOpacity: 0.8, //折线的透明度，取值范围0 - 1
+            strokeColor: "#18a45b" //折线颜色
+          });
+
+          map.addOverlay(polyline); //增加折线
 
           //添加圆
           let railPoint = new BMap.Point(railInfo.lng, railInfo.lat); //圆的中心坐标
@@ -509,7 +558,8 @@ export default {
     });
     return {
       memberInfoBack,
-      bindOpen, unBindOpen,
+      bindOpen,
+      unBindOpen,
       addRail,
       selectRow,
       railList,
