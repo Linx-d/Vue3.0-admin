@@ -2,14 +2,14 @@
     "featureType": "land",
     "elementType": "geometry",
     "stylers": {
-        "color": "#0d1b2aff",
+        "color": "#0b1532ff",
         "visibility": "on"
     }
 }, {
     "featureType": "water",
     "elementType": "labels.text.fill",
     "stylers": {
-        "color": "#0d1b2aff",
+        "color": "#0b1532ff",
         "visibility": "on"
     }
 }, {
@@ -154,7 +154,7 @@
     "featureType": "scenicspots",
     "elementType": "geometry",
     "stylers": {
-        "color": "#0d1b2aff",
+        "color": "#0b1532ff",
         "visibility": "on"
     }
 }, {

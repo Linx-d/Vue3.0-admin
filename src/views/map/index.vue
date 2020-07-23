@@ -11,15 +11,17 @@
     </div>
     <!-- alanysis 数据分析模块 login -->
     <div :class="['alanysis', {'alanysisToggle': alanysisStatus.status}]">
+      <!-- <div
+      :class="['alanysis', {'alanysisToggle': alanysisStatus.status}]"
+      >-->
       <div class="alanysis_top">
         <div id="online" class="alanysis_top_a echartsIndivi"></div>
-        <div id="device" class="alanysis_top_b echartsIndivi"></div>
       </div>
       <div class="alanysis_bottom">
         <div class="alanysis_bottom_L echartsIndivi">
           <a href="javascript:;" id="grandTotal">
             <h1
-              style="color: #222; font-weight: 500; font-size: 18px; margin-left: 15px; margin-top: 20px;margin-bottom: 20px;"
+              style="color: #fff; font-weight: 500; font-size: 18px; margin-left: 15px; margin-top: 20px;margin-bottom: 20px;"
             >
               警告统计
               <span
@@ -36,7 +38,7 @@
               <tr>
                 <td style="color: #bf4739; font-size: 26px;">{{ alarmData.alarmSum }}</td>
                 <td style="color: #cd6212; font-size: 26px;">{{ alarmData.personSum }}</td>
-                <td style="color: #153147; font-size: 26px;">{{ alarmData.tsum }}</td>
+                <td style="color: #1089e7; font-size: 26px;">{{ alarmData.tsum }}</td>
                 <td style="color: #35cbbf; font-size: 26px;">{{ alarmData.psum }}</td>
               </tr>
               <tr style="height: 30px; font-weight: 700; color: #2d2d2d; font-size: 13px;">
@@ -56,7 +58,7 @@
                 </td>
                 <td style="color: #b2b2b2; font-size: 13px;">
                   <span>新增</span>
-                  <span style="color: #153147;">+{{ alarmData.newTSum }}</span>
+                  <span style="color: #1089e7;">+{{ alarmData.newTSum }}</span>
                 </td>
                 <td style="color: #b2b2b2; font-size: 13px;">
                   <span>新增</span>
@@ -80,7 +82,12 @@
 
 <script>
 import { Map } from "@/map";
-import { onMounted, computed, reactive } from "@vue/composition-api";
+import {
+  onMounted,
+  computed,
+  reactive,
+  watchEffect
+} from "@vue/composition-api";
 import {
   listAlarmView,
   getAlarmView,
@@ -95,18 +102,31 @@ import deviceOption from "./options/deviceOption.js"; // 设备模块
 import historyOption from "./options/historyOption.js"; // 历史告警模块
 import onlineOption from "./options/onlineOption.js"; // 在线统计模块
 import systemOption from "./options/systemOption.js"; // 系统统计模块
-import onLineIcon from "./images/marker_online.png";
-import unLineIcon from "./images/marker_unline.png";
-import dangerIcon from "./images/marker_danger.png";
+import onLineIcon from "@/views/images/marker_online.png";
+import unLineIcon from "@/views/images/marker_unline.png";
+import dangerIcon from "@/views/images/marker_danger.png";
+import pointAggre from "@/views/images/pointAggre.png"; // 点聚合
 import custom_map_config from "./custom_map_config/custom_map_config2.json";
+import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
   setup(props, { root }) {
     const cutFull = () => {
+      adaptionEchartsV2(systemChart);
+      adaptionEchartsV2(onlineChart);
+      adaptionEchartsV2(historyChart);
+      // systemChart.resize();
+      // onlineChart.resize();
       alanysisStatus.status = !alanysisStatus.status;
       // 切换
       root.$store.commit("SET_FULL"); // commit 不用指向 map模块
     };
+    // window.onresize = function() {
+    //   systemChart.resize();
+    //   onlineChart.resize();
+    //   historyChart.resize();
+    //   //myChart1.resize();    //若有多个图表变动，可多写
+    // };
     const full = computed(() => {
       return root.$store.state.map.full;
     });
@@ -121,18 +141,31 @@ export default {
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
         let map = new BMap.Map("mapShow"); // 创建Map实例
         //添加地图类型控件
-        map.addControl(
-          new BMap.MapTypeControl({
-            mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
-          })
-        );
-        map.centerAndZoom(new BMap.Point(107.26569, 28.676057), 17); // 初始化地图,设置中心点坐标和地图级别
-        map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
-        map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
-        // map.setMapStyleV2({ styleJson: custom_map_config });
+        // map.addControl(
+        //   new BMap.MapTypeControl({
+        //     mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
+        //   })
+        // );
         listUserLocation().then(res => {
           let code = res.code;
           let data = res.data;
+          let len = data.length;
+          let zoomLevel = null;
+          if (len < 50) {
+            zoomLevel = 19;
+          } else if (len < 100) {
+            zoomLevel = 17;
+          } else if (len < 300) {
+            zoomLevel = 15;
+          } else if (len < 500) {
+            zoomLevel = 12;
+          } else {
+            zoomLevel = 10;
+          }
+          map.centerAndZoom(new BMap.Point(107.26569, 28.676057), zoomLevel); // 初始化地图,设置中心点坐标和地图级别
+          map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
+          map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+          map.setMapStyleV2({ styleJson: custom_map_config });
           let markers = [];
           let pointArray = [];
           let opts = {
@@ -152,7 +185,7 @@ export default {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
             let deviceOline = false;
-            if (gmtTime < 300001) {
+            if (gmtTime < 1800001) {
               deviceOline = true;
             }
             let temperature = parseFloat(item.temperature);
@@ -171,6 +204,7 @@ export default {
             }
             let point = new BMap.Point(item.longitude, item.latitude);
             let marker = new BMap.Marker(point, { icon: myIcon });
+            // marker.setAnimation(BMAP_ANIMATION_BOUNCE);
             // let marker = new BMap.Marker(point);
             let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
             addClickHandler(content, marker);
@@ -197,12 +231,12 @@ export default {
           let markerClusterer = new BMapLib.MarkerClusterer(map, {
             markers: markers,
             minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
-            // styles: [
-            //   {
-            //     url: "img/info.png",
-            //     size: new BMap.Size(0, 0)
-            //   }
-            // ]
+            styles: [
+              {
+                url: pointAggre,
+                size: new BMap.Size(48, 48)
+              }
+            ]
           });
         });
       });
@@ -210,16 +244,20 @@ export default {
     /**
      * 在线率 online
      */
+    let onlineChart = null;
     const online = status => {
-      let myChart = root.$echarts.init(document.getElementById("online"));
-      adaptionEchartsV2(myChart);
+      let onlineChart = root.$echarts.init(
+        document.getElementById("online"),
+        "dark"
+      );
+      adaptionEchartsV2(onlineChart);
       let option = onlineOption;
       onlineOption.series[0].data[0].value = status.temperatureStatic;
       onlineOption.series[0].data[1].value = status.personStatic;
       onlineOption.series[0].data[2].value = status.onlineStatic;
       onlineOption.series[0].data[3].value = status.eletricStatic;
       // 使用刚指定的配置项和数据显示图表。
-      myChart.setOption(option);
+      onlineChart.setOption(option);
     };
 
     /**
@@ -253,7 +291,6 @@ export default {
       //   console.log(res);
       // });
       getAlarmView().then(res => {
-        // console.log(res);
         let data = res.data;
         // time
         alarmData.date = data.date;
@@ -270,70 +307,21 @@ export default {
       });
     }
     /**
-     * 围栏统计 rail
-     */
-    const device = () => {
-      let myChart = root.$echarts.init(document.getElementById("device"));
-      adaptionEchartsV2(myChart);
-      let option = deviceOption;
-      let railListPaging = reactive({
-        pageNum: 1,
-        pageSize: 5
-      });
-      // 查询所有围栏信息 selectRailList
-      const selectRailList = railListPaging => {
-        listRail(railListPaging)
-          .then(res => {
-            let data = res.data.list ? res.data.list : res.data;
-            let size = res.data.size,
-              hasPreviousPage = res.data.hasPreviousPage;
-            let statistics = {
-              normalArr: [],
-              abnormalArr: [],
-              railNameArr: []
-            };
-            let normalArr = [];
-            let abnormalArr = [];
-            let railNameArr = [];
-            data.forEach(item => {
-              // console.log(item)
-              listUserInfoByRail(item.id).then(res => {
-                let abnormalPerson = 0;
-                let data = res.data;
-                data.forEach(item => {
-                  let temperature = parseFloat(item.temperature);
-                  if (temperature > 37.3) {
-                    abnormalPerson++;
-                  }
-                });
-                item.abnormalPerson = abnormalPerson;
-                statistics.railNameArr.push(item.railName);
-                statistics.normalArr.push(item.personSum);
-                statistics.abnormalArr.push(item.abnormalPerson);
-              });
-            });
-            return statistics;
-          })
-          .then(data => {
-            // option.yAxis.data = data.railNameArr;
-            // option.series[0].data = data.normalArr;
-            // option.series[1].data = data.abnormalArr;
-            // console.log(option);
-            myChart.setOption(option);
-          });
-      };
-      selectRailList();
-    };
-    /**
      * 告警历史 history
      */
+    let historyChart = null;
     const history = () => {
       listAlarmView()
         .then(res => {
           return res.data;
         })
         .then(data => {
-          let myChart = root.$echarts.init(document.getElementById("history"));
+          // let darkEcharts = JSON.parse(dark);
+          // echarts.registerTheme('dark', darkEcharts);
+          historyChart = root.$echarts.init(
+            document.getElementById("history"),
+            "dark"
+          );
 
           let alarmSum = [];
           let personSum = [];
@@ -348,7 +336,7 @@ export default {
             tsum.push(item.tsum);
           });
 
-          adaptionEchartsV2(myChart);
+          adaptionEchartsV2(historyChart);
           // 使用刚指定的配置项和数据显示图表。
           let option = historyOption;
           option.xAxis.data = gmtCreate;
@@ -356,26 +344,33 @@ export default {
           option.series[1].data = personSum;
           option.series[2].data = psum;
           option.series[3].data = tsum;
-          myChart.setOption(option);
+          historyChart.setOption(option);
         });
     };
 
     /**
      * 统计 system
      */
+    let systemChart = null;
     const system = () => {
-      let myChart = root.$echarts.init(document.getElementById("system"));
-      adaptionEchartsV2(myChart);
+      systemChart = root.$echarts.init(
+        document.getElementById("system"),
+        "dark"
+      );
+      adaptionEchartsV2(systemChart);
       let option = systemOption;
-      myChart.setOption(option);
+      systemChart.setOption(option);
     };
-
+    watchEffect(() => {
+      adaptionEchartsV2(systemChart);
+      adaptionEchartsV2(historyChart);
+      adaptionEchartsV2(onlineChart);
+    });
     /**
      * 生命周期函数 onMounted
      */
     onMounted(() => {
       alarm(); // 告警图表
-      device(); // 设备图表
       history(); // 历史图表
       system(); // 历史图表
       baiduMap(); // 百度地图
@@ -399,6 +394,10 @@ $alanysisMinHeight_Top: 454px;
 // alanysis 底部模块 height、width的min，max 设置
 $alanysisMinWidth_Bottom: 1915px;
 $alanysisMinHeight_Bottom: 227px;
+
+// echarts CSS 
+$echartsMargin: 15px;
+$echartsBorder: 1px solid #146ede;
 
 #map {
   height: 100vh;
@@ -446,6 +445,9 @@ $alanysisMinHeight_Bottom: 227px;
 .alanysisToggle {
   display: none;
 }
+.alanysisToggleShow {
+  display: block;
+}
 .tool_top {
   top: 16px;
 }
@@ -453,54 +455,60 @@ $alanysisMinHeight_Bottom: 227px;
 // 数据分析 alanysis 模块
 .alanysis {
   height: 100%;
+  overflow: hidden;
   .alanysis_top {
-    height: 60%;
+    height: 54%;
     width: 20%;
     position: relative;
+    top: 15px;
+    left: 15px;
+    background-color: #0b1532;
     .alanysis_top_a {
       width: 100%;
       height: 100%;
       left: 0;
       top: 0;
-    }
-    .alanysis_top_b {
-      width: 100%;
-      height: 0%;
-      right: 0;
-      bottom: 0;
+      border: $echartsBorder;
     }
   }
   .alanysis_bottom {
     height: 40%;
     width: 100%;
     position: relative;
+    bottom: -32px;
     .alanysis_bottom_L {
       width: 20%;
       height: 100%;
-      float: left;
-      left: 0;
+      float: $echartsMargin;
+      left: $echartsMargin;
       bottom: 0;
+      background: #0b1532;
+      border: $echartsBorder;
     }
     .alanysis_bottom_R {
-      width: 80%;
+      width: 77.5%;
       height: 100%;
       float: right;
-      right: 0;
+      right: $echartsMargin;
       bottom: 0;
-      padding-top: 20px;
       @include webkit("box-sizing", border-box);
+      background: #0b1532;
       #history {
         height: 100%;
         width: 100%;
+        border: $echartsBorder;
+        float: right;
       }
     }
   }
   .alanysis_right {
-    height: 60%;
+    height: 54%;
     width: 20%;
     position: absolute;
-    right: 0;
-    top: 0;
+    right: $echartsMargin;
+    top: $echartsMargin;
+    border: $echartsBorder;
+    background-color: #0b1532;
     .alanysis_right_content {
       position: absolute;
       right: 0;
@@ -518,9 +526,10 @@ $alanysisMinHeight_Bottom: 227px;
 
 /*---------------------table login-----------------------*/
 .tdBgc {
-  background-color: #f4f4f4;
+  background-color: #273e84;
   border-radius: 5px;
   min-width: 72px;
+  color: #fff;
 }
 
 .tdcolor {
@@ -529,9 +538,9 @@ $alanysisMinHeight_Bottom: 227px;
 #grandTotal {
   display: block;
   width: 94%;
-  background-color: #fff;
+  background-color: #0b1532;
   margin-top: 10px;
-  border: 1px solid #fff;
+  border: 1px solid #0b1532;
   margin: 9.2px auto;
   @include webkit("box-shadow", rgba(0, 0, 0, 0.1) 0 0 8px);
   min-height: 168.5px;
@@ -547,6 +556,7 @@ $alanysisMinHeight_Bottom: 227px;
     text-align: center;
     padding-bottom: 0;
     line-height: 47px;
+    background: #0b1532;
   }
 }
 /*---------------------table end-----------------------*/
