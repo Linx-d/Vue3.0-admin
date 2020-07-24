@@ -10,15 +10,26 @@
       </ul>
     </div>
     <!-- alanysis 数据分析模块 login -->
-    <div :class="['alanysis', {'alanysisToggle': alanysisStatus.status}]">
+    <div :class="['alanysis']">
       <!-- <div
       :class="['alanysis', {'alanysisToggle': alanysisStatus.status}]"
       >-->
+      <div class="case_header">
+        <h1>疫情防控中心</h1>
+      </div>
       <div class="alanysis_top">
+        <div class="case_top_right"></div>
+        <div class="case_top_left"></div>
+        <div class="case_bottom_left"></div>
+        <div class="case_bottom_right"></div>
         <div id="online" class="alanysis_top_a echartsIndivi"></div>
       </div>
       <div class="alanysis_bottom">
         <div class="alanysis_bottom_L echartsIndivi">
+          <div class="case_top_right"></div>
+          <div class="case_top_left"></div>
+          <div class="case_bottom_left"></div>
+          <div class="case_bottom_right"></div>
           <a href="javascript:;" id="grandTotal">
             <h1
               style="color: #fff; font-weight: 500; font-size: 18px; margin-left: 15px; margin-top: 20px;margin-bottom: 20px;"
@@ -69,10 +80,18 @@
           </a>
         </div>
         <div :class="['alanysis_bottom_R echartsIndivi']">
+          <div class="case_top_right"></div>
+          <div class="case_top_left"></div>
+          <div class="case_bottom_left"></div>
+          <div class="case_bottom_right"></div>
           <div id="history"></div>
         </div>
       </div>
       <div class="alanysis_right">
+        <div class="case_top_right"></div>
+        <div class="case_top_left"></div>
+        <div class="case_bottom_left"></div>
+        <div class="case_bottom_right"></div>
         <div id="system" class="alanysis_right_content echartsIndivi"></div>
       </div>
     </div>
@@ -86,13 +105,13 @@ import {
   onMounted,
   computed,
   reactive,
-  watchEffect
+  watchEffect,
 } from "@vue/composition-api";
 import {
   listAlarmView,
   getAlarmView,
   listUserLocation,
-  add
+  add,
 } from "@/api/mapApi";
 import { listRail, selectRailList, listUserInfoByRail } from "@/api/railApi";
 import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
@@ -106,11 +125,18 @@ import onLineIcon from "@/views/images/marker_online.png";
 import unLineIcon from "@/views/images/marker_unline.png";
 import dangerIcon from "@/views/images/marker_danger.png";
 import pointAggre from "@/views/images/pointAggre.png"; // 点聚合
+import case_top_right from "@/views/images/case_top_right.png";
 import custom_map_config from "./custom_map_config/custom_map_config2.json";
 import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
   setup(props, { root }) {
+    /**
+     * 图表框
+     */
+    const echartsBorder = reactive({
+      top_right: case_top_right,
+    });
     const cutFull = () => {
       adaptionEchartsV2(systemChart);
       adaptionEchartsV2(onlineChart);
@@ -132,13 +158,13 @@ export default {
     });
     // 隐藏图表
     const alanysisStatus = reactive({
-      status: false
+      status: false,
     });
     /**
      * 百度地图方法
      */
     let baiduMap = () => {
-      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
+      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
         let map = new BMap.Map("mapShow"); // 创建Map实例
         //添加地图类型控件
         // map.addControl(
@@ -146,7 +172,7 @@ export default {
         //     mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
         //   })
         // );
-        listUserLocation().then(res => {
+        listUserLocation().then((res) => {
           let code = res.code;
           let data = res.data;
           let len = data.length;
@@ -172,16 +198,16 @@ export default {
             width: 250,
             height: 80,
             title: "个人信息",
-            enableMessage: true //设置允许信息窗发送短息
+            enableMessage: true, //设置允许信息窗发送短息
           };
           // 状态统计
           let status = {
             personStatic: data.length,
             eletricStatic: 0,
             temperatureStatic: 0,
-            onlineStatic: 0
+            onlineStatic: 0,
           };
-          data.forEach(item => {
+          data.forEach((item) => {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
             let deviceOline = false;
@@ -213,7 +239,7 @@ export default {
           });
           online(status); // 统计表 比例
           function addClickHandler(content, marker) {
-            marker.addEventListener("click", function(e) {
+            marker.addEventListener("click", function (e) {
               openInfo(content, e);
             });
           }
@@ -234,9 +260,9 @@ export default {
             styles: [
               {
                 url: pointAggre,
-                size: new BMap.Size(48, 48)
-              }
-            ]
+                size: new BMap.Size(48, 48),
+              },
+            ],
           });
         });
       });
@@ -245,7 +271,7 @@ export default {
      * 在线率 online
      */
     let onlineChart = null;
-    const online = status => {
+    const online = (status) => {
       let onlineChart = root.$echarts.init(
         document.getElementById("online"),
         "dark"
@@ -272,7 +298,7 @@ export default {
       personSum: "",
       psum: "",
       tsum: "",
-      date: ""
+      date: "",
     });
     const alarm = () => {
       getView();
@@ -290,7 +316,7 @@ export default {
       // add(randomObj).then(res => {
       //   console.log(res);
       // });
-      getAlarmView().then(res => {
+      getAlarmView().then((res) => {
         let data = res.data;
         // time
         alarmData.date = data.date;
@@ -312,10 +338,10 @@ export default {
     let historyChart = null;
     const history = () => {
       listAlarmView()
-        .then(res => {
+        .then((res) => {
           return res.data;
         })
-        .then(data => {
+        .then((data) => {
           // let darkEcharts = JSON.parse(dark);
           // echarts.registerTheme('dark', darkEcharts);
           historyChart = root.$echarts.init(
@@ -328,7 +354,7 @@ export default {
           let psum = [];
           let tsum = [];
           let gmtCreate = [];
-          data.forEach(item => {
+          data.forEach((item) => {
             gmtCreate.push(item.gmtCreate);
             alarmSum.push(item.alarmSum);
             personSum.push(item.personSum);
@@ -375,8 +401,8 @@ export default {
       system(); // 历史图表
       baiduMap(); // 百度地图
     });
-    return { cutFull, full, alarmData, alanysisStatus };
-  }
+    return { cutFull, full, alarmData, alanysisStatus, echartsBorder };
+  },
 };
 </script>
 
@@ -395,7 +421,7 @@ $alanysisMinHeight_Top: 454px;
 $alanysisMinWidth_Bottom: 1915px;
 $alanysisMinHeight_Bottom: 227px;
 
-// echarts CSS 
+// echarts CSS
 $echartsMargin: 15px;
 $echartsBorder: 1px solid #146ede;
 
@@ -456,8 +482,10 @@ $echartsBorder: 1px solid #146ede;
 .alanysis {
   height: 100%;
   overflow: hidden;
+  padding-top: 80px;
+  @include webkit('box-sizing', border-box);
   .alanysis_top {
-    height: 54%;
+    height: 52%;
     width: 20%;
     position: relative;
     top: 15px;
@@ -472,10 +500,10 @@ $echartsBorder: 1px solid #146ede;
     }
   }
   .alanysis_bottom {
-    height: 40%;
+    height: 41%;
     width: 100%;
     position: relative;
-    bottom: -32px;
+    bottom: -36px;
     .alanysis_bottom_L {
       width: 20%;
       height: 100%;
@@ -486,7 +514,7 @@ $echartsBorder: 1px solid #146ede;
       border: $echartsBorder;
     }
     .alanysis_bottom_R {
-      width: 77.5%;
+      width: 77.2%;
       height: 100%;
       float: right;
       right: $echartsMargin;
@@ -502,11 +530,11 @@ $echartsBorder: 1px solid #146ede;
     }
   }
   .alanysis_right {
-    height: 54%;
+    height: 47%;
     width: 20%;
     position: absolute;
     right: $echartsMargin;
-    top: $echartsMargin;
+    top: 95px;
     border: $echartsBorder;
     background-color: #0b1532;
     .alanysis_right_content {
@@ -522,6 +550,56 @@ $echartsBorder: 1px solid #146ede;
   background: #fff;
   position: absolute;
   @include webkit("box-sizing", boder-box);
+}
+
+/**echartsBorder */
+
+.case_top_left {
+  width: 15px;
+  height: 14px;
+  background-image: url("../images/case_top_left.png");
+  position: absolute;
+  left: -8px;
+  top: -8px;
+}
+.case_top_right {
+  width: 15px;
+  height: 14px;
+  background-image: url("../images/case_top_right.png");
+  position: absolute;
+  top: -7px;
+  right: -8px;
+}
+.case_bottom_left {
+  width: 15px;
+  height: 14px;
+  background-image: url("../images/case_bottom_left.png");
+  position: absolute;
+  left: -7px;
+  bottom: -7px;
+}
+.case_bottom_right {
+  width: 15px;
+  height: 14px;
+  background-image: url("../images/case_bottom_right.png");
+  position: absolute;
+  right: -9px;
+  bottom: -7px;
+}
+.case_header {
+  height: 116px;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-image: url("../images/case_header.png");
+  h1 {
+    text-align: center;
+    color: #fff;
+    line-height: 116px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
 }
 
 /*---------------------table login-----------------------*/
@@ -546,7 +624,7 @@ $echartsBorder: 1px solid #146ede;
   min-height: 168.5px;
   min-width: 303px;
   height: 90%;
-  padding-top: 30px;
+  padding-top: 8%;
   box-sizing: border-box;
   table {
     color: #000;
@@ -555,7 +633,7 @@ $echartsBorder: 1px solid #146ede;
     width: 100%;
     text-align: center;
     padding-bottom: 0;
-    line-height: 47px;
+    line-height: 59px;
     background: #0b1532;
   }
 }
