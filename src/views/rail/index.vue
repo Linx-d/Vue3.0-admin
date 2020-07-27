@@ -316,7 +316,7 @@ export default {
         resetForm("modifyRailData");
       } else {
         root
-          .$confirm("确认关闭？")
+          .$confirm("您已修改围栏信息,是否关闭窗口？")
           .then(_ => {
             done();
             resetForm("modifyRailData");
@@ -337,7 +337,7 @@ export default {
         resetForm("addRailData");
       } else {
         root
-          .$confirm("确认关闭？")
+          .$confirm("您已编辑围栏信息,是否关闭窗口？")
           .then(_ => {
             done();
             resetForm("addRailData");

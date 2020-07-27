@@ -399,6 +399,12 @@ export default {
       alarm(); // 告警图表
       history(); // 历史图表
       system(); // 历史图表
+      online({
+        personStatic: 0,
+        eletricStatic: 0,
+        temperatureStatic: 0,
+        onlineStatic: 0,
+      });
       baiduMap(); // 百度地图
     });
     return { cutFull, full, alarmData, alanysisStatus, echartsBorder };
@@ -485,7 +491,7 @@ $echartsBorder: 1px solid #146ede;
   overflow: hidden;
   padding-top: 80px;
   min-width: $layout-min-width;
-  @include webkit('box-sizing', border-box);
+  @include webkit("box-sizing", border-box);
   .alanysis_top {
     height: 52%;
     width: 20%;
