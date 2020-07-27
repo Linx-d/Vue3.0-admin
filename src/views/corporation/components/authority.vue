@@ -592,7 +592,6 @@ $corporationHeight: 655px;
   cursor: pointer;
   .departSvg {
     margin-right: 5px;
-    vertical-align: text-top;
   }
 }
 .department-icon:hover {

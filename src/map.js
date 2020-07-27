@@ -49,16 +49,22 @@ export function Map(ak) {
       document.head.appendChild(link);
 
       let script3 = document.createElement("script");
-      script2.type = "text/javascript";
-      script2.src =
+      script3.type = "text/javascript";
+      script3.src =
         "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js";
       document.body.appendChild(script3);
 
       let script4 = document.createElement("script");
-      script2.type = "text/javascript";
-      script2.src =
+      script4.type = "text/javascript";
+      script4.src =
         "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
       document.body.appendChild(script4);
+
+      let script5 = document.createElement("script");
+      script5.type = "text/javascript";
+      script5.src =
+        "http://api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js";
+      document.body.appendChild(script5);
     } else {
       console.log("BMapLib.DrawingManager is loaded!");
     }

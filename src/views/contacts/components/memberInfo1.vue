@@ -133,6 +133,9 @@ import {
 } from "@/api/contactsApi";
 import { listRail } from "@/api/railApi";
 import personTravel from "@/views/images/personTravel.png";
+import onLineIcon from "@/views/images/marker_online.png";
+import unLineIcon from "@/views/images/marker_unline.png";
+import dangerIcon from "@/views/images/marker_danger.png";
 export default {
   name: "memberList",
   props: {
@@ -464,10 +467,11 @@ export default {
     const baiduMap = () => {
       watchEffect(() => {
         // 成员坐标
-        let location = {
-          lng: props.currentMemberInfo.userLongitude, // 注意经纬度的对应 userLongitude
-          lat: props.currentMemberInfo.userLatitude // 注意经纬度的对应 userLatitude
-        };
+        // let location = {
+        //   lng: props.currentMemberInfo.userLongitude, // 注意经纬度的对应 userLongitude
+        //   lat: props.currentMemberInfo.userLatitude // 注意经纬度的对应 userLatitude
+        // };
+        // console.log(location);
         // 围栏信息
         let railInfo = {
           lng: props.currentMemberInfo.railLongitude,
@@ -475,84 +479,55 @@ export default {
           radius: props.currentMemberInfo.radius
         };
         Map("ak").then(BMap => {
-          console.log(props.tmpHistory.newArr_position);
+          let newArr_position = props.tmpHistory.newArr_position;
+          let len = newArr_position.length;
+          let lastPoint = newArr_position[len - 1];
           let map = new BMap.Map("mapShow"); // 创建Map实例
           let pointArray = [];
-          let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
+          let point = new BMap.Point(lastPoint.lng, lastPoint.lat); // 创建点坐标
           pointArray.push(point);
-          let marker = new BMap.Marker(point);
+          let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32), {
+            offset: new BMap.Size(32, 64) // 图标中央下端的尖角位置。
+          });
+          let temperature = props.currentMemberInfo.temperature;
+          let online = props.currentMemberInfo.online;
+          let electric = props.currentMemberInfo.electric;
+          if (temperature > 37.3) {
+            myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
+          }
+          if (online) {
+            myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
+          }
+          if (electric < 2) {
+            //
+          }
+          let marker = new BMap.Marker(point, { icon: myIcon });
           map.addOverlay(marker); //添加一个标注
           map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
           map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
-          let lushu;
-          // 实例化一个驾车导航用来生成路线
-          let drv = new BMap.DrivingRoute("北京", {
-            onSearchComplete: function(res) {
-              if (drv.getStatus() == BMAP_STATUS_SUCCESS) {
-                let plan = res.getPlan(0);
-                let arrPois = [];
-                for (let j = 0; j < plan.getNumRoutes(); j++) {
-                  let route = plan.getRoute(j);
-                  arrPois = arrPois.concat(route.getPath());
-                }
-                map.addOverlay(
-                  new BMap.Polyline(arrPois, { strokeColor: "#111" })
-                );
-                map.setViewport(arrPois);
-                lushu = new BMapLib.LuShu(map, arrPois, {
-                  defaultContent: "从出发地到目的地", //"从天安门到百度大厦"
-                  autoView: true, //是否开启自动视野调整，如果开启那么路书在运动过程中会根据视野自动调整
-                  icon: new BMap.Icon(personTravel, new BMap.Size(48, 48), {
-                    anchor: new BMap.Size(20, 35)
-                  }),
-                  speed: 10000,
-                  enableRotation: false, //是否设置marker随着道路的走向进行旋转props.tmpHistory.newArr_position
-                  landmarkPois: props.tmpHistory.newArr_position
-                });
-              }
-            }
+
+          let sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+            scale: 0.6, //图标缩放大小
+            strokeColor: "#fff", //设置矢量图标的线填充颜色
+            strokeWeight: "2" //设置线宽
           });
-          // console.log(props.tmpHistory.newArr_position);
-          let start = new BMap.Point(
-            props.tmpHistory.newArr_position[0].lng,
-            props.tmpHistory.newArr_position[0].lat
-          );
-          let end = new BMap.Point(
-            props.tmpHistory.newArr_position[
-              props.tmpHistory.newArr_position.length - 1
-            ].lng,
-            props.tmpHistory.newArr_position[
-              props.tmpHistory.newArr_position.length - 1
-            ].lat
-          );
-          // let start = new BMap.Point(
-          //   28.63764140625861,
-          //   108.37516062460054
-          // );
-          // let end = new BMap.Point(
-          //   28.63764140625811,
-          //   108.37516062460064
-          // );
-          drv.search(start, end);
-          //绑定事件
-          $("run").onclick = function() {
-            lushu.start();
-          };
-          $("stop").onclick = function() {
-            lushu.stop();
-          };
-          $("pause").onclick = function() {
-            lushu.pause();
-          };
-          $("hide").onclick = function() {
-            lushu.hideInfoWindow();
-          };
-          $("show").onclick = function() {
-            lushu.showInfoWindow();
-          };
-          function $(element) {
-            return document.getElementById(element);
-          }
+          let icons = new BMap.IconSequence(sy, "10", "30");
+          // 创建polyline对象
+          let pois = [];
+          props.tmpHistory.newArr_position.forEach(item => {
+            pois.push(new BMap.Point(item.lng, item.lat));
+          });
+          let polyline = new BMap.Polyline(pois, {
+            enableEditing: false, //是否启用线编辑，默认为false
+            enableClicking: true, //是否响应点击事件，默认为true
+            icons: [icons],
+            strokeWeight: "8", //折线的宽度，以像素为单位
+            strokeOpacity: 0.8, //折线的透明度，取值范围0 - 1
+            strokeColor: "#18a45b" //折线颜色
+          });
+
+          map.addOverlay(polyline); //增加折线
+
           //添加圆
           let railPoint = new BMap.Point(railInfo.lng, railInfo.lat); //圆的中心坐标
           let verify =

@@ -112,12 +112,12 @@
                 >
                   <td :title="rail.railName">{{ rail.railName }}</td>
                   <td :title="rail.personSum">{{ rail.personSum }}</td>
-                  <td :title="rail.personSum">{{ rail.abnormalPerson }}</td>
+                  <td :title="rail.personSum" class="railTemperatrue">{{ rail.abnormalPerson }}</td>
                   <td :title="rail.gmtCreate">{{ rail.gmtCreate }}</td>
                   <td :title="rail.gmtModified">{{ rail.gmtModified }}</td>
                   <td :title="rail.radius">{{ rail.radius }}</td>
                   <td :title="rail.latitude">({{ rail.longitude }},{{ rail.latitude }})</td>
-                  <td :title="rail.railAddr">{{ rail.railAddr }}</td>
+                  <td :title="rail.railAddr" class="railAddress">{{ rail.railAddr }}</td>
                   <td class="tdTool">
                     <a href="javascript:;" @click.stop="modifyRailFn(rail, index)">查看</a>
                     <a href="javascript:;" @click.stop="delRailFn(rail, index)">删除</a>
@@ -936,4 +936,17 @@ $customerHeight: 648px;
   width: 100%;
 }
 // modify form表单
+
+
+// 围栏地址宽度限制
+.railAddress {
+  width: 220px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.railTemperatrue {
+  text-align: center;
+}
 </style>
