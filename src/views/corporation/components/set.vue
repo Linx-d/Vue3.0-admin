@@ -87,7 +87,12 @@
         class="employeeInfoClass"
       >
         <el-form-item label="名称" :label-width="modifyStaffData.formLabelWidth" prop="name">
-          <el-input v-model="employeeName.name" autocomplete="off" maxlength="15"></el-input>
+          <el-input
+            v-model="employeeName.name"
+            autocomplete="off"
+            maxlength="15"
+            @input="inputDetection"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -125,7 +130,7 @@ import {
   getLoginEmployee,
   updateEmployee,
   selectEmpDepRoleByEmpId,
-  updateEmployeeNotAuth
+  updateEmployeeNotAuth,
 } from "@/api/employeeApi";
 import { jssdk } from "@/utils/wxwork";
 import { reactive, onMounted, watchEffect, ref } from "@vue/composition-api";
@@ -149,13 +154,13 @@ export default {
       corpUserId: 0,
       role: null,
       roleId: null,
-      managersStatus: true
+      managersStatus: true,
     });
     let employeeName = reactive({
-      name: ""
+      name: "",
     });
-    
-    getLoginEmployee().then(res => {
+
+    getLoginEmployee().then((res) => {
       let data = res.data;
       let roleId = data.role.id;
       employeeInfo.id = data.id;
@@ -171,7 +176,7 @@ export default {
       if (roleId === 1) {
         employeeInfo.departmentManagers = "所有部门";
         employeeInfo.photo = superPng;
-      }else if(roleId === 2){
+      } else if (roleId === 2) {
         employeeInfo.departmentManagers = "所有部门";
         employeeInfo.photo = normalPng;
       } else {
@@ -179,7 +184,7 @@ export default {
         let departManagers = data.departmentManagers;
         employeeInfo.departmentManagers = [];
         if (departManagers.length > 0) {
-          selectEmpDepRoleByEmpId(data.id).then(response => {
+          selectEmpDepRoleByEmpId(data.id).then((response) => {
             let len = response.data.length;
             if (len > 5) {
               employeeInfo.managersStatus = true;
@@ -197,37 +202,37 @@ export default {
     const modifyStaffData = reactive({
       dialogNameVisible: false,
       dialogTelVisible: false,
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
     });
     const rules = reactive({
       name: [
-        { required: true, message: "请输入名称" }
+        { required: true, message: "请输入名称" },
         // { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
       tel: [
         { required: true, message: "请输入联系电话" },
-        { min: 11, max: 11, message: "长度为 11 个字符" }
-      ]
+        { min: 11, max: 11, message: "长度为 11 个字符" },
+      ],
     });
-    const submitNameForm = formName => {
-      refs[formName].validate(valid => {
+    const submitNameForm = (formName) => {
+      refs[formName].validate((valid) => {
         if (valid) {
           let modifyData = new URLSearchParams();
           modifyData.append("name", employeeName.name);
           modifyData.append("id", employeeInfo.id);
-          updateEmployeeNotAuth(modifyData).then(res => {
+          updateEmployeeNotAuth(modifyData).then((res) => {
             let code = res.code;
             if (code === 0) {
               employeeInfo.name = employeeName.name;
               modifyStaffData.dialogNameVisible = false;
               root.$message({
                 type: "success",
-                message: "修改成功"
+                message: "修改成功",
               });
             } else {
               root.$message({
                 type: "warning",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -237,24 +242,24 @@ export default {
         }
       });
     };
-    const submitTelForm = formName => {
-      refs[formName].validate(valid => {
+    const submitTelForm = (formName) => {
+      refs[formName].validate((valid) => {
         if (valid) {
           let modifyData = new URLSearchParams();
           modifyData.append("tel", employeeInfo.tel);
           modifyData.append("id", employeeInfo.id);
-          updateEmployeeNotAuth(modifyData).then(res => {
+          updateEmployeeNotAuth(modifyData).then((res) => {
             let code = res.code;
             if (code === 0) {
               root.$message({
                 type: "success",
-                message: "修改成功"
+                message: "修改成功",
               });
               modifyStaffData.dialogTelVisible = false;
             } else {
               root.$message({
                 type: "warning",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -264,7 +269,7 @@ export default {
         }
       });
     };
-    const resetForm = formName => {
+    const resetForm = (formName) => {
       refs[formName].resetFields();
     };
 
@@ -278,10 +283,18 @@ export default {
     const modifyStaffTel = () => {
       modifyStaffData.dialogTelVisible = true;
     };
-    const confirmNameOpen = data => {
-      submitNameForm(data);
+    const confirmNameOpen = (data) => {
+      let patrn = /[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、''；‘'，。、]/im;
+      if (patrn.test(employeeName.name)) {
+        root.$message({
+          type: "error",
+          message: "名称不能有字符",
+        });
+      } else {
+        submitNameForm(data);
+      }
     };
-    const confirmTelOpen = data => {
+    const confirmTelOpen = (data) => {
       submitTelForm(data);
     };
     const modifyNameCancle = () => {
@@ -299,6 +312,18 @@ export default {
     const modifyNameBefore = () => {
       resetForm("employeeInfo");
       modifyStaffData.dialogNameVisible = false;
+    };
+
+    /**修改名称限制输入特殊字符 */
+    const inputDetection = () => {
+      let str = employeeName.name;
+      let patrn = /[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、''；‘'，。、]/im;
+      if (patrn.test(str)) {
+        root.$message({
+          type: "error",
+          message: "名称不能有字符",
+        });
+      }
     };
     watchEffect(() => {});
     onMounted(() => {});
@@ -327,9 +352,10 @@ export default {
       modifyNameBefore,
       modifyTelCancle,
       confirmTelOpen,
-      loadWWOpenData
+      loadWWOpenData,
+      inputDetection,
     };
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
