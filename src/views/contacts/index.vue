@@ -224,13 +224,13 @@ export default {
      * 数据
      */
     let companyData = reactive({
-      companyId: 6
+      // companyId: 6
     }); // 顶级部门 id
     // 同步执行
-    const getCompanyId = async () => {
-      const { data } = await getMaxDepartmentId();
-      return data;
-    };
+    // const getCompanyId = async () => {
+    //   const { data } = await getMaxDepartmentId();
+    //   return data;
+    // };
     let treeData = reactive({
       status: false
     });
@@ -239,15 +239,16 @@ export default {
       {
         label: "",
         displayOrder: 10001,
-        id: 0,
-        pid: 0,
+        // id: 0,
+        pid: 99,
         children: [],
         childrenLen: 0
       }
     ]);
-    getCompanyId().then(res => {
-      departData[0].id = res;
-    });
+    // getCompanyId().then(res => {
+    //   // departData[0].id = res;
+    //   // departData[0].label = "顶级部门";
+    // });
     // watchEffect(() => departData);
     // 当前部门信息
     let currentDepart = reactive({
@@ -322,7 +323,6 @@ export default {
         }
       }
     });
-    console.log(employeeInfo);
     /**---------------------------------- 部门 end---------------------------------- */
     /**
      * 函数
@@ -405,11 +405,9 @@ export default {
      * 添加部门成员
      */
     const addMemberFn = (depId, userIdArr) => {
-      console.log(depId, userIdArr);
       let params = new URLSearchParams();
       params.append("userId", userIdArr); // [1, 2, 7]
       params.append("depId", depId); // 7
-      //console.log(params);
       return addMember(params);
     };
 
@@ -592,8 +590,6 @@ export default {
         data: data,
         node: node
       };
-      console.log(data, "data");
-      console.log(node, "node");
       let id = removeData.data.id || 0;
       memberLabel.value = `是否移除'${removeData.data.label}'`;
       if (companyData.companyId == id) {
@@ -707,7 +703,6 @@ export default {
      */
     let showDepartOperation = ref(false);
     const showDepartClick = () => {
-      console.log("1");
       showDepartOperation.value = true;
     };
     const hideDepartLeave = () => {
@@ -717,7 +712,6 @@ export default {
 
     /**---------------------------------- 生命周期 onMounted login ---------------------------------- */
     onMounted(() => {
-      console.log("挂载完成");
       /**在挂载完成之后在执行侦听器 */
       // 只能使用 watch, 不能使用 watchEffect
       watch(
