@@ -1,6 +1,6 @@
 <template>
   <main id="contacts" class="frame_center">
-    <div class="contacts_main frame_center_main">
+    <div class="contacts_main frame_center_main" v-loading="loading">
       <div class="chunk_title">
         <div class="chunk_title_top">
           <el-input class="search" placeholder="搜索部门" v-model="filterText"></el-input>
@@ -239,7 +239,6 @@ export default {
       {
         label: "",
         displayOrder: 10001,
-        id: 0,
         pid: 0,
         children: [],
         childrenLen: 0
@@ -454,6 +453,7 @@ export default {
         .then(res => {
           memberListPaging.id = companyData.companyId;
           selectChildMember(memberListPaging);
+          loading.value = false;
         });
     };
     selectAllDepart();
@@ -763,7 +763,7 @@ export default {
       */
     });
     /**---------------------------------- 生命周期 onMounted end---------------------------------- */
-
+    const loading = ref(true);
     return {
       contactsModule,
       open4,
@@ -804,7 +804,8 @@ export default {
       showDepartOperation, // 点击左侧导航栏的菜单栏的样式 布尔值
       showDepartClick, // 鼠标 点击 控制左侧导航栏的显示菜单栏函数
       hideDepartLeave, // 鼠标离开 控制左侧导航栏隐藏的菜单栏函数
-      memberListPaging
+      memberListPaging,
+      loading
     };
   }
 };

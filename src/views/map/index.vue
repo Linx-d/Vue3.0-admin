@@ -1,5 +1,12 @@
 <template>
-  <main id="map" :class="{cutFullClass: full}">
+  <main
+    id="map"
+    :class="{cutFullClass: full}"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(11, 21, 50, 0.8)"
+  >
     <div id="mapShow" :class="['map_main', 'frame_center']"></div>
     <div :class="['tool', { tool_top: full }]">
       <ul>
@@ -106,6 +113,7 @@ import {
   computed,
   reactive,
   watchEffect,
+  ref,
 } from "@vue/composition-api";
 import {
   listAlarmView,
@@ -238,6 +246,7 @@ export default {
             pointArray.push(point);
           });
           online(status); // 统计表 比例
+          loading.value = false;
           function addClickHandler(content, marker) {
             marker.addEventListener("click", function (e) {
               openInfo(content, e);
@@ -392,6 +401,7 @@ export default {
       adaptionEchartsV2(historyChart);
       adaptionEchartsV2(onlineChart);
     });
+    const loading = ref(true);
     /**
      * 生命周期函数 onMounted
      */
@@ -407,7 +417,7 @@ export default {
       });
       baiduMap(); // 百度地图
     });
-    return { cutFull, full, alarmData, alanysisStatus, echartsBorder };
+    return { cutFull, full, alarmData, alanysisStatus, echartsBorder, loading };
   },
 };
 </script>

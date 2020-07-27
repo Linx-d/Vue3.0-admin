@@ -102,7 +102,7 @@
         class="railTable"
         id="memberRailList"
       >
-        <el-table :data="railList.data" style="width: 100%" max-height="250">
+        <el-table :data="railList.data" style="width: 100%" max-height="400">
           <el-table-column fixed prop="gmtCreate" label="日期" width="220"></el-table-column>
           <el-table-column prop="railName" label="围栏名称" width="120"></el-table-column>
           <el-table-column prop="personSum" label="人数" width="120"></el-table-column>
@@ -394,7 +394,7 @@ export default {
             {
               type: "inside",
               start: 0,
-              end: 100
+              end: 10
             },
             {
               start: 0,

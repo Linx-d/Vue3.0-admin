@@ -72,7 +72,7 @@
       </el-form>
     </el-drawer>
 
-    <div class="customer_main frame_center_main">
+    <div class="customer_main frame_center_main" v-loading="loading">
       <div class="chunk_cnt">
         <div class="cnt_top">
           <div class="cnt_top_l">
@@ -400,6 +400,7 @@ export default {
             })
             .then(data => {
               railData.data.push(item);
+              loading.value = false;
             });
         });
       });
@@ -780,6 +781,7 @@ export default {
       resetForm("addRailData");
       addDrawer.value = false;
     };
+    const loading = ref(true);
     onMounted(() => {});
     return {
       railData, // 围栏信息
@@ -803,7 +805,8 @@ export default {
       addHandleClose, // 增加围栏点击覆盖层触发事件
       modifyOpen,
       closeModifyDrawer,
-      closeAddDrawer
+      closeAddDrawer,
+      loading
     };
   }
 };
