@@ -72,7 +72,7 @@
       </el-form>
     </el-drawer>
 
-    <div class="customer_main frame_center_main">
+    <div class="customer_main frame_center_main" v-loading="loading">
       <div class="chunk_cnt">
         <div class="cnt_top">
           <div class="cnt_top_l">
@@ -313,7 +313,7 @@ export default {
         resetForm("modifyRailData");
       } else {
         root
-          .$confirm("确认关闭？")
+          .$confirm("您已修改围栏信息,是否关闭窗口？")
           .then(_ => {
             done();
             resetForm("modifyRailData");
@@ -334,7 +334,7 @@ export default {
         resetForm("addRailData");
       } else {
         root
-          .$confirm("确认关闭？")
+          .$confirm("您已编辑围栏信息,是否关闭窗口？")
           .then(_ => {
             done();
             resetForm("addRailData");
@@ -396,6 +396,7 @@ export default {
             })
             .then(data => {
               railData.data.push(item);
+              loading.value = false;
             });
         });
       });
@@ -499,7 +500,7 @@ export default {
         let overlaycomplete = function(e) {
           clearAll();
           let point = e.overlay.point;
-          let radius = parseInt(e.overlay.xa);
+          let radius = parseInt(e.overlay.Da);
           modifyRailData.radius = radius;
           geoc.getLocation(point, function(rs) {
             let addComp = rs.addressComponents;
@@ -558,7 +559,7 @@ export default {
         let overlaycomplete = function(e) {
           clearAll();
           let point = e.overlay.point;
-          let radius = parseInt(e.overlay.xa);
+          let radius = parseInt(e.overlay.Da);
           addRailData.radius = radius;
           addRailData.longitude = point.lng;
           addRailData.latitude = point.lat;
@@ -776,6 +777,7 @@ export default {
       resetForm("addRailData");
       addDrawer.value = false;
     };
+    const loading = ref(true);
     onMounted(() => {});
     return {
       railData, // 围栏信息
@@ -799,7 +801,8 @@ export default {
       addHandleClose, // 增加围栏点击覆盖层触发事件
       modifyOpen,
       closeModifyDrawer,
-      closeAddDrawer
+      closeAddDrawer,
+      loading
     };
   }
 };

@@ -29,6 +29,7 @@ export default {};
   text-align: center;
   font-size: 12px;
   margin-top: 23px;
+  min-width: 1080px;
   .frame_bottom_nav {
     margin-bottom: 2px;
     height: 24px;

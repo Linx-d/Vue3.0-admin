@@ -2,7 +2,7 @@
   <div id="app">
     <Header v-if="full"></Header>
 
-    <router-view />
+    <router-view v-loading="loading" />
 
     <Footer v-if="full"></Footer>
   </div>
@@ -10,7 +10,7 @@
 <script>
 import Header from "./views/Layout/Header";
 import Footer from "./views/Layout/Footer";
-import { computed } from "@vue/composition-api";
+import { computed, ref } from "@vue/composition-api";
 export default {
   name: "App",
   components: { Header, Footer },
@@ -18,8 +18,14 @@ export default {
     const full = computed(() => {
       return root.$store.state.map.full;
     });
-    return { full };
-  }
+    const loading = ref(true);
+    let hasToken = sessionStorage.getItem("auth_token");
+    let verify = hasToken == null || hasToken == undefined || hasToken == "";
+    if (!verify) {
+      loading.value = false;
+    }
+    return { full, loading };
+  },
 };
 </script>
 
