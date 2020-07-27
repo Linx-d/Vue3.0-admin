@@ -284,6 +284,7 @@ export default {
      * 查询所有角色及拥有该角色的员工
      */
     const queryAllRole = () => {
+      const that =  this;
       roleList.splice(0, roleList.length);
       employee.id = null;
       listAllRole()
@@ -291,12 +292,16 @@ export default {
           return res.data;
         })
         .then(data => {
-          data.forEach(item => {
-            listEmployeeByRole(item.id).then(res => {
-              item.employees = res.data.list;
+          for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+              const item = data[key];
               roleList.push(item);
-            });
-          });
+              listEmployeeByRole(item.id).then(res => {
+                item.employees = res.data.list; 
+                roleList.splice(key,1,item);
+              });
+            }
+          }
         });
       WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
     };
