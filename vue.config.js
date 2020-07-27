@@ -45,11 +45,11 @@ module.exports = {
       );
       // 修改vue.config.js 分离不常用代码库
       // 如果不配置webpack也可直接在index.html引入
-      config.externals = {
-        vue: "Vue",
-        "vue-router": "VueRouter",
-        moment: "moment",
-      };
+      // config.externals = {
+      //   vue: "Vue",
+      //   "vue-router": "VueRouter",
+      //   moment: "moment",
+      // };
       // 开启分离js
       config.optimization = {
         runtimeChunk: "single",
