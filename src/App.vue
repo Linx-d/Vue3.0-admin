@@ -1,16 +1,14 @@
 <template>
-  <div id="app">
+  <div id="app" v-if="!loading">
     <Header v-if="full"></Header>
-
-    <router-view v-loading="loading" />
-
+    <router-view/>
     <Footer v-if="full"></Footer>
   </div>
 </template>
 <script>
 import Header from "./views/Layout/Header";
 import Footer from "./views/Layout/Footer";
-import { computed, ref } from "@vue/composition-api";
+import { computed, ref, watchEffect } from "@vue/composition-api";
 export default {
   name: "App",
   components: { Header, Footer },
@@ -19,11 +17,10 @@ export default {
       return root.$store.state.map.full;
     });
     const loading = ref(true);
-    let hasToken = sessionStorage.getItem("auth_token");
-    let verify = hasToken == null || hasToken == undefined || hasToken == "";
-    if (!verify) {
-      loading.value = false;
-    }
+    watchEffect(()=>{
+      let hasToken = sessionStorage.getItem("auth_token");
+      loading.value = hasToken == null || hasToken == undefined || hasToken == "";
+    })
     return { full, loading };
   },
 };
