@@ -428,6 +428,7 @@ $echartsBorder: 1px solid #146ede;
 #map {
   height: 100vh;
   min-height: 757px;
+  min-width: $layout-min-width;
   position: relative;
   background-color: #fff;
   .map_main {
@@ -483,6 +484,7 @@ $echartsBorder: 1px solid #146ede;
   height: 100%;
   overflow: hidden;
   padding-top: 80px;
+  min-width: $layout-min-width;
   @include webkit('box-sizing', border-box);
   .alanysis_top {
     height: 52%;
