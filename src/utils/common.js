@@ -82,7 +82,6 @@ export function switchModule(data, current) {
  */
 export function adaptionEcharts(element, myChart) {
   EleResize.on(element, () => {
-    console.log(EleResize);
     myChart.resize();
   });
 }

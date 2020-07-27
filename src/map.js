@@ -6,7 +6,6 @@
 export function loadBaiDuMap(ak) {
   return new Promise(function(resolve, reject) {
     try {
-      console.log("BMap is defined:", BMap === undefined || BMap);
       resolve(BMap);
     } catch (e) {
       window.init = function() {
@@ -36,7 +35,6 @@ export function Map(ak) {
       loaded = false;
     }
     if (!loaded) {
-      console.log("BMapLib.DrawingManager loading!");
       let script2 = document.createElement("script");
       script2.type = "text/javascript";
       script2.src =

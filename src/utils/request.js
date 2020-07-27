@@ -32,12 +32,10 @@ service.interceptors.response.use(
     // 对响应数据做点什么
     let data = response.data;
     if (data.code !== 0) {
-      //console.log(data);
       // Message.error(data.msg);
       return Promise.resolve(data);  //return Promise.reject(data);
     } else {
       //return response; //所有相应数据
-      //console.log(data);
       //Message.success(data.msg);
       return Promise.resolve(data); //只有data数据
     }

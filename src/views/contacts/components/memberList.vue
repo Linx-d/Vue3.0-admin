@@ -237,7 +237,6 @@ export default {
 
     /**选择单个成员 */
     const checkChild = () => {
-      console.log("1");
     };
     /**
      * 添加成员

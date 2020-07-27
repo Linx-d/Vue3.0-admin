@@ -306,7 +306,7 @@ export default {
      *  成员个人信息温度变化图表
      */
     const memberInfoEcharts = () => {
-      let tmpHistory = props.tmpHistory; //console.log(tmpHistory);
+      let tmpHistory = props.tmpHistory; 
       watchEffect(() => {
         // 基于准备好的dom，初始化echarts实例
         let myChart = root.$echarts.init(
@@ -475,7 +475,6 @@ export default {
           radius: props.currentMemberInfo.radius
         };
         Map("ak").then(BMap => {
-          console.log(props.tmpHistory.newArr_position);
           let map = new BMap.Map("mapShow"); // 创建Map实例
           let pointArray = [];
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
@@ -512,7 +511,6 @@ export default {
               }
             }
           });
-          // console.log(props.tmpHistory.newArr_position);
           let start = new BMap.Point(
             props.tmpHistory.newArr_position[0].lng,
             props.tmpHistory.newArr_position[0].lat

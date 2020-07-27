@@ -130,7 +130,6 @@ export default {
      * 退出登录
      */
     const logOut = () => {
-      // console.log(sessionStorage.getItem('auth_token'));
       sessionStorage.clear();
       // window.location.href="http://www.chinautech.com/";
       window.location.href="http://iot.chinautech.com/";
@@ -140,7 +139,6 @@ export default {
       let path = root.$route.path;
       if (path != "/") {
         navList.forEach((item, index) => {
-          //console.log(item, index);
         });
       }
     });

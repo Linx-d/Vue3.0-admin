@@ -305,17 +305,7 @@ export default {
     };
     setInterval(getView, 6000000);
     function getView() {
-      // let randomObj = reactive({
-      //   imei: "ut1000001000000",
-      //   temperature: "39.8",
-      //   latitude: "29.490295",
-      //   type: "0",
-      //   longitude: "106.486654",
-      //   electric: "2"
-      // });
-      // add(randomObj).then(res => {
-      //   console.log(res);
-      // });
+      
       getAlarmView().then((res) => {
         let data = res.data;
         // time

@@ -270,7 +270,6 @@ export default {
     const modifySubmitForm = formName => {
       refs[formName].validate(valid => {
         if (!valid) {
-          console.log("error submit!!");
           return false;
         } else {
           modifyOpen();
@@ -282,10 +281,8 @@ export default {
     const addSubmitForm = formName => {
       refs[formName].validate(valid => {
         if (!valid) {
-          console.log("error submit!!");
           return false;
         } else {
-          console.log("success submit!!");
           addOpen();
           return true;
         }
@@ -384,7 +381,6 @@ export default {
 
         railData.data.splice(0, railData.data.length);
         data.forEach(item => {
-          // console.log(item)
           listUserInfoByRail(item.id)
             .then(res => {
               let abnormalPerson = 0;

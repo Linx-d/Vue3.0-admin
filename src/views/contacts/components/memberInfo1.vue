@@ -309,7 +309,7 @@ export default {
      *  成员个人信息温度变化图表
      */
     const memberInfoEcharts = () => {
-      let tmpHistory = props.tmpHistory; //console.log(tmpHistory);
+      let tmpHistory = props.tmpHistory; 
       watchEffect(() => {
         // 基于准备好的dom，初始化echarts实例
         let myChart = root.$echarts.init(
@@ -466,12 +466,6 @@ export default {
      */
     const baiduMap = () => {
       watchEffect(() => {
-        // 成员坐标
-        // let location = {
-        //   lng: props.currentMemberInfo.userLongitude, // 注意经纬度的对应 userLongitude
-        //   lat: props.currentMemberInfo.userLatitude // 注意经纬度的对应 userLatitude
-        // };
-        // console.log(location);
         // 围栏信息
         let railInfo = {
           lng: props.currentMemberInfo.railLongitude,

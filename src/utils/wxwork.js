@@ -5,7 +5,6 @@ export function jssdk(jsApiList,fun){
     if(url.indexOf("#")!=-1){
        url = url.substring(0,url.indexOf("#"));
     }
-    console.log(url,"url");
     service.request({
       method:"POST",
       url:"/qywx/getJSSDK?url="+url
