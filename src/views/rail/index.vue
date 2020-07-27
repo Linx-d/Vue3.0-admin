@@ -503,7 +503,7 @@ export default {
         let overlaycomplete = function(e) {
           clearAll();
           let point = e.overlay.point;
-          let radius = parseInt(e.overlay.xa);
+          let radius = parseInt(e.overlay.Da);
           modifyRailData.radius = radius;
           geoc.getLocation(point, function(rs) {
             let addComp = rs.addressComponents;
@@ -562,7 +562,7 @@ export default {
         let overlaycomplete = function(e) {
           clearAll();
           let point = e.overlay.point;
-          let radius = parseInt(e.overlay.xa);
+          let radius = parseInt(e.overlay.Da);
           addRailData.radius = radius;
           addRailData.longitude = point.lng;
           addRailData.latitude = point.lat;
