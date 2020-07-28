@@ -219,7 +219,9 @@ export default {
       lastUpdate: "2020-05-14 15:48:02",
       tnumber: null,
       pnumber: 109,
-    }); // 当前成员温度随时间变化的历史数据
+      tableData: []
+    }); 
+    // 当前成员温度随时间变化的历史数据
     /**
      * 数据
      */
