@@ -99,7 +99,6 @@
                   <th>创建时间</th>
                   <th>修改时间</th>
                   <th>半径(m)</th>
-                  <th>中心坐标</th>
                   <th>地址</th>
                   <th>操作</th>
                 </tr>
@@ -116,7 +115,6 @@
                   <td :title="rail.gmtCreate">{{ rail.gmtCreate }}</td>
                   <td :title="rail.gmtModified">{{ rail.gmtModified }}</td>
                   <td :title="rail.radius">{{ rail.radius }}</td>
-                  <td :title="rail.latitude">({{ rail.longitude }},{{ rail.latitude }})</td>
                   <td :title="rail.railAddr" class="railAddress">{{ rail.railAddr }}</td>
                   <td class="tdTool">
                     <a href="javascript:;" @click.stop="modifyRailFn(rail, index)">查看</a>
@@ -162,7 +160,7 @@ import {
   deleteRail,
   listUserInfoByRail,
   queryRailByName,
-  updateRail
+  updateRail,
 } from "@/api/railApi";
 import { reactive, ref, onMounted, watchEffect } from "@vue/composition-api";
 import { Message } from "element-ui";
@@ -171,6 +169,8 @@ import { Map } from "@/map";
 import onLineIcon from "./images/marker_online.png";
 import unLineIcon from "./images/marker_unline.png";
 import dangerIcon from "./images/marker_danger.png";
+import pointAggre from "@/views/images/pointAggre.png"; // 点聚合
+import railPosition from "@/views/images/railPosition.png"; // 围栏标注
 export default {
   name: "rail",
   setup(props, { root, refs }) {
@@ -183,7 +183,7 @@ export default {
     let listByRailData = reactive([]);
     // 当前围栏信息
     let currentRailData = reactive({
-      index: null
+      index: null,
     });
     // 增加围栏 data
     let addRailData = reactive({
@@ -191,7 +191,7 @@ export default {
       longitude: "",
       radius: null,
       railName: "",
-      railAddr: ""
+      railAddr: "",
     });
     const addRailFn = () => {
       railText = {
@@ -199,7 +199,7 @@ export default {
         longitude: "",
         radius: null,
         railName: "",
-        railAddr: ""
+        railAddr: "",
       };
       addDrawer.value = true; // 显示新增围栏模块
       addBaiduMap();
@@ -211,7 +211,7 @@ export default {
       radius: null,
       railName: "",
       id: null,
-      railAddr: ""
+      railAddr: "",
     });
     const modifyRailFn = (data, index) => {
       cloneObject(modifyRailData, data);
@@ -220,19 +220,19 @@ export default {
       modifyDrawer.value = true; // 显示修改围栏模块
       currentRailData.index = index; // 当前围栏的索引
       listUserInfoByRail(id)
-        .then(res => {
+        .then((res) => {
           let data = res.data.list ? res.data.list : res.data;
           // 深拷贝数组
           cloneArray(listByRailData, data);
           return res;
         })
-        .then(res => {
+        .then((res) => {
           modifyBaiduMap();
         });
     };
     // 自定义校验规则, 围栏名称不能重复
     const validateRailName = (rule, value, callback) => {
-      queryRailByName(value).then(res => {
+      queryRailByName(value).then((res) => {
         let code = res.code;
         if (code != 0) {
           callback(new Error("已经有这个围栏，请重新设置"));
@@ -245,13 +245,13 @@ export default {
       railName: [
         { required: true, message: "请输入围栏名称", trigger: "blur" },
         { min: 3, max: 7, message: "长度在 3 到 7 个字符" },
-        { validator: validateRailName, trigger: "blur" }
+        { validator: validateRailName, trigger: "blur" },
       ],
       railAddr: [
         { required: true, message: "请设置围栏地址" },
-        { min: 1, max: 25, message: "长度在 1 到 25 个字符" }
+        { min: 1, max: 25, message: "长度在 1 到 25 个字符" },
       ],
-      radius: [{ required: true, message: "请在地图中选取设置围栏半径" }]
+      radius: [{ required: true, message: "请在地图中选取设置围栏半径" }],
     });
     // 删除围栏
     const delData = reactive({
@@ -259,7 +259,7 @@ export default {
       longitude: "",
       radius: 0,
       railName: "",
-      id: null
+      id: null,
     });
     const delRailFn = (data, index) => {
       cloneObject(delData, data);
@@ -267,8 +267,8 @@ export default {
     };
 
     // 修改围栏提交
-    const modifySubmitForm = formName => {
-      refs[formName].validate(valid => {
+    const modifySubmitForm = (formName) => {
+      refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         } else {
@@ -278,8 +278,8 @@ export default {
       });
     };
     // 增加围栏提交
-    const addSubmitForm = formName => {
-      refs[formName].validate(valid => {
+    const addSubmitForm = (formName) => {
+      refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         } else {
@@ -289,7 +289,7 @@ export default {
       });
     };
     // 重置
-    const resetForm = formName => {
+    const resetForm = (formName) => {
       refs[formName].resetFields();
     };
     // 修改围栏点击覆盖层触发事件
@@ -299,9 +299,9 @@ export default {
       radius: null,
       railName: "",
       id: null,
-      railAddr: ""
+      railAddr: "",
     });
-    const modifyHandleClose = done => {
+    const modifyHandleClose = (done) => {
       let status = true;
       for (let key in railText) {
         if (railText[key] != modifyRailData[key]) {
@@ -314,15 +314,15 @@ export default {
       } else {
         root
           .$confirm("您已修改围栏信息,是否关闭窗口？")
-          .then(_ => {
+          .then((_) => {
             done();
             resetForm("modifyRailData");
           })
-          .catch(_ => {});
+          .catch((_) => {});
       }
     };
     // 增加围栏点击覆盖层触发事件
-    const addHandleClose = done => {
+    const addHandleClose = (done) => {
       let status = true;
       for (let key in railText) {
         if (railText[key] != addRailData[key]) {
@@ -335,24 +335,24 @@ export default {
       } else {
         root
           .$confirm("您已编辑围栏信息,是否关闭窗口？")
-          .then(_ => {
+          .then((_) => {
             done();
             resetForm("addRailData");
           })
-          .catch(_ => {});
+          .catch((_) => {});
       }
     };
     /**查询所有围栏信息 */
     let railListPaging = reactive({
       pageNum: 1,
-      pageSize: 15
+      pageSize: 15,
     });
     // 围栏信息
     let railData = reactive({
       total: 10,
       lastPage: 2,
       data: [],
-      status: true
+      status: true,
     });
 
     /**
@@ -360,8 +360,8 @@ export default {
      */
 
     // 查询所有围栏信息 selectRailList
-    const selectRailList = railListPaging => {
-      listRail(railListPaging).then(res => {
+    const selectRailList = (railListPaging) => {
+      listRail(railListPaging).then((res) => {
         let data = res.data.list ? res.data.list : res.data;
         let size = res.data.size,
           hasPreviousPage = res.data.hasPreviousPage;
@@ -380,12 +380,12 @@ export default {
         railData.lastPage = res.data.lastPage; // 最后一页的页码
 
         railData.data.splice(0, railData.data.length);
-        data.forEach(item => {
+        data.forEach((item) => {
           listUserInfoByRail(item.id)
-            .then(res => {
+            .then((res) => {
               let abnormalPerson = 0;
               let data = res.data;
-              data.forEach(item => {
+              data.forEach((item) => {
                 let temperature = parseFloat(item.temperature);
                 if (temperature > 37.3) {
                   abnormalPerson++;
@@ -394,7 +394,7 @@ export default {
               item.abnormalPerson = abnormalPerson;
               return item;
             })
-            .then(data => {
+            .then((data) => {
               railData.data.push(item);
               loading.value = false;
             });
@@ -404,22 +404,31 @@ export default {
     selectRailList(railListPaging);
 
     /**当前页变动时候触发的事件 */
-    const handleCurrentChange = val => {
+    const handleCurrentChange = (val) => {
       railListPaging.pageNum = val;
       selectRailList(railListPaging);
     };
-    const handleSizeChange = val => {
+    const handleSizeChange = (val) => {
       railListPaging.pageSize = val;
       selectRailList(railListPaging);
     };
     let modifyBaiduMap = () => {
-      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
+      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
         // 百度地图API功能
         let map = new BMap.Map("modifyMap");
         let point = new BMap.Point(
           modifyRailData.longitude,
           modifyRailData.latitude
         );
+        /**围栏标注
+         * 
+         */
+        let railIcon = new BMap.Icon(railPosition, new BMap.Size(48, 48));
+        let railMarker = new BMap.Marker(point, {icon: railIcon});
+        let content = '围栏名称：'+ modifyRailData.railName;
+        map.addOverlay(railMarker);
+        addClickHandler(content, railMarker);
+
         let geoc = new BMap.Geocoder();
         let overlays = []; // 围栏
         let markers = []; // 点聚合
@@ -433,17 +442,17 @@ export default {
         let opts = {
           width: 250,
           height: 80,
-          title: "个人信息",
-          enableMessage: true //设置允许信息窗发送短息
+          title: "信息",
+          enableMessage: true, //设置允许信息窗发送短息
         };
         // 状态统计
         let status = {
           personStatic: listByRailData.length,
           eletricStatic: 0,
           temperatureStatic: 0,
-          onlineStatic: 0
+          onlineStatic: 0,
         };
-        listByRailData.forEach(item => {
+        listByRailData.forEach((item) => {
           let gmtTime =
             new Date().getTime() - new Date(item.gmtCreate).getTime();
           let deviceOline = false;
@@ -466,13 +475,13 @@ export default {
           }
           let point = new BMap.Point(item.longitude, item.latitude);
           let marker = new BMap.Marker(point, { icon: myIcon });
-          let content = item.userName;
+          let content = '姓名：'+ item.userName;
           map.addOverlay(marker);
           addClickHandler(content, marker);
           markers.push(marker);
         });
         function addClickHandler(content, marker) {
-          marker.addEventListener("click", function(e) {
+          marker.addEventListener("click", function (e) {
             openInfo(content, e);
           });
         }
@@ -484,7 +493,14 @@ export default {
         }
         //map.setViewport(markers);
         let markerClusterer = new BMapLib.MarkerClusterer(map, {
-          markers: markers
+          markers: markers,
+          minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
+          styles: [
+            {
+              url: pointAggre,
+              size: new BMap.Size(48, 48),
+            },
+          ],
         });
 
         var radius = modifyRailData.radius || 100;
@@ -493,16 +509,16 @@ export default {
           strokeWeight: 1,
           strokeOpacity: 0.01,
           fillColor: "#53aeff",
-          fillOpacity: 0.4
+          fillOpacity: 0.4,
         });
         map.addOverlay(circle);
         overlays.push(circle);
-        let overlaycomplete = function(e) {
+        let overlaycomplete = function (e) {
           clearAll();
           let point = e.overlay.point;
           let radius = parseInt(e.overlay.Da);
           modifyRailData.radius = radius;
-          geoc.getLocation(point, function(rs) {
+          geoc.getLocation(point, function (rs) {
             let addComp = rs.addressComponents;
             modifyRailData.railAddr =
               addComp.province +
@@ -518,7 +534,7 @@ export default {
           fillColor: "#53aeff", //填充颜色。当参数为空时，圆形将没有填充效果。
           strokeWeight: 1, //边线的宽度，以像素为单位。
           strokeOpacity: 0.01, //边线透明度，取值范围0 - 1。
-          fillOpacity: 0.4 //填充的透明度，取值范围0 - 1。
+          fillOpacity: 0.4, //填充的透明度，取值范围0 - 1。
           //strokeStyle: "solid" //边线的样式，solid或dashed。
         };
         //实例化鼠标绘制工具
@@ -528,12 +544,12 @@ export default {
           drawingToolOptions: {
             anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
             offset: new BMap.Size(5, 5), //偏离值
-            drawingModes: [BMAP_DRAWING_CIRCLE]
+            drawingModes: [BMAP_DRAWING_CIRCLE],
           },
           circleOptions: styleOptions, //圆的样式
           polylineOptions: styleOptions, //线的样式
           polygonOptions: styleOptions, //多边形的样式
-          rectangleOptions: styleOptions //矩形的样式
+          rectangleOptions: styleOptions, //矩形的样式
         });
         //添加鼠标绘制工具监听事件，用于获取绘制结果
         drawingManager.addEventListener("overlaycomplete", overlaycomplete);
@@ -547,7 +563,7 @@ export default {
     };
 
     let addBaiduMap = () => {
-      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then(BMap => {
+      Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
         // 百度地图API功能
         let map = new BMap.Map("addMap");
         let point = new BMap.Point(106.520406, 29.825615);
@@ -556,14 +572,14 @@ export default {
         map.centerAndZoom(point, 16);
         map.enableScrollWheelZoom();
 
-        let overlaycomplete = function(e) {
+        let overlaycomplete = function (e) {
           clearAll();
           let point = e.overlay.point;
           let radius = parseInt(e.overlay.Da);
           addRailData.radius = radius;
           addRailData.longitude = point.lng;
           addRailData.latitude = point.lat;
-          geoc.getLocation(point, function(rs) {
+          geoc.getLocation(point, function (rs) {
             let addComp = rs.addressComponents;
             addRailData.railAddr =
               addComp.province +
@@ -579,7 +595,7 @@ export default {
           fillColor: "#53aeff", //填充颜色。当参数为空时，圆形将没有填充效果。
           strokeWeight: 1, //边线的宽度，以像素为单位。
           strokeOpacity: 0.01, //边线透明度，取值范围0 - 1。
-          fillOpacity: 0.4 //填充的透明度，取值范围0 - 1。
+          fillOpacity: 0.4, //填充的透明度，取值范围0 - 1。
           //strokeStyle: "solid" //边线的样式，solid或dashed。
         };
         //实例化鼠标绘制工具
@@ -589,12 +605,12 @@ export default {
           drawingToolOptions: {
             anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
             offset: new BMap.Size(5, 5), //偏离值
-            drawingModes: [BMAP_DRAWING_CIRCLE]
+            drawingModes: [BMAP_DRAWING_CIRCLE],
           },
           circleOptions: styleOptions, //圆的样式
           polylineOptions: styleOptions, //线的样式
           polygonOptions: styleOptions, //多边形的样式
-          rectangleOptions: styleOptions //矩形的样式
+          rectangleOptions: styleOptions, //矩形的样式
         });
         //添加鼠标绘制工具监听事件，用于获取绘制结果
         drawingManager.addEventListener("overlaycomplete", overlaycomplete);
@@ -617,7 +633,7 @@ export default {
         .$msgbox({
           title: "修改围栏",
           message: h("p", null, [
-            h("span", null, "修改围栏信息")
+            h("span", null, "修改围栏信息"),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -636,21 +652,21 @@ export default {
             } else {
               done();
             }
-          }
+          },
         })
-        .then(action => {
-          updateRail(modifyRailData).then(res => {
+        .then((action) => {
+          updateRail(modifyRailData).then((res) => {
             let code = res.code;
             if (code === 0) {
               selectRailList(railListPaging);
               root.$message({
                 type: "success",
-                message: "修改成功"
+                message: "修改成功",
               });
             } else {
               root.$message({
                 type: "error",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -658,19 +674,19 @@ export default {
         .catch(() => {
           root.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     };
 
     // 删除围栏确认框
-    const delOpen = index => {
+    const delOpen = (index) => {
       const h = root.$createElement;
       root
         .$msgbox({
           title: "删除围栏",
           message: h("p", null, [
-            h("span", null, `删除"${delData.railName}"围栏信息`)
+            h("span", null, `删除"${delData.railName}"围栏信息`),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -689,22 +705,22 @@ export default {
             } else {
               done();
             }
-          }
+          },
         })
-        .then(action => {
-          deleteRail(delData).then(res => {
+        .then((action) => {
+          deleteRail(delData).then((res) => {
             let code = res.code;
             if (code === 0) {
               root.$message({
                 type: "success",
-                message: "删除成功"
+                message: "删除成功",
               });
               railData.data.splice(index, 1);
               selectRailList(railListPaging);
             } else {
               root.$message({
                 type: "error",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -712,19 +728,19 @@ export default {
         .catch(() => {
           root.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     };
 
     // 增加围栏确认框
-    const addOpen = index => {
+    const addOpen = (index) => {
       const h = root.$createElement;
       root
         .$msgbox({
           title: "增加围栏",
           message: h("p", null, [
-            h("span", null, `增加"${addRailData.railName}"围栏信息`)
+            h("span", null, `增加"${addRailData.railName}"围栏信息`),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -743,21 +759,21 @@ export default {
             } else {
               done();
             }
-          }
+          },
         })
-        .then(action => {
-          addRail(addRailData).then(res => {
+        .then((action) => {
+          addRail(addRailData).then((res) => {
             let code = res.code;
             if (code === 0) {
               selectRailList(railListPaging);
               root.$message({
                 type: "success",
-                message: "增加成功"
+                message: "增加成功",
               });
             } else {
               root.$message({
                 type: "error",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -765,7 +781,7 @@ export default {
         .catch(() => {
           root.$message({
             type: "info",
-            message: "已取消增加"
+            message: "已取消增加",
           });
         });
     };
@@ -802,9 +818,9 @@ export default {
       modifyOpen,
       closeModifyDrawer,
       closeAddDrawer,
-      loading
+      loading,
     };
-  }
+  },
 };
 </script>
 
@@ -935,7 +951,6 @@ $customerHeight: 648px;
   width: 100%;
 }
 // modify form表单
-
 
 // 围栏地址宽度限制
 .railAddress {
