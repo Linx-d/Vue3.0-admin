@@ -36,26 +36,27 @@
           </div>
         </el-dialog>
       </div>
-      <el-menu :default-openeds="['1','2','3']" @open="loadWWOpenData()">
+      <el-menu :default-openeds="['1','2','3']" @open="loadWWOpenData()" class="roleMenu">
         <el-submenu
           :index="role.id + ''"
           v-for="(role, index) in roleList"
           :key="role.id"
           :value="role.id"
+          class="menu"
         >
           <template slot="title">
             <span>{{ role.name }}</span>
           </template>
-          <el-menu-item-group>
             <el-menu-item
               v-for="employee in role.employees"
               :index="index + '-' + employee.id"
               :key="employee.id"
               :value="employee.id"
               @click="choose(employee.id)"
-              v-html="employee.name"
-            ></el-menu-item>
-          </el-menu-item-group>
+            >
+                <svg-icon iconClass="people" class="peopleSvg"></svg-icon>
+                <span v-html="employee.name">{{ employee.name }}</span>
+            </el-menu-item>
         </el-submenu>
       </el-menu>
     </div>
@@ -74,14 +75,19 @@
           v-if="!isEdit&&employee.role.id!=1"
         >删除管理员</a>
       </div>
-      <el-image :src="employee.photo" class="photo"></el-image>
+      <div class="group">
+        <el-image :src="employee.photo" class="photo"></el-image>
+      </div>
       <el-form label-width="120px" style="position: relative;">
-        <el-form-item label="管理员姓名">
-          <label class="label-info" v-html="employee.name"></label>
-        </el-form-item>
-        <el-form-item label="联系电话">
-          <label class="label-info">{{employee.tel}}</label>
-        </el-form-item>
+        <div class="group">
+            <el-form-item label="管理员姓名">
+              <label class="label-info" v-html="employee.name"></label>
+            </el-form-item>
+            <el-form-item label="联系电话">
+              <label class="label-info">{{employee.tel}}</label>
+            </el-form-item>
+        </div>
+        
         <!-- <span
           style="height: 1px;
           width: 100%;
@@ -90,6 +96,7 @@
           top: 111px;
           left: 0;"
         ></span>-->
+        <div class="group">
         <el-form-item label="管理权限" v-if="!isEdit">
           <label class="label-info">{{employee.role.name}}</label>
         </el-form-item>
@@ -135,9 +142,12 @@
             <label class="label-info">所有部门</label>
           </template>
         </el-form-item>
+        </div>
+        <div class="group-tail">
         <el-form-item label="注册时间">
           <label class="label-info">{{employee.gmtCreate}}</label>
         </el-form-item>
+        </div>
         <el-form-item>
           <template v-if="isEdit">
             <el-button type="primary" @click="submit()">提 交</el-button>
@@ -573,7 +583,7 @@ $corporationHeight: 655px;
   min-width: 80px;
   height: 80px;
   border: 2px rgb(221, 221, 221) solid;
-  margin: 20px 0;
+  // margin: 20px 0;
 }
 .image-slot,
 .el-icon-picture-outline {
@@ -629,5 +639,20 @@ $corporationHeight: 655px;
 }
 .addBtn:hover {
   background: #ededed;
+}
+.peopleSvg{
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 10px;
+}
+.group {
+    height: 94px;
+    border-bottom: 1px solid #e4e6e9;
+    padding: 30px 0;
+}
+.group-tail{
+    height: 94px;
+    // border-bottom: 1px solid #e4e6e9;
+    padding: 30px 0;
 }
 </style>
