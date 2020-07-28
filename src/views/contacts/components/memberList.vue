@@ -37,6 +37,7 @@
               v-for="(member, index) in memberData.data"
               :key="member.id"
               @click.stop="compileTool(member)"
+              :class="{danger: member.temperature>=37.3}"
             >
               <!--
               <td @click.stop="checkChild">
@@ -115,7 +116,7 @@ import {
   removeMember,
   listUserByDepartment,
   listUserByNoDepartment,
-  addMember
+  addMember,
 } from "@/api/contactsApi";
 import { Message } from "element-ui";
 import { cloneArray } from "@/utils/common";
@@ -125,48 +126,48 @@ export default {
     currentDepart: {
       // 不用在setup中重新声明一次变量
       type: Object,
-      default: () => {} // default值 需要使用箭头函数回调
+      default: () => {}, // default值 需要使用箭头函数回调
     },
     memberData: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     contactsModule: {
       type: Object,
-      default: () => []
+      default: () => [],
     },
     currentMemberInfo: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     tmpHistory: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     memberListPaging: {
       type: Object,
-      default: () => {}
-    }
+      default: () => {},
+    },
   },
   setup(props, { root, refs }) {
     let changeModule = reactive({
-      status: true
+      status: true,
     });
     const dialogTableVisible = reactive({
-      status: false
+      status: false,
     });
     let multipleSelection = reactive([]);
-    const toggleSelection = rows => {
+    const toggleSelection = (rows) => {
       dialogTableVisible.status = false;
       if (rows) {
-        rows.forEach(row => {
+        rows.forEach((row) => {
           refs.multipleTable.toggleRowSelection(row);
         });
       } else {
         refs.multipleTable.clearSelection();
       }
     };
-    const handleSelectionChange = val => {
+    const handleSelectionChange = (val) => {
       multipleSelection = val;
     };
     watchEffect(() => {
@@ -179,7 +180,7 @@ export default {
     /**
      *  tr click事件
      */
-    const compileTool = data => {
+    const compileTool = (data) => {
       // 切换模块
       switchModule(props.contactsModule, "memberInfo");
 
@@ -191,34 +192,51 @@ export default {
       let tmpHistory = props.tmpHistory;
       /**根据用户id获取历史数据信息 */
       let currentObj = {
-        userId: currentMemberInfo.userId
+        userId: currentMemberInfo.userId,
       };
-      listUserLocationById(currentObj).then(res => {
+      listUserLocationById(currentObj).then((res) => {
         let array = res.data.list ? res.data.list : res.data; // 服务器与local切换
         let newArr_time = [],
           newArr_tmp = [],
-          newArr_position = [];
-        array.forEach(item => {
+          newArr_position = [],
+          new_tableData = [];
+        array.forEach((item) => {
+          // tempreatrue
           newArr_time.push(item.gmtCreate);
           let temperature = Number(item.temperature).toFixed(1);
           newArr_tmp.push(temperature); //Number().toFiexd(1)
+
+          // position
           let positionObj = {
             lng: item.longitude,
-            lat: item.latitude
-          }
+            lat: item.latitude,
+          };
           newArr_position.push(positionObj);
+
+          // tableData
+          let tableObj = {
+            name: props.currentMemberInfo.name,
+            time: item.gmtCreate,
+            tempreatrue: temperature
+          }
+          new_tableData.push(tableObj);
         });
         tmpHistory.newArr_time = newArr_time;
         tmpHistory.newArr_tmp = newArr_tmp;
         tmpHistory.newArr_position = newArr_position;
+        tmpHistory.tableData = new_tableData;
       });
       /**根据用户id获取设备最新数据和告警信息 */
       let currentArray = [currentMemberInfo.userId];
-      listDeviceAlarmInfoByUserId(currentArray).then(res => {
+      listDeviceAlarmInfoByUserId(currentArray).then((res) => {
         let data = res.data[0] ? res.data[0] : [];
         props.tmpHistory.railName = data.railName;
         for (let key in data) {
-          currentMemberInfo[key] = data[key];
+          if (key == "age") {
+            currentMemberInfo[key] = parseInt(data[key]);
+          } else {
+            currentMemberInfo[key] = data[key];
+          }
         }
         for (let key in currentMemberInfo) {
           if (key === "railName") {
@@ -236,8 +254,7 @@ export default {
     };
 
     /**选择单个成员 */
-    const checkChild = () => {
-    };
+    const checkChild = () => {};
     /**
      * 添加成员
      */
@@ -248,7 +265,7 @@ export default {
       pageNum: 1,
       pageSize: 15,
       value: false,
-      data: []
+      data: [],
     });
     const addMemberBtn = () => {
       ungrouped.pageNum = 1;
@@ -257,11 +274,11 @@ export default {
       noDepart(ungrouped.pageNum, ungrouped.pageSize);
     };
     const noDepart = (pageNum, pageSize) => {
-      listUserByNoDepartment(pageNum, pageSize).then(res => {
+      listUserByNoDepartment(pageNum, pageSize).then((res) => {
         let data = res.data.list ? res.data.list : res.data,
           len = data.length;
         if (len !== 0) {
-          data.forEach(item => {
+          data.forEach((item) => {
             ungrouped.data.push(item);
           });
         } else {
@@ -286,23 +303,23 @@ export default {
     };
 
     /**当前页变动时候触发的事件 */
-    const handleCurrentChange = val => {
+    const handleCurrentChange = (val) => {
       props.memberListPaging.pageNum = val;
       selectChildMember(props.memberListPaging);
     };
-    const handleSizeChange = val => {
+    const handleSizeChange = (val) => {
       props.memberListPaging.pageSize = val;
       selectChildMember(props.memberListPaging);
     };
     /**
      * 查询部门成员
      */
-    const selectChildMember = memberListPaging => {
+    const selectChildMember = (memberListPaging) => {
       let params = new URLSearchParams(); // text post 提交
       params.append("id", memberListPaging.id);
       params.append("pageNum", memberListPaging.pageNum);
       params.append("pageSize", memberListPaging.pageSize);
-      listUserByDepartment(params).then(res => {
+      listUserByDepartment(params).then((res) => {
         props.memberData.data.splice(0, props.memberData.data.length);
         let data = res.data.list ? res.data.list : res.data;
 
@@ -345,7 +362,7 @@ export default {
         .$msgbox({
           title: "移除成员",
           message: h("p", null, [
-            h("span", null, `移除"${item.name}"`)
+            h("span", null, `移除"${item.name}"`),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -364,26 +381,26 @@ export default {
             } else {
               done();
             }
-          }
+          },
         })
-        .then(action => {
+        .then((action) => {
           let parmas = {
             depId: props.currentDepart.id,
-            userIds: [id]
+            userIds: [id],
           };
-          removeMember(parmas).then(res => {
+          removeMember(parmas).then((res) => {
             let code = res.code;
             if (code === 0) {
               //props.memberData.data.splice(index, 1);
               root.$message({
                 type: "success",
-                message: "移除成功"
+                message: "移除成功",
               });
               selectChildMember(props.memberListPaging);
             } else {
               root.$message({
                 type: "error",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -391,7 +408,7 @@ export default {
         .catch(() => {
           root.$message({
             type: "info",
-            message: "已取消移除"
+            message: "已取消移除",
           });
         });
     };
@@ -412,7 +429,7 @@ export default {
         .$msgbox({
           title: "添加成员",
           message: h("p", null, [
-            h("span", null, `增加成员`)
+            h("span", null, `增加成员`),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -431,29 +448,29 @@ export default {
             } else {
               done();
             }
-          }
+          },
         })
-        .then(action => {
+        .then((action) => {
           let addMemberData = {
             userId: [],
-            depId: props.currentDepart.id
+            depId: props.currentDepart.id,
           };
-          multipleSelection.forEach(item => {
+          multipleSelection.forEach((item) => {
             addMemberData.userId.push(item.userId);
           });
-          addMember(addMemberData).then(res => {
+          addMember(addMemberData).then((res) => {
             let code = res.code;
             if (code === 0) {
               selectChildMember(props.memberListPaging);
               root.$message({
                 type: "success",
-                message: "添加成功"
+                message: "添加成功",
               });
               dialogTableVisible.status = false;
             } else {
               root.$message({
                 type: "error",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -461,7 +478,7 @@ export default {
         .catch(() => {
           root.$message({
             type: "info",
-            message: "已取消添加"
+            message: "已取消添加",
           });
         });
     };
@@ -480,9 +497,9 @@ export default {
       handleSelectionChange,
       dialogTableVisible,
       addMemberList,
-      tableScroll
+      tableScroll,
     };
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -540,6 +557,9 @@ $contactsHeight: 592px;
           tr:hover {
             background: #f5f5f5;
           }
+        }
+        .danger {
+          color: #da5646;
         }
       }
     }

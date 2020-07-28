@@ -61,6 +61,9 @@
             </span>
           </div>
         </div>
+        <div
+          :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
+        >{{ currentMemberInfo.temperature }}°C</div>
       </div>
       <div id="info_personal" class="info_module">
         <ul>
@@ -84,15 +87,37 @@
           </li>
           <li>
             <span>体温告警：</span>
-            <i>{{ currentMemberInfo.tnumber }}</i>
+            <i>
+              {{ currentMemberInfo.tnumber }}&nbsp;
+              <span
+                v-show="currentMemberInfo.tnumber!='暂无数据'"
+              >次</span>
+            </i>
           </li>
           <li>
             <span>位置告警：</span>
-            <i>{{ currentMemberInfo.pnumber }}</i>
+            <i>
+              {{ currentMemberInfo.pnumber }}&nbsp;
+              <span
+                v-show="currentMemberInfo.pnumber!='暂无数据'"
+              >次</span>
+            </i>
           </li>
         </ul>
       </div>
-      <div id="info_temperature" class="info_module"></div>
+      <div id="tempreatrue_box">
+        <div id="info_temperature" class="info_module" v-show="temperature"></div>
+        <div id="info_table" v-show="!temperature">
+          <el-table :data="tmpHistory.tableData" style="width: 100%" :row-class-name="tableRowClassName" height="430">
+            <el-table-column prop="time" label="日期" width="180"></el-table-column>
+            <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+            <el-table-column prop="tempreatrue" label="温度"></el-table-column>
+          </el-table>
+        </div>
+        <div class="table_svg" @click="toggleTable">
+          <svg-icon iconClass="table_menu" class="table_menu"></svg-icon>
+        </div>
+      </div>
       <div class="info_module mapBox" v-loading="loading">
         <div id="mapShow"></div>
       </div>
@@ -333,45 +358,45 @@ export default {
           toolbox: {
             show: true,
             feature: {
-              dataZoom: {
-                yAxisIndex: "none",
-              },
-              dataView: {
-                readOnly: true,
-                optionToContent: function (opt) {
-                  let axisData = opt.xAxis[0].data;
-                  let table =
-                    '<table style="width:70%;text-align:left;line-height: 28px;" class="tmp_table"><tbody><tr>' +
-                    "<td>时间</td>" +
-                    "<td>温度</td>" +
-                    //+ '<td>' + series[1].name + '</td>'
-                    "</tr>";
-                  for (let len = newArr_time.length, i = len - 1; i >= 0; i--) {
-                    if (newArr_tmp[i] >= 37.3) {
-                      table += '<tr style="color: red;">';
-                    } else {
-                      table += "<tr>";
-                    }
-                    table +=
-                      "<td>" +
-                      newArr_time[i] +
-                      "</td>" +
-                      "<td>" +
-                      newArr_tmp[i] +
-                      "</td>" +
-                      //+ '<td>' + series[1].data[i] + '</td>'
-                      "</tr>";
-                  }
-                  table += "</tbody></table>";
-                  return table;
-                },
-                contentToOption: function (opts) {
-                  //this.optionToContent();
-                },
-              },
+              // dataZoom: {
+              //   yAxisIndex: "none",
+              // },
+              // dataView: {
+              //   readOnly: true,
+              //   optionToContent: function (opt) {
+              //     let axisData = opt.xAxis[0].data;
+              //     let table =
+              //       '<table style="width:70%;text-align:left;line-height: 28px;" class="tmp_table"><tbody><tr>' +
+              //       "<td>时间</td>" +
+              //       "<td>温度</td>" +
+              //       //+ '<td>' + series[1].name + '</td>'
+              //       "</tr>";
+              //     for (let len = newArr_time.length, i = len - 1; i >= 0; i--) {
+              //       if (newArr_tmp[i] >= 37.3) {
+              //         table += '<tr style="color: red;">';
+              //       } else {
+              //         table += "<tr>";
+              //       }
+              //       table +=
+              //         "<td>" +
+              //         newArr_time[i] +
+              //         "</td>" +
+              //         "<td>" +
+              //         newArr_tmp[i] +
+              //         "</td>" +
+              //         //+ '<td>' + series[1].data[i] + '</td>'
+              //         "</tr>";
+              //     }
+              //     table += "</tbody></table>";
+              //     return table;
+              //   },
+              //   contentToOption: function (opts) {
+              //     //this.optionToContent();
+              //   },
+              // },
               //magicType: {type: ['line', 'bar']}, // 柱状图
               //restore: {}
-              saveAsImage: {},
+              // saveAsImage: {},
             },
           },
           xAxis: {
@@ -387,9 +412,9 @@ export default {
           },
           yAxis: {
             type: "value",
-            min: 24,
-            max: 40,
-            interval: 2,
+            min: 35,
+            max: 43,
+            interval: 1,
             axisLabel: {
               formatter: "{value}°C", //Y坐标
             },
@@ -462,6 +487,55 @@ export default {
     const memberInfoBack = () => {
       switchModule(contactsModule, "memberList");
     };
+    const temperature = ref(true);
+    const tableData = reactive([
+      {
+        date: "2016-05-03",
+        name: "王小虎",
+        address: "上海市普陀区金沙江路 1518 弄",
+      },
+      {
+        date: "2016-05-02",
+        name: "王小虎",
+        address: "上海市普陀区金沙江路 1518 弄",
+      },
+      {
+        date: "2016-05-04",
+        name: "王小虎",
+        address: "上海市普陀区金沙江路 1518 弄",
+      },
+      {
+        date: "2016-05-01",
+        name: "王小虎",
+        address: "上海市普陀区金沙江路 1518 弄",
+      },
+      {
+        date: "2016-05-08",
+        name: "王小虎",
+        address: "上海市普陀区金沙江路 1518 弄",
+      },
+      {
+        date: "2016-05-06",
+        name: "王小虎",
+        address: "上海市普陀区金沙江路 1518 弄",
+      },
+      {
+        date: "2016-05-07",
+        name: "王小虎",
+        address: "上海市普陀区金沙江路 1518 弄",
+      },
+    ]);
+    const toggleTable = () => {
+      temperature.value = !temperature.value;
+    };
+    const tableRowClassName = ({row, rowIndex}) => {
+      console.log(row, rowIndex, 'rowIndex');
+      let tempreatrue = parseInt(row.tempreatrue);
+      if(tempreatrue >=37.3) {
+        return 'warning-row';
+      }
+      return '';
+      }
     /**
      * 百度地图方法
      */
@@ -587,6 +661,10 @@ export default {
       railList,
       dialogRailVisible,
       unBindRail,
+      temperature,
+      toggleTable,
+      tableData,
+      tableRowClassName
     };
   },
 };
@@ -624,6 +702,7 @@ $contactsHeight: 592px;
   .info_head {
     height: 110px;
     padding: 20px 0 20px;
+    position: relative;
     @include webkit("box-sizing", border-box);
     .info_head_l {
       float: left;
@@ -655,6 +734,18 @@ $contactsHeight: 592px;
         margin-bottom: 10px;
       }
     }
+    .info_head_main {
+      position: absolute;
+      right: 150px;
+      top: 38px;
+      font-size: 26px;
+    }
+    .danger {
+      color: #bf4739;
+    }
+    .normal {
+      color: green;
+    }
   }
   .info_module {
     padding: 35px 25px 25px 25px;
@@ -679,8 +770,22 @@ $contactsHeight: 592px;
       }
     }
   }
-  #info_temperature {
-    height: 500px;
+  #tempreatrue_box {
+    position: relative;
+    #info_temperature {
+      height: 500px;
+    }
+    #info_table {
+      height: 500px;
+      padding: 35px 25px 25px 25px;
+      @include webkit("box-sizing", border-box);
+    }
+    .table_svg {
+      position: absolute;
+      right: 100px;
+      top: 50px;
+      cursor: pointer;
+    }
   }
   .mapBox {
     padding-top: 0;

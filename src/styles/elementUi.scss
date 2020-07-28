@@ -123,3 +123,16 @@
   font-size: 14px;
   margin-bottom: 20px;
 }
+
+/*
+ *表格样式
+ */
+ #info_table {
+  .el-table .warning-row {
+    color: #da5646;
+  }
+  
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
+ }
