@@ -164,7 +164,7 @@ import {
   listUserByNoDepartment,
   removeMember,
   listDepartmentByPid,
-  getMaxDepartmentId
+  getMaxDepartmentId,
 } from "@/api/contactsApi";
 import { getLoginEmployee, selectEmpDepRoleByEmpId } from "@/api/employeeApi";
 import { translateDataToTree, switchModule } from "@/utils/common";
@@ -176,7 +176,7 @@ import {
   watchEffect,
   ref,
   computed,
-  watch
+  watch,
 } from "@vue/composition-api";
 export default {
   name: "contacts",
@@ -189,7 +189,7 @@ export default {
       memberList: true, // 成员列表
       memberInfo: false, // 成员信息
       memberModify: false, // 修改信息
-      status: false
+      status: false,
     });
     let currentMemberInfo = reactive({
       address: "山西省太原市万柏林区a",
@@ -205,7 +205,7 @@ export default {
       userId: "5",
       userLatitude: 106.53721028909878,
       userLongitude: 29.821216648608489,
-      online: true
+      online: true,
     }); // 当前成员信息
     let tmpHistory = reactive({
       newArr_time: [],
@@ -218,7 +218,7 @@ export default {
       railName: "万寿福居公租房",
       lastUpdate: "2020-05-14 15:48:02",
       tnumber: null,
-      pnumber: 109
+      pnumber: 109,
     }); // 当前成员温度随时间变化的历史数据
     /**
      * 数据
@@ -232,7 +232,7 @@ export default {
     //   return data;
     // };
     let treeData = reactive({
-      status: false
+      status: false,
     });
     let memberLabel = ref("移除部门");
     let departData = reactive([
@@ -241,8 +241,8 @@ export default {
         displayOrder: 10001,
         pid: 0,
         children: [],
-        childrenLen: 0
-      }
+        childrenLen: 0,
+      },
     ]);
     // getCompanyId().then(res => {
     //   // departData[0].id = res;
@@ -255,19 +255,19 @@ export default {
       id: 1,
       pid: 0,
       length: 0,
-      topId: 2
+      topId: 2,
     });
     //selectChildDepart(0);
     let childData = reactive({}); // add child
     let addStatus = ref(false); // 增加部门的确定按钮的禁用状态
     let removeData = reactive({
       data: {},
-      node: {}
+      node: {},
     }); // remove child
     let modifyNodeData = reactive({});
     const defaultProps = reactive({
       children: "children",
-      label: "label"
+      label: "label",
     });
     const filterText = ref("");
     const dialogFormVisible = ref(false); // formLog
@@ -277,7 +277,7 @@ export default {
       delivery: false,
       type: [],
       resource: "",
-      desc: ""
+      desc: "",
     });
     const modifyData = reactive({ name: "", visibel: false, status: false }); // 修改部门名称 data
     const formLabelWidth = ref("100px");
@@ -293,9 +293,9 @@ export default {
       identity: "", // 身份
       corpUserId: 0,
       role: null,
-      roleId: null
+      roleId: null,
     });
-    getLoginEmployee().then(res => {
+    getLoginEmployee().then((res) => {
       let data = res.data;
       let roleId = data.role.id;
       employeeInfo.id = data.id;
@@ -311,7 +311,7 @@ export default {
         let departManagers = data.departmentManagers;
         employeeInfo.departmentManagers = [];
         if (departManagers.length > 0) {
-          selectEmpDepRoleByEmpId(data.id).then(response => {
+          selectEmpDepRoleByEmpId(data.id).then((response) => {
             let len = response.data.length;
             response.data.forEach((item, index) => {
               employeeInfo.departmentManagers.push(item.depName);
@@ -331,8 +331,8 @@ export default {
     /**
      * 添加子部门 btn
      */
-    const append = data => {
-      addDepart(form.name, data.id).then(res => {
+    const append = (data) => {
+      addDepart(form.name, data.id).then((res) => {
         let resData = res.data;
         let code = res.code;
         if (code === 0) {
@@ -341,7 +341,7 @@ export default {
             pid: resData.pid,
             label: resData.name,
             displayOrder: resData.displayOrder,
-            children: []
+            children: [],
           };
           if (!data.children) {
             set(data, "children", []);
@@ -349,12 +349,12 @@ export default {
           data.children.push(newChild);
           root.$message({
             message: "成功添加部门",
-            type: "success"
+            type: "success",
           });
         } else {
           root.$message({
             message: res.msg,
-            type: "error"
+            type: "error",
           });
         }
       });
@@ -366,20 +366,27 @@ export default {
     const remove = (node, data) => {
       let id = data.id;
       delDepart(id)
-        .then(res => {
-          const parent = node.parent;
-          const children = parent.data.children || parent.data;
-          const index = children.findIndex(d => d.id === data.id);
-          children.splice(index, 1);
-          root.$message({
-            message: "成功移除部门",
-            type: "success"
-          });
+        .then((res) => {
+          if (res.code == 0) {
+            const parent = node.parent;
+            const children = parent.data.children || parent.data;
+            const index = children.findIndex((d) => d.id === data.id);
+            children.splice(index, 1);
+            root.$message({
+              message: "成功移除部门",
+              type: "success",
+            });
+          } else {
+            root.$message({
+              message: res.msg,
+              type: "error",
+            });
+          }
         })
-        .catch(res => {
+        .catch((res) => {
           root.$message({
             message: res.msg,
-            type: "error"
+            type: "error",
           });
         });
     };
@@ -387,10 +394,10 @@ export default {
     /**
      * 查询子部门
      */
-    const selectChildDepart = id => {
+    const selectChildDepart = (id) => {
       let listPidParams = new URLSearchParams();
       listPidParams.append("id", id);
-      listDepartmentByPid(listPidParams).then(res => {
+      listDepartmentByPid(listPidParams).then((res) => {
         let data = res.data;
         let len = data.length,
           i = 0;
@@ -422,7 +429,7 @@ export default {
      */
     const selectAllDepart = () => {
       return listAllDepartment()
-        .then(res => {
+        .then((res) => {
           let data = res.data.list ? res.data.list : res.data,
             len = data.length;
           if (len <= 0) {
@@ -436,7 +443,7 @@ export default {
             if (treeData == undefined) {
               root.$message({
                 message: "部门信息有误",
-                type: "error"
+                type: "error",
               });
             } else {
               departData[0].label = currentDepart.label = treeData.name;
@@ -449,7 +456,7 @@ export default {
           }
           return companyData;
         })
-        .then(res => {
+        .then((res) => {
           memberListPaging.id = companyData.companyId;
           selectChildMember(memberListPaging);
           loading.value = false;
@@ -463,14 +470,14 @@ export default {
     const addDepart = (name, pid) => {
       return addDepartment({
         name: name,
-        pid: pid
+        pid: pid,
       });
     };
 
     /**
      * 删除部门
      */
-    const delDepart = id => {
+    const delDepart = (id) => {
       let removeDepartmentId = new URLSearchParams();
       removeDepartmentId.append("id", id);
       return removeDepartment(removeDepartmentId);
@@ -479,20 +486,20 @@ export default {
     /**
      * 修改部门信息
      */
-    const updateDepart = modifyNodeData => {
+    const updateDepart = (modifyNodeData) => {
       let data = modifyNodeData.data;
       return updateDepartment({
         id: data.id,
         name: data.label,
         pid: data.pid,
-        displayOrder: data.displayOrder
+        displayOrder: data.displayOrder,
       });
     };
 
     /**
      * departData 点击事件
      */
-    const handleNodeClick = data => {
+    const handleNodeClick = (data) => {
       // 当前部门信息
       let id = data.id;
       currentDepart.label = data.label;
@@ -520,10 +527,10 @@ export default {
       //查询部门成员
       let listUserId = new URLSearchParams();
       listUserId.append("id", 7);
-      listUserByDepartment(listUserId).then(res => {
+      listUserByDepartment(listUserId).then((res) => {
         root.$message({
           message: res.msg,
-          type: "warning"
+          type: "warning",
         });
       });
       selectAllDepart();
@@ -532,7 +539,7 @@ export default {
     /**
      * handleClose
      */
-    const handleClose = done => {
+    const handleClose = (done) => {
       this.$confirm("确认关闭？")
         .then(() => {
           done();
@@ -548,7 +555,7 @@ export default {
       let len = node.level;
       if (len > 14) {
         root.$message({
-          message: "子部门层级超过15层，无法添加"
+          message: "子部门层级超过15层，无法添加",
         });
       } else {
         childData = data;
@@ -570,13 +577,13 @@ export default {
         addStatus.value = true;
         root.$message({
           message: "部门名称长度不能大于7",
-          type: "warning"
+          type: "warning",
         });
       } else {
         addStatus.value = true;
         root.$message({
           message: "部门名称不能为空",
-          type: "warning"
+          type: "warning",
         });
       }
     };
@@ -588,14 +595,14 @@ export default {
     const dialogDel = (data, node) => {
       removeData = {
         data: data,
-        node: node
+        node: node,
       };
       let id = removeData.data.id || 0;
       memberLabel.value = `是否移除'${removeData.data.label}'`;
       if (companyData.companyId == id) {
         root.$message({
           message: "不能移除顶级部门",
-          type: "warning"
+          type: "warning",
         });
       } else {
         dialogVisible.value = true;
@@ -625,7 +632,7 @@ export default {
       } else {
         root.$message({
           message: "不能更改顶级部门的名称",
-          type: "warning"
+          type: "warning",
         });
       }
     };
@@ -639,7 +646,7 @@ export default {
       if (len <= 0) {
         root.$message({
           message: "部门名称不能为空",
-          type: "warning"
+          type: "warning",
         });
         modifyData.status = true;
       } else {
@@ -647,18 +654,25 @@ export default {
         modifyNodeData.data.label = inputTxt;
         modifyNodeData.data.name = inputTxt;
         updateDepart(modifyNodeData)
-          .then(res => {
-            root.$message({
-              message: "修改名称成功",
-              type: "success"
-            });
-            currentDepart.label = inputTxt; // 修改memberList中的名称
-            modifyData.visibel = false;
+          .then((res) => {
+            if (res.code == 0) {
+              root.$message({
+                message: "修改名称成功",
+                type: "success",
+              });
+              currentDepart.label = inputTxt; // 修改memberList中的名称
+              modifyData.visibel = false;
+            }else {
+              root.$message({
+                message: res.msg,
+                type: "error",
+              });
+            }
           })
-          .catch(res => {
+          .catch((res) => {
             root.$message({
               message: res.msg,
-              type: "error"
+              type: "error",
             });
           });
       }
@@ -669,22 +683,22 @@ export default {
     let memberData = reactive({
       total: null,
       status: true,
-      data: []
+      data: [],
     });
     let memberListPaging = reactive({
       pageNum: 1,
       pageSize: 15,
-      id: null
+      id: null,
     });
     /**
      * 查询部门成员
      */
-    const selectChildMember = memberListPaging => {
+    const selectChildMember = (memberListPaging) => {
       let params = new URLSearchParams(); // text post 提交
       params.append("id", memberListPaging.id);
       params.append("pageNum", memberListPaging.pageNum);
       params.append("pageSize", memberListPaging.pageSize);
-      listUserByDepartment(params).then(res => {
+      listUserByDepartment(params).then((res) => {
         memberData.data.splice(0, memberData.data.length);
         let data = res.data.list ? res.data.list : res.data;
         memberData.total = res.data.total;
@@ -716,7 +730,7 @@ export default {
       // 只能使用 watch, 不能使用 watchEffect
       watch(
         () => filterText.value,
-        val => {
+        (val) => {
           refs.tree.filter(val);
         },
         () => departData
@@ -734,7 +748,7 @@ export default {
         } else if (len >= 30) {
           root.$message({
             message: "部门名称长度不能大于30",
-            type: "warning"
+            type: "warning",
           });
         }
       });
@@ -745,7 +759,7 @@ export default {
         } else if (modifyLen >= 30) {
           root.$message({
             message: "部门名称长度不能大于30",
-            type: "warning"
+            type: "warning",
           });
         }
       });
@@ -800,9 +814,9 @@ export default {
       showDepartClick, // 鼠标 点击 控制左侧导航栏的显示菜单栏函数
       hideDepartLeave, // 鼠标离开 控制左侧导航栏隐藏的菜单栏函数
       memberListPaging,
-      loading
+      loading,
     };
-  }
+  },
 };
 </script>
 

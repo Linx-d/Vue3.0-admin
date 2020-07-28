@@ -93,7 +93,7 @@
         </ul>
       </div>
       <div id="info_temperature" class="info_module"></div>
-      <div class="info_module mapBox">
+      <div class="info_module mapBox" v-loading="loading">
         <div id="mapShow"></div>
       </div>
       <el-dialog
@@ -124,12 +124,12 @@
 </template>
 <script>
 import { Map } from "@/map"; // 导入map.js文件
-import { onMounted, watchEffect, reactive } from "@vue/composition-api";
+import { onMounted, watchEffect, reactive, ref } from "@vue/composition-api";
 import { switchModule, cloneArray } from "@/utils/common";
 import {
   batchDeleteRailUser,
   listDeviceAlarmInfoByUserId,
-  batchUpdateUser
+  batchUpdateUser,
 } from "@/api/contactsApi";
 import { listRail } from "@/api/railApi";
 import personTravel from "@/views/images/personTravel.png";
@@ -139,25 +139,29 @@ export default {
     currentDepart: {
       // 不用在setup中重新声明一次变量
       type: Object,
-      default: () => {} // default值 需要使用箭头函数回调
+      default: () => {}, // default值 需要使用箭头函数回调
     },
     currentMemberInfo: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     contactsModule: {
       type: Object,
-      default: () => []
+      default: () => [],
     },
     tmpHistory: {
       type: Object,
-      default: () => {}
-    }
+      default: () => {},
+    },
   },
   setup(props, { root }) {
+    /**加载动画
+     *
+     */
+    const loading = ref(true);
     let contactsModule = props.contactsModule; // contacts 模块
     const dialogRailVisible = reactive({
-      status: false
+      status: false,
     });
     /**
      * 查询围栏列表
@@ -166,11 +170,11 @@ export default {
       pageNum: 1,
       pageSize: 15,
       value: false,
-      data: []
+      data: [],
     });
     const addRail = () => {
       dialogRailVisible.status = true;
-      listRail().then(res => {
+      listRail().then((res) => {
         cloneArray(railList.data, res.data.list);
       });
     };
@@ -190,7 +194,7 @@ export default {
               "span",
               null,
               `将 ${props.currentMemberInfo.name} 绑定到${railName}`
-            )
+            ),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -209,26 +213,26 @@ export default {
             } else {
               done();
             }
-          }
+          },
         })
-        .then(action => {
+        .then((action) => {
           let data = {
             railId: railId,
-            userId: [props.currentMemberInfo.userId]
+            userId: [props.currentMemberInfo.userId],
           };
-          batchUpdateUser(data).then(res => {
+          batchUpdateUser(data).then((res) => {
             let code = res.code;
             if (code === 0) {
               root.$message({
                 type: "success",
-                message: "绑定成功"
+                message: "绑定成功",
               });
               props.tmpHistory.railName = railName;
               dialogRailVisible.status = false;
             } else {
               root.$message({
                 type: "error",
-                message: "绑定失败"
+                message: "绑定失败",
               });
             }
           });
@@ -236,7 +240,7 @@ export default {
         .catch(() => {
           root.$message({
             type: "info",
-            message: "已取消绑定"
+            message: "已取消绑定",
           });
         });
     };
@@ -252,7 +256,7 @@ export default {
               "span",
               null,
               `将 ${props.currentMemberInfo.name} 从 “${props.tmpHistory.railName}” 中解绑`
-            )
+            ),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -271,33 +275,33 @@ export default {
             } else {
               done();
             }
-          }
+          },
         })
-        .then(action => {
+        .then((action) => {
           unBindRail();
         })
         .catch(() => {
           root.$message({
             type: "info",
-            message: "已取消解绑"
+            message: "已取消解绑",
           });
         });
     };
 
     const unBindRail = () => {
       let userId = [props.currentMemberInfo.userId];
-      batchDeleteRailUser(userId).then(res => {
+      batchDeleteRailUser(userId).then((res) => {
         let code = res.code;
         if (code === 0) {
           props.tmpHistory.railName = null;
           root.$message({
             type: "success",
-            message: "解绑成功"
+            message: "解绑成功",
           });
         } else {
           root.$message({
             type: "error",
-            message: "解绑失败"
+            message: "解绑失败",
           });
         }
       });
@@ -306,7 +310,7 @@ export default {
      *  成员个人信息温度变化图表
      */
     const memberInfoEcharts = () => {
-      let tmpHistory = props.tmpHistory; 
+      let tmpHistory = props.tmpHistory;
       watchEffect(() => {
         // 基于准备好的dom，初始化echarts实例
         let myChart = root.$echarts.init(
@@ -318,23 +322,23 @@ export default {
         let option = {
           title: {
             text: "体温变化",
-            subtext: "疫情防控"
+            subtext: "疫情防控",
           },
           tooltip: {
-            trigger: "axis"
+            trigger: "axis",
           },
           legend: {
-            data: ["最高温度"] //定义曲线具体数据
+            data: ["最高温度"], //定义曲线具体数据
           },
           toolbox: {
             show: true,
             feature: {
               dataZoom: {
-                yAxisIndex: "none"
+                yAxisIndex: "none",
               },
               dataView: {
                 readOnly: true,
-                optionToContent: function(opt) {
+                optionToContent: function (opt) {
                   let axisData = opt.xAxis[0].data;
                   let table =
                     '<table style="width:70%;text-align:left;line-height: 28px;" class="tmp_table"><tbody><tr>' +
@@ -361,25 +365,25 @@ export default {
                   table += "</tbody></table>";
                   return table;
                 },
-                contentToOption: function(opts) {
+                contentToOption: function (opts) {
                   //this.optionToContent();
-                }
+                },
               },
               //magicType: {type: ['line', 'bar']}, // 柱状图
               //restore: {}
-              saveAsImage: {}
-            }
+              saveAsImage: {},
+            },
           },
           xAxis: {
             type: "category",
             boundaryGap: false,
             data: newArr_time,
             axisLabel: {
-              rotate: 285
-            }
+              rotate: 285,
+            },
           },
           grid: {
-            bottom: "40%"
+            bottom: "40%",
           },
           yAxis: {
             type: "value",
@@ -387,14 +391,14 @@ export default {
             max: 40,
             interval: 2,
             axisLabel: {
-              formatter: "{value}°C" //Y坐标
-            }
+              formatter: "{value}°C", //Y坐标
+            },
           },
           dataZoom: [
             {
               type: "inside",
               start: 0,
-              end: 10
+              end: 10,
             },
             {
               start: 0,
@@ -407,9 +411,9 @@ export default {
                 shadowBlur: 3,
                 shadowColor: "rgba(0, 0, 0, 0.6)",
                 shadowOffsetX: 2,
-                shadowOffsetY: 2
-              }
-            }
+                shadowOffsetY: 2,
+              },
+            },
           ],
           visualMap: {
             show: false,
@@ -418,12 +422,12 @@ export default {
               {
                 gte: 37.3,
                 lte: 9999,
-                color: "rgb(194, 53, 49)"
-              }
+                color: "rgb(194, 53, 49)",
+              },
             ], //pieces的值由动态数据决定
             outOfRange: {
-              color: "green"
-            }
+              color: "green",
+            },
           },
           series: [
             {
@@ -433,17 +437,17 @@ export default {
               markPoint: {
                 data: [
                   { type: "max", name: "最大值" },
-                  { type: "min", name: "最小值" }
-                ]
+                  { type: "min", name: "最小值" },
+                ],
               },
               markLine: {
                 data: [
                   //{type: 'average', name: '平均值'}设置标线类型
-                  { yAxis: 37.3 }
-                ]
-              }
-            }
-          ]
+                  { yAxis: 37.3 },
+                ],
+              },
+            },
+          ],
         };
         // 使用刚指定的配置项和数据显示图表。
 
@@ -466,15 +470,15 @@ export default {
         // 成员坐标
         let location = {
           lng: props.currentMemberInfo.userLongitude, // 注意经纬度的对应 userLongitude
-          lat: props.currentMemberInfo.userLatitude // 注意经纬度的对应 userLatitude
+          lat: props.currentMemberInfo.userLatitude, // 注意经纬度的对应 userLatitude
         };
         // 围栏信息
         let railInfo = {
           lng: props.currentMemberInfo.railLongitude,
           lat: props.currentMemberInfo.railLatitude,
-          radius: props.currentMemberInfo.radius
+          radius: props.currentMemberInfo.radius,
         };
-        Map("ak").then(BMap => {
+        Map("ak").then((BMap) => {
           let map = new BMap.Map("mapShow"); // 创建Map实例
           let pointArray = [];
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
@@ -486,7 +490,7 @@ export default {
           let lushu;
           // 实例化一个驾车导航用来生成路线
           let drv = new BMap.DrivingRoute("北京", {
-            onSearchComplete: function(res) {
+            onSearchComplete: function (res) {
               if (drv.getStatus() == BMAP_STATUS_SUCCESS) {
                 let plan = res.getPlan(0);
                 let arrPois = [];
@@ -502,15 +506,16 @@ export default {
                   defaultContent: "从出发地到目的地", //"从天安门到百度大厦"
                   autoView: true, //是否开启自动视野调整，如果开启那么路书在运动过程中会根据视野自动调整
                   icon: new BMap.Icon(personTravel, new BMap.Size(48, 48), {
-                    anchor: new BMap.Size(20, 35)
+                    anchor: new BMap.Size(20, 35),
                   }),
                   speed: 10000,
                   enableRotation: false, //是否设置marker随着道路的走向进行旋转props.tmpHistory.newArr_position
-                  landmarkPois: props.tmpHistory.newArr_position
+                  landmarkPois: props.tmpHistory.newArr_position,
                 });
               }
-            }
+            },
           });
+          // 数据为监听数据，第一次获取不到会报错 'lng' of undefined
           let start = new BMap.Point(
             props.tmpHistory.newArr_position[0].lng,
             props.tmpHistory.newArr_position[0].lat
@@ -523,31 +528,23 @@ export default {
               props.tmpHistory.newArr_position.length - 1
             ].lat
           );
-          // let start = new BMap.Point(
-          //   28.63764140625861,
-          //   108.37516062460054
-          // );
-          // let end = new BMap.Point(
-          //   28.63764140625811,
-          //   108.37516062460064
-          // );
           drv.search(start, end);
           //绑定事件
-          $("run").onclick = function() {
-            lushu.start();
-          };
-          $("stop").onclick = function() {
-            lushu.stop();
-          };
-          $("pause").onclick = function() {
-            lushu.pause();
-          };
-          $("hide").onclick = function() {
-            lushu.hideInfoWindow();
-          };
-          $("show").onclick = function() {
-            lushu.showInfoWindow();
-          };
+          // $("run").onclick = function () {
+          //   lushu.start();
+          // };
+          // $("stop").onclick = function () {
+          //   lushu.stop();
+          // };
+          // $("pause").onclick = function () {
+          //   lushu.pause();
+          // };
+          // $("hide").onclick = function () {
+          //   lushu.hideInfoWindow();
+          // };
+          // $("show").onclick = function () {
+          //   lushu.showInfoWindow();
+          // };
           function $(element) {
             return document.getElementById(element);
           }
@@ -569,7 +566,7 @@ export default {
             strokeWeight: 1,
             strokeOpacity: 0.01,
             fillColor: "#53aeff",
-            fillOpacity: 0.4
+            fillOpacity: 0.4,
           });
           map.addOverlay(circle);
         });
@@ -578,8 +575,10 @@ export default {
     onMounted(() => {
       baiduMap();
       memberInfoEcharts();
+      loading.value = false;
     });
     return {
+      loading,
       memberInfoBack,
       bindOpen,
       unBindOpen,
@@ -587,9 +586,9 @@ export default {
       selectRow,
       railList,
       dialogRailVisible,
-      unBindRail
+      unBindRail,
     };
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
