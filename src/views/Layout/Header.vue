@@ -59,27 +59,20 @@ export default {
       },
       {
         index: 2,
-        name: "首页",
-        targetId: "index",
-        target: "/index",
-        current: true
-      },
-      {
-        index: 3,
         name: "围栏",
         targetId: "rail",
         target: "/rail",
         current: false
       },
       {
-        index: 4,
+        index: 3,
         name: "企业",
         targetId: "corporation",
         target: "/corporation",
         current: false
       }
     ]);
-    const step = ref(63);
+    const step = ref(90);
     const clickStr = ref("translateX(" + step.value + "px)");
     const urlStr = ref("");
     /**
@@ -90,12 +83,12 @@ export default {
         if (urlStr.value !== "") {
           return urlStr.value;
         }
-        step.value = 63;
+        step.value = 90;
         let url = window.location.href;
         navList.forEach(value => {
           let target = value.target;
           if (url.indexOf(target) !== -1) {
-            step.value += 216 * value.index;
+            step.value += 270 * value.index;
             clickStr.value = "translateX(" + step.value + "px)";
           }
         });
@@ -119,8 +112,8 @@ export default {
       navList.forEach(value => {
         value.current = false;
       });
-      step.value = 63;
-      let stepMove = 216;
+      step.value = 90;
+      let stepMove = 270;
       step.value += stepMove * index;
       clickStr.value = "translateX(" + step.value + "px)";
       stepStyle.value = "transform:" + clickStr.value;
@@ -207,7 +200,7 @@ export default {
         background: #fff;
         .frame_nav {
           display: inline-block;
-          width: 216px;
+          width: 270px;
           color: $tab-text;
           text-align: center;
           font-size: 14px;

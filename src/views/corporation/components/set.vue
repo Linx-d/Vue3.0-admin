@@ -521,9 +521,6 @@ $mainWidth: 705px;
   white-space: nowrap;
   display: inline-block;
   @include webkit("box-sizing", border-box);
-  .departSvg {
-    vertical-align: text-top;
-  }
   span {
     font-size: 12px;
     margin-left: 5px;

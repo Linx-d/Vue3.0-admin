@@ -10,11 +10,6 @@ Vue.use(VueRouter)
     redirect: "/map"
   },
   {
-    path: "/index",
-    name: "Index",
-    component: resolve => require(["../views/index/index.vue"], resolve)
-  },
-  {
     path: "/contacts",
     name: "Contacts",
     component: resolve => require(["../views/contacts/index.vue"], resolve)
