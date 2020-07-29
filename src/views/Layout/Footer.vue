@@ -1,34 +1,51 @@
 <template>
   <footer class="frame_bottom">
     <nav class="frame_bottom_nav">
-      <a href="http://www.chinautech.com/">关于如泰</a>
-      <span class="frame_operation_dep">|</span>
-      <a href="javascript:;">用户协议</a>
-      <span class="frame_operation_dep">|</span>
-      <a href="javascript:;">使用规范</a>
-      <span class="frame_operation_dep">|</span>
-      <a href="javascript:;">隐私政策</a>
-      <span class="frame_operation_dep">|</span>
-      <a href="javascript:;">更新日志</a>
-      <span class="frame_operation_dep">|</span>
-      <a href="javascript:;">帮助中心</a>
-      <!--
-      <span class="frame_operation_dep">|</span>
-      <a href="javascript:;">中文</a>
-      -->
+      <div class="footer_link">
+        <a href="http://www.chinautech.com/" target="_blank">关于如泰</a>
+        <span class="frame_operation_dep">|</span>
+      </div>
+      <div v-for="link in links" :key="link.id" class="footer_link">
+        <router-link :to="{path: link.path}" target="_blank">{{ link.text }}</router-link>
+        <span class="frame_operation_dep">|</span>
+      </div>
     </nav>
-    <p>© 2009&nbsp;-&nbsp;2020&nbsp;Utech Inc. All Rights Reserved</p>
+    <p class="version">© 2009&nbsp;-&nbsp;2020&nbsp;Utech Inc. All Rights Reserved</p>
   </footer>
 </template>
 <script>
-export default {};
+import { reactive } from "@vue/composition-api";
+export default {
+  name: "documents",
+  setup() {
+    const links = reactive([
+      { name: "userAgreement", path: "/userAgreement", text: "用户协议" },
+      {
+        name: "manual",
+        path: "/manual",
+        text: "使用手册",
+      },
+      {
+        name: "privacy",
+        path: "/privacy",
+        text: "隐私政策",
+      },
+      {
+        name: "updateLog",
+        path: "/updateLog",
+        text: "更新日志",
+      },
+    ]);
+    return { links };
+  },
+};
 </script>
 <style lang="scss" scoped>
 .frame_bottom {
   padding-bottom: 23px;
   text-align: center;
   font-size: 12px;
-  margin-top: 23px;
+  margin-top: 24px;
   min-width: 1080px;
   .frame_bottom_nav {
     margin-bottom: 2px;
@@ -46,9 +63,14 @@ export default {};
       width: 8px;
       padding: 0 6px;
     }
-  }
-  p {
-    color: #9e9e9e;
+    .footer_link {
+      display: inline-block;
+    }
+    .footer_link:last-child {
+      .frame_operation_dep {
+        display: none;
+      }
+    }
   }
 }
 </style>
