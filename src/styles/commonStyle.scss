@@ -231,10 +231,12 @@ tbody {
  *documents
  */
 .document_fix {
-  position: fixed;
-  top: 32px;
+  position: relative;
+  top: -60px;
   left: 0;
-  height: 800px;
+  height: 2000px;
+  padding-top: 24px;
+  margin-bottom: -150px;
 
   .frame_cnt {
     margin-top: 24px;
@@ -260,6 +262,7 @@ tbody {
   background: white;
   margin: 14px 0 6px;
 }
+
 b {
   font-weight: 700;
 }
