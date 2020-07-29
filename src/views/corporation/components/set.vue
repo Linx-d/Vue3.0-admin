@@ -46,7 +46,7 @@
             :key="depart.id"
             class="departContent"
           >
-            <div class="depart_item item_margin-bottom">
+            <div class="depart_item item_margin-bottom" :title="depart">
               <svg-icon iconClass="depart" class="departSvg"></svg-icon>
               <span>{{ depart }}</span>
             </div>

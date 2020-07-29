@@ -114,7 +114,7 @@
             <el-table-column prop="tempreatrue" label="温度"></el-table-column>
           </el-table>
         </div>
-        <div class="table_svg" @click="toggleTable">
+        <div class="table_svg" @click="toggleTable" title="数据视图">
           <svg-icon iconClass="table_menu" class="table_menu"></svg-icon>
         </div>
       </div>
