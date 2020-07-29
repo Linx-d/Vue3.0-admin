@@ -36,7 +36,7 @@
           </div>
         </el-dialog>
       </div>
-      <el-menu :default-openeds="['1','2','3']" @open="loadWWOpenData()" class="roleMenu">
+      <el-menu @open="loadWWOpenData()" class="roleMenu">
         <el-submenu
           :index="role.id + ''"
           v-for="(role, index) in roleList"
@@ -52,6 +52,7 @@
               :index="index + '-' + employee.id"
               :key="employee.id"
               :value="employee.id"
+              :unique-opened="true"
               @click="choose(employee.id)"
             >
                 <svg-icon iconClass="people" class="peopleSvg"></svg-icon>
@@ -327,53 +328,53 @@ export default {
     const choose = id => {
       departmentList.splice(0, departmentList.length);
       queryAllDepartment();
-
       isEdit.value = false;
       getEmployee(id)
-        .then(res => {
+      .then(res => {
+        if (res.code == 0) {
+          return res.data;
+        }
+        return null;
+      })
+      .then(data => {
+        selectEmpDepRoleByEmpId(data.id).then(res => {
           if (res.code == 0) {
-            return res.data;
-          }
-          return null;
-        })
-        .then(data => {
-          selectEmpDepRoleByEmpId(data.id).then(res => {
-            if (res.code == 0) {
-              let departments = [];
-              res.data.forEach(p => {
-                let department = {
-                  key: p.departmentId,
-                  label: p.depName
-                };
-                departments.push(department);
-                allDepartment.forEach((p1, index) => {
-                  if (p1.key == department.key) {
-                    departmentList.push(p1.key);
-                    // allDepartment.splice(index,1);
-                  }
-                });
-              });
-              data.departments = departments;
-              let role = data.role;
-              if (data.role == null) {
-                data.role = { id: 3 };
-              }
-              roleId.value = data.role.id.toString();
-              for (const key in data) {
-                if (data.hasOwnProperty(key)) {
-                  employee[key] = data[key];
+            let departments = [];
+            res.data.forEach(p => {
+              let department = {
+                key: p.departmentId,
+                label: p.depName
+              };
+              departments.push(department);
+              allDepartment.forEach((p1, index) => {
+                if (p1.key == department.key) {
+                  departmentList.push(p1.key);
+                  // allDepartment.splice(index,1);
                 }
-                if (key === "tel") {
-                  if (data[key]) {
-                    employee[key] = data[key];
-                  } else {
-                    employee[key] = "暂无";
-                  }
+              });
+            });
+            data.departments = departments;
+            let role = data.role;
+            if (data.role == null) {
+              data.role = { id: 3 };
+            }
+            roleId.value = data.role.id.toString();
+            for (const key in data) {
+              if (data.hasOwnProperty(key)) {
+                employee[key] = data[key];
+              }
+              if (key === "tel") {
+                if (data[key]) {
+                  employee[key] = data[key];
+                } else {
+                  employee[key] = "暂无";
                 }
               }
             }
-          });
+          }
         });
+      });
+      WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
     };
 
     /**
@@ -646,12 +647,12 @@ $corporationHeight: 655px;
   margin-right: 10px;
 }
 .group {
-    height: 94px;
+    min-height: 94px;
     border-bottom: 1px solid #e4e6e9;
     padding: 30px 0;
 }
 .group-tail{
-    height: 94px;
+    min-height: 94px;
     // border-bottom: 1px solid #e4e6e9;
     padding: 30px 0;
 }
