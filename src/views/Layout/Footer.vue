@@ -1,12 +1,8 @@
 <template>
   <footer class="frame_bottom">
     <nav class="frame_bottom_nav">
-      <div class="footer_link">
-        <a href="http://www.chinautech.com/" target="_blank">关于如泰</a>
-        <span class="frame_operation_dep">|</span>
-      </div>
       <div v-for="link in links" :key="link.id" class="footer_link">
-        <router-link :to="{path: link.path}" target="_blank">{{ link.text }}</router-link>
+        <a :href="link.path" target="_blank">{{ link.text }}</a>
         <span class="frame_operation_dep">|</span>
       </div>
     </nav>
@@ -19,20 +15,21 @@ export default {
   name: "documents",
   setup() {
     const links = reactive([
-      { name: "userAgreement", path: "/userAgreement", text: "用户协议" },
+      { name: "utech", path: "http://www.chinautech.com/", text: "关于如泰" },
+      { name: "userAgreement", path: "#/userAgreement", text: "用户协议" },
       {
         name: "manual",
-        path: "/manual",
+        path: "#/manual",
         text: "使用手册",
       },
       {
         name: "privacy",
-        path: "/privacy",
+        path: "#/privacy",
         text: "隐私政策",
       },
       {
         name: "updateLog",
-        path: "/updateLog",
+        path: "#/updateLog",
         text: "更新日志",
       },
     ]);
