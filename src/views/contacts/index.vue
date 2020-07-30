@@ -206,6 +206,7 @@ export default {
       userLatitude: 106.53721028909878,
       userLongitude: 29.821216648608489,
       online: true,
+      photo: ''
     }); // 当前成员信息
     let tmpHistory = reactive({
       newArr_time: [],
@@ -828,8 +829,6 @@ $contactsHeight: 592px;
   .contacts_main {
     position: relative;
     .chunk_title {
-      width: 257px;
-      max-width: 257px;
       min-width: 257px;
       height: $contactsHeight;
       .chunk_title_top {

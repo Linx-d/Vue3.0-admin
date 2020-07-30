@@ -15,7 +15,8 @@
     <div class="info_main">
       <div class="info_head">
         <div class="info_head_l">
-          <svg-icon iconClass="info" class="info_svg"></svg-icon>
+          <!-- <svg-icon iconClass="info" class="info_svg"></svg-icon> -->
+          <el-image style="height: 70px; width: 70px;" :src="currentMemberInfo.photo" :fit="fit" class="info_svg"></el-image>
         </div>
         <div class="info_head_r">
           <p>
@@ -63,21 +64,24 @@
         </div>
         <div
           :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
-        >{{ currentMemberInfo.temperature }}°C</div>
+        >{{ currentMemberInfo.temperature }}<span v-show="currentMemberInfo.temperature!='暂无数据'">°C</span></div>
       </div>
       <div id="info_personal" class="info_module">
         <ul>
           <li>
             <span>年龄：</span>
-            <i>{{ currentMemberInfo.age }}</i>
+            <i>{{ currentMemberInfo.age }}&nbsp;岁</i>
           </li>
           <li>
             <span>电话：</span>
             <i>{{ currentMemberInfo.tel }}</i>
           </li>
           <li>
-            <span>地址：</span>
+            <span>住址：</span>
             <i>{{ currentMemberInfo.address }}</i>
+            <a class="info_position" href="#temperature_box">
+              <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
+            </a>
           </li>
           <li>
             <span>围栏：</span>
@@ -105,17 +109,23 @@
           </li>
         </ul>
       </div>
-      <div id="tempreatrue_box">
+      <div id="temperature_box">
         <div id="info_temperature" class="info_module" v-show="temperature"></div>
         <div id="info_table" v-show="!temperature">
-          <el-table :data="tmpHistory.tableData" style="width: 100%" :row-class-name="tableRowClassName" height="430">
+          <el-table
+            :data="tmpHistory.tableData"
+            style="width: 100%"
+            :row-class-name="tableRowClassName"
+            height="430"
+          >
             <el-table-column prop="time" label="日期" width="180"></el-table-column>
             <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-            <el-table-column prop="tempreatrue" label="温度"></el-table-column>
+            <el-table-column prop="temperature" label="温度"></el-table-column>
           </el-table>
         </div>
         <div class="table_svg" @click="toggleTable" title="数据视图">
-          <svg-icon iconClass="table_menu" class="table_menu"></svg-icon>
+          <svg-icon iconClass="table_menu" class="table_menu" v-if="temperature"></svg-icon>
+          <svg-icon iconClass="line_chart" class="line_chart" v-else></svg-icon>
         </div>
       </div>
       <div class="info_module mapBox" v-loading="loading">
@@ -488,54 +498,17 @@ export default {
       switchModule(contactsModule, "memberList");
     };
     const temperature = ref(true);
-    const tableData = reactive([
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-      },
-      {
-        date: "2016-05-02",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-      },
-      {
-        date: "2016-05-04",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-      },
-      {
-        date: "2016-05-01",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-      },
-      {
-        date: "2016-05-08",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-      },
-      {
-        date: "2016-05-06",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-      },
-      {
-        date: "2016-05-07",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-      },
-    ]);
+    const tableData = reactive([]);
     const toggleTable = () => {
       temperature.value = !temperature.value;
     };
-    const tableRowClassName = ({row, rowIndex}) => {
-      console.log(row, rowIndex, 'rowIndex');
-      let tempreatrue = parseInt(row.tempreatrue);
-      if(tempreatrue >=37.3) {
-        return 'warning-row';
+    const tableRowClassName = ({ row, rowIndex }) => {
+      let temperature = parseInt(row.temperature);
+      if (temperature >= 37.3) {
+        return "warning-row";
       }
-      return '';
-      }
+      return "";
+    };
     /**
      * 百度地图方法
      */
@@ -664,7 +637,7 @@ export default {
       temperature,
       toggleTable,
       tableData,
-      tableRowClassName
+      tableRowClassName,
     };
   },
 };
@@ -707,8 +680,6 @@ $contactsHeight: 592px;
     .info_head_l {
       float: left;
       .info_svg {
-        height: 70px;
-        width: 70px;
         margin-right: 20px;
         vertical-align: middle;
       }
@@ -737,8 +708,8 @@ $contactsHeight: 592px;
     .info_head_main {
       position: absolute;
       right: 150px;
-      top: 38px;
-      font-size: 26px;
+      top: 35px;
+      font-size: 42px;
     }
     .danger {
       color: #bf4739;
@@ -751,6 +722,17 @@ $contactsHeight: 592px;
     padding: 35px 25px 25px 25px;
     border-top: 1px dashed #e4e6e9;
     @include webkit("box-sizing", border-box);
+    .info_position {
+      position: relative;
+      .quick_position {
+        width: 1.9em;
+        height: 1.9em;
+        position: absolute;
+        top: -3px;
+        left: 3px;
+        cursor: pointer;
+      }
+    }
   }
   #info_personal {
     ul {
@@ -770,7 +752,7 @@ $contactsHeight: 592px;
       }
     }
   }
-  #tempreatrue_box {
+  #temperature_box {
     position: relative;
     #info_temperature {
       height: 500px;

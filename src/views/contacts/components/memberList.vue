@@ -28,7 +28,7 @@
               <th>年龄</th>
               <th>温度</th>
               <th>电话</th>
-              <th>地址</th>
+              <th>住址</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -201,7 +201,7 @@ export default {
           newArr_position = [],
           new_tableData = [];
         array.forEach((item) => {
-          // tempreatrue
+          // temperature
           newArr_time.push(item.gmtCreate);
           let temperature = Number(item.temperature).toFixed(1);
           newArr_tmp.push(temperature); //Number().toFiexd(1)
@@ -217,23 +217,28 @@ export default {
           let tableObj = {
             name: props.currentMemberInfo.name,
             time: item.gmtCreate,
-            tempreatrue: temperature
+            temperature: temperature
           }
           new_tableData.push(tableObj);
         });
         tmpHistory.newArr_time = newArr_time;
         tmpHistory.newArr_tmp = newArr_tmp;
         tmpHistory.newArr_position = newArr_position;
-        tmpHistory.tableData = new_tableData;
+        tmpHistory.tableData = new_tableData.reverse();
       });
       /**根据用户id获取设备最新数据和告警信息 */
       let currentArray = [currentMemberInfo.userId];
       listDeviceAlarmInfoByUserId(currentArray).then((res) => {
         let data = res.data[0] ? res.data[0] : [];
         props.tmpHistory.railName = data.railName;
+        console.log(data);
         for (let key in data) {
           if (key == "age") {
-            currentMemberInfo[key] = parseInt(data[key]);
+            let newDate = new Date().getTime();
+            let date = new Date(data[key]).getTime();
+            let oneDay = 365*24*60*60*1000; // 一天的毫秒数
+            let age = parseInt((newDate - date)/oneDay);
+            currentMemberInfo[key] = age;
           } else {
             currentMemberInfo[key] = data[key];
           }
