@@ -206,7 +206,7 @@ export default {
       userLatitude: 106.53721028909878,
       userLongitude: 29.821216648608489,
       online: true,
-      photo: ''
+      photo: "",
     }); // 当前成员信息
     let tmpHistory = reactive({
       newArr_time: [],
@@ -220,8 +220,8 @@ export default {
       lastUpdate: "2020-05-14 15:48:02",
       tnumber: null,
       pnumber: 109,
-      tableData: []
-    }); 
+      tableData: [],
+    });
     // 当前成员温度随时间变化的历史数据
     /**
      * 数据
@@ -665,7 +665,7 @@ export default {
               });
               currentDepart.label = inputTxt; // 修改memberList中的名称
               modifyData.visibel = false;
-            }else {
+            } else {
               root.$message({
                 message: res.msg,
                 type: "error",
@@ -687,6 +687,7 @@ export default {
       total: null,
       status: true,
       data: [],
+      authority: false
     });
     let memberListPaging = reactive({
       pageNum: 1,
@@ -702,17 +703,22 @@ export default {
       params.append("pageNum", memberListPaging.pageNum);
       params.append("pageSize", memberListPaging.pageSize);
       listUserByDepartment(params).then((res) => {
-        memberData.data.splice(0, memberData.data.length);
-        let data = res.data.list ? res.data.list : res.data;
-        memberData.total = res.data.total;
-        currentDepart.length = data.length;
-        let i = 0,
-          len = data.length;
-        for (i; i < len; i++) {
-          data[i].temperature = Number(data[i].temperature).toFixed(1);
-          memberData.data.push(data[i]);
+        let code = res.code;
+        if (code === 0) {
+          memberData.data.splice(0, memberData.data.length);
+          let data = res.data.list ? res.data.list : res.data;
+          memberData.total = res.data.total;
+          currentDepart.length = data.length;
+          let i = 0,
+            len = data.length;
+          for (i; i < len; i++) {
+            data[i].temperature = Number(data[i].temperature).toFixed(1);
+            memberData.data.push(data[i]);
+          }
+          //[ ... memberData.data] = data;
+        }else if(code===10004){
+          memberData.total = res.data;
         }
-        //[ ... memberData.data] = data;
       });
     };
     /**
