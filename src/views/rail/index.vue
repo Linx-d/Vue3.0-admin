@@ -840,7 +840,6 @@ $customerHeight: 648px;
 }
 .chunk_cnt {
   height: $customerHeight;
-  width: 1080px;
   padding-bottom: 45px !important;
   position: relative;
   .cnt_top {

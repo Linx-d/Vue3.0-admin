@@ -659,7 +659,7 @@ $corporationHeight: 655px;
     padding: 30px 0;
 }
 .group-tail{
-    min-height: 94px;
+    min-height: 60px;
     // border-bottom: 1px solid #e4e6e9;
     padding: 30px 0;
 }

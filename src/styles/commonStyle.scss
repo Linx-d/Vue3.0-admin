@@ -26,7 +26,8 @@
  * 框架 frame_center_main 用于main中的主体
  */
 .frame_center_main {
-  width: 1080px;
+  width: 58%;
+  min-width: 1112px;
   margin: 0 auto;
   background: #fff;
   @include webkit("box-shadow", 0 1px 2px 0 rgba(0, 0, 0, 0.15));
@@ -38,7 +39,7 @@
  */
 .chunk_title {
   height: 100%;
-  width: 184px;
+  width: 15%;
   border-right: 1px dotted #dce1e6;
   border-radius: 4px 0 0 4px;
   display: table-cell;
@@ -53,7 +54,7 @@
  */
 .chunk_cnt {
   height: 100%;
-  width: 896px;
+  width: 80%;
   display: table-cell;
   vertical-align: top;
   border-radius: 0 4px 4px 0;
@@ -112,22 +113,26 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .mm_tabel th,
 .mm_tabel td {
   padding-left: 10px;
   padding-right: 5px;
   box-sizing: border-box;
   cursor: pointer;
+
   input {
     vertical-align: -3px;
     width: 14px;
     height: 14px;
   }
 }
+
 .mm_tabel th:first-child,
 .mm_tabel td:first-child {
   width: 20px;
 }
+
 .mm_tabel th:first-child {
   input {
     vertical-align: -3px;
@@ -135,12 +140,15 @@
     height: 14px;
   }
 }
+
 .mm_tabel td:last-child {
   width: 20px;
 }
+
 .mm_tabel th:first-child:before {
   width: 0;
 }
+
 .mm_tabel th {
   padding-bottom: 4px;
   border-bottom: 1px solid #e4e6e9;
@@ -148,6 +156,7 @@
   font-size: 12px;
   color: #787878;
 }
+
 .mm_tabel th:before {
   content: "";
   width: 1px;
@@ -156,12 +165,14 @@
   float: left;
   margin-left: -10px;
 }
+
 thead,
 tbody {
   display: table-header-group;
   vertical-align: middle;
   border-color: inherit;
 }
+
 /**
  * contacts 中的a链接
  */
@@ -176,6 +187,7 @@ tbody {
   background: #fff;
   cursor: pointer;
 }
+
 .memberLink:hover {
   background: #f0f0f0;
 }
@@ -209,7 +221,48 @@ tbody {
 .modifyInfoBtn {
   color: #0c4c7f;
 }
+
 .modifyInfoBtn:hover {
   text-decoration: underline;
   cursor: pointer;
+}
+
+/*
+ *documents
+ */
+.document_fix {
+  position: relative;
+  top: -60px;
+  left: 0;
+  padding-top: 24px;
+  margin-bottom: -150px;
+  p:first-child {
+    font-size: 20px;
+  }
+  .frame_cnt {
+    padding: 40px 60px;
+    line-height: 1.57;
+    font-size: 14px;
+    @include webkit("box-sizing", border-box);
+  }
+}
+
+// 版本
+.version {
+  color: #9e9e9e;
+  text-align: center;
+  font-size: 12px;
+}
+
+.MsoNormal {
+  mso-margin-top-alt: auto;
+  mso-margin-bottom-alt: auto;
+  text-align: left;
+  mso-pagination: widow-orphan;
+  background: white;
+  margin: 14px 0 6px;
+}
+
+b {
+  font-weight: 700;
 }

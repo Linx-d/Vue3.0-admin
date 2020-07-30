@@ -5,10 +5,10 @@
         <h1>如泰科技</h1>
       </a>
       <aside class="frame_operation">
-        <a href="javascript:;">文档</a>
+        <!-- <a href="javascript:;">文档</a>
         <span class="frame_operation_separator">|</span>
         <span>联系客服</span>
-        <span class="frame_operation_separator">|</span>
+        <span class="frame_operation_separator">|</span> -->
         <a href="javascript:;" @click="logOut">退出</a>
       </aside>
     </div>
@@ -154,7 +154,8 @@ export default {
   margin-bottom: 20px;
   .frame_head_top {
     height: 32px;
-    width: 1080px;
+    width: 90%;
+    max-width:1080px;
     color: #fff;
     margin: 0 auto;
     background: #335883;

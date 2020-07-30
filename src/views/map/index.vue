@@ -25,11 +25,34 @@
         <h1>疫情防控中心</h1>
       </div>
       <div class="alanysis_top">
-        <div class="case_top_right"></div>
-        <div class="case_top_left"></div>
-        <div class="case_bottom_left"></div>
-        <div class="case_bottom_right"></div>
-        <div id="online" class="alanysis_top_a echartsIndivi"></div>
+        <div class="alanysis-a">
+          <div class="case_top_right"></div>
+          <div class="case_top_left"></div>
+          <div class="case_bottom_left"></div>
+          <div class="case_bottom_right"></div>
+          <div id="abnormal" class="alanysis_top_a echartsIndivi">
+            <h1>
+              设备总量:
+              <span>{{ scaleStatic.person }}</span>台
+            </h1>
+            <span class="onlineLine"></span>
+            <p class="abnormal_top">
+              <span>在线</span>
+              <span>离线</span>
+            </p>
+            <p class="abnormal_bottom">
+              <span>{{ scaleStatic.online }}台</span>
+              <span>{{ scaleStatic.unline }}台</span>
+            </p>
+          </div>
+        </div>
+        <div class="alanysis-b">
+          <div class="case_top_right"></div>
+          <div class="case_top_left"></div>
+          <div class="case_bottom_left"></div>
+          <div class="case_bottom_right"></div>
+          <div id="online" class="alanysis_top_a echartsIndivi"></div>
+        </div>
       </div>
       <div class="alanysis_bottom">
         <div class="alanysis_bottom_L echartsIndivi">
@@ -145,6 +168,14 @@ export default {
     const echartsBorder = reactive({
       top_right: case_top_right,
     });
+    /**在线统计
+     *
+     */
+    const scaleStatic = reactive({
+      person: 0,
+      online: 0,
+      unline: 0,
+    });
     const cutFull = () => {
       adaptionEchartsV2(systemChart);
       adaptionEchartsV2(onlineChart);
@@ -215,6 +246,7 @@ export default {
             temperatureStatic: 0,
             onlineStatic: 0,
           };
+          scaleStatic.person = data.length;
           data.forEach((item) => {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
@@ -236,6 +268,9 @@ export default {
             if (electric < 2) {
               status.eletricStatic++;
             }
+            // 在线统计
+            scaleStatic.online = status.onlineStatic;
+            scaleStatic.unline = status.personStatic - scaleStatic.online;
             let point = new BMap.Point(item.longitude, item.latitude);
             let marker = new BMap.Marker(point, { icon: myIcon });
             // marker.setAnimation(BMAP_ANIMATION_BOUNCE);
@@ -287,10 +322,9 @@ export default {
       );
       adaptionEchartsV2(onlineChart);
       let option = onlineOption;
-      onlineOption.series[0].data[0].value = status.temperatureStatic;
-      onlineOption.series[0].data[1].value = status.personStatic;
-      onlineOption.series[0].data[2].value = status.onlineStatic;
-      onlineOption.series[0].data[3].value = status.eletricStatic;
+      onlineOption.series[0].data[0].value =
+        status.personStatic - status.temperatureStatic;
+      onlineOption.series[0].data[1].value = status.temperatureStatic;
       // 使用刚指定的配置项和数据显示图表。
       onlineChart.setOption(option);
     };
@@ -314,7 +348,6 @@ export default {
     };
     setInterval(getView, 6000000);
     function getView() {
-      
       getAlarmView().then((res) => {
         let data = res.data;
         // time
@@ -407,7 +440,15 @@ export default {
       });
       baiduMap(); // 百度地图
     });
-    return { cutFull, full, alarmData, alanysisStatus, echartsBorder, loading };
+    return {
+      cutFull,
+      full,
+      alarmData,
+      alanysisStatus,
+      echartsBorder,
+      loading,
+      scaleStatic,
+    };
   },
 };
 </script>
@@ -437,6 +478,9 @@ $echartsBorder: 1px solid #146ede;
   min-width: $layout-min-width;
   position: relative;
   background-color: #fff;
+  #mapShow {
+    background-color: rgb(11, 21, 50) !important;
+  }
   .map_main {
     position: absolute;
     top: 0;
@@ -498,13 +542,67 @@ $echartsBorder: 1px solid #146ede;
     position: relative;
     top: 15px;
     left: 15px;
-    background-color: #0b1532;
+    .alanysis-a {
+      position: relative;
+      height: 38%;
+    }
+    .alanysis-b {
+      position: relative;
+      top: 20px;
+      height: 56%;
+    }
     .alanysis_top_a {
       width: 100%;
       height: 100%;
       left: 0;
       top: 0;
       border: $echartsBorder;
+    }
+    #abnormal {
+      top: 0;
+      background: #0b1532;
+      font-size: 20px;
+      text-align: center;
+      .abnormal_top {
+        margin-top: 10px;
+        span {
+          display: inline-block;
+          width: 50%;
+          text-align: center;
+          line-height: 20px;
+          color: #95dbff;
+        }
+        span:last-child {
+          color: #dcb917;
+        }
+      }
+      .abnormal_bottom {
+        margin-top: 10px;
+        span {
+          display: inline-block;
+          width: 50%;
+          text-align: center;
+          line-height: 20px;
+          color: #95dbff;
+        }
+        span:last-child {
+          color: #dcb917;
+        }
+      }
+      .onlineLine {
+        display: inline-block;
+        width: 80%;
+        height: 1px;
+        background: #0f9ae2;
+        margin: 0 auto;
+      }
+      h1 {
+        color: #0f9ae2;
+        font-size: 22px;
+        font-weight: 400;
+        text-align: center;
+        margin-top: 15px;
+      }
     }
   }
   .alanysis_bottom {

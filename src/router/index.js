@@ -46,6 +46,26 @@ Vue.use(VueRouter)
         component: resolve => require(["@/views/corporation/components/set.vue"], resolve)
       }
     ]
+  },
+  {
+    path: "/manual",
+    name: "Manual",
+    component: resolve => require(["@/views/documents/manual.vue"], resolve)
+  },
+  {
+    path: "/privacy",
+    name: "privacy",
+    component: resolve => require(["@/views/documents/privacy.vue"], resolve)
+  },
+  {
+    path: "/updateLog",
+    name: "updateLog",
+    component: resolve => require(["@/views/documents/updateLog.vue"], resolve)
+  },
+  {
+    path: "/userAgreement",
+    name: "userAgreement",
+    component: resolve => require(["@/views/documents/userAgreement.vue"], resolve)
   }
 ]
 
