@@ -26,7 +26,8 @@
  * 框架 frame_center_main 用于main中的主体
  */
 .frame_center_main {
-  width: 1080px;
+  width: 58%;
+  min-width: 1112px;
   margin: 0 auto;
   background: #fff;
   @include webkit("box-shadow", 0 1px 2px 0 rgba(0, 0, 0, 0.15));
@@ -38,7 +39,7 @@
  */
 .chunk_title {
   height: 100%;
-  width: 184px;
+  width: 15%;
   border-right: 1px dotted #dce1e6;
   border-radius: 4px 0 0 4px;
   display: table-cell;
@@ -53,7 +54,7 @@
  */
 .chunk_cnt {
   height: 100%;
-  width: 896px;
+  width: 80%;
   display: table-cell;
   vertical-align: top;
   border-radius: 0 4px 4px 0;
@@ -226,7 +227,6 @@ tbody {
   cursor: pointer;
 }
 
-
 /*
  *documents
  */
@@ -234,16 +234,16 @@ tbody {
   position: relative;
   top: -60px;
   left: 0;
-  height: 2000px;
   padding-top: 24px;
   margin-bottom: -150px;
-
+  p:first-child {
+    font-size: 20px;
+  }
   .frame_cnt {
-    margin-top: 24px;
     padding: 40px 60px;
     line-height: 1.57;
     font-size: 14px;
-    @include webkit('box-sizing', border-box);
+    @include webkit("box-sizing", border-box);
   }
 }
 

@@ -154,7 +154,8 @@ export default {
   margin-bottom: 20px;
   .frame_head_top {
     height: 32px;
-    width: 1080px;
+    width: 90%;
+    max-width:1080px;
     color: #fff;
     margin: 0 auto;
     background: #335883;

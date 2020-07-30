@@ -357,7 +357,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-$mainWidth: 705px;
+$mainWidth: 80%;
 .body {
   padding: 15px 25px 15px;
   .tab_cnt {
@@ -492,9 +492,7 @@ $mainWidth: 705px;
     padding-top: 9px;
   }
   .departManagers {
-    width: 400px !important;
-    float: left !important;
-    margin-left: 10px;
+    width: 80%;
     text-overflow: ellipsis;
     width: $mainWidth;
     height: 100%;

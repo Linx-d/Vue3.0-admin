@@ -31,6 +31,11 @@
           <div class="case_bottom_left"></div>
           <div class="case_bottom_right"></div>
           <div id="abnormal" class="alanysis_top_a echartsIndivi">
+            <h1>
+              设备总量:
+              <span>{{ scaleStatic.person }}</span>台
+            </h1>
+            <span class="onlineLine"></span>
             <p class="abnormal_top">
               <span>在线</span>
               <span>离线</span>
@@ -39,11 +44,6 @@
               <span>{{ scaleStatic.online }}台</span>
               <span>{{ scaleStatic.unline }}台</span>
             </p>
-            <span class="onlineLine"></span>
-            <h1>
-              设备总量:
-              <span>{{ scaleStatic.person }}</span>台
-            </h1>
           </div>
         </div>
         <div class="alanysis-b">
@@ -169,12 +169,12 @@ export default {
       top_right: case_top_right,
     });
     /**在线统计
-     * 
+     *
      */
     const scaleStatic = reactive({
       person: 0,
       online: 0,
-      unline: 0
+      unline: 0,
     });
     const cutFull = () => {
       adaptionEchartsV2(systemChart);
@@ -440,7 +440,15 @@ export default {
       });
       baiduMap(); // 百度地图
     });
-    return { cutFull, full, alarmData, alanysisStatus, echartsBorder, loading, scaleStatic };
+    return {
+      cutFull,
+      full,
+      alarmData,
+      alanysisStatus,
+      echartsBorder,
+      loading,
+      scaleStatic,
+    };
   },
 };
 </script>
