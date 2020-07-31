@@ -420,20 +420,22 @@ export default {
           modifyRailData.longitude,
           modifyRailData.latitude
         );
-        /**围栏标注
-         * 
-         */
-        let railIcon = new BMap.Icon(railPosition, new BMap.Size(48, 48));
-        let railMarker = new BMap.Marker(point, {icon: railIcon});
-        let content = '围栏名称：'+ modifyRailData.railName;
-        map.addOverlay(railMarker);
-        addClickHandler(content, railMarker);
 
         let geoc = new BMap.Geocoder();
         let overlays = []; // 围栏
         let markers = []; // 点聚合
         map.centerAndZoom(point, 16);
         map.enableScrollWheelZoom();
+
+        /**围栏标注
+         *
+         */
+        let railIcon = new BMap.Icon(railPosition, new BMap.Size(48, 48));
+        let railMarker = new BMap.Marker(point, { icon: railIcon });
+        let content = "围栏名称：" + modifyRailData.railName;
+        map.addOverlay(railMarker);
+        overlays.push(railMarker);
+        addClickHandler(content, railMarker);
 
         /**点聚合
          *
@@ -475,7 +477,7 @@ export default {
           }
           let point = new BMap.Point(item.longitude, item.latitude);
           let marker = new BMap.Marker(point, { icon: myIcon });
-          let content = '姓名：'+ item.userName;
+          let content = "姓名：" + item.userName;
           map.addOverlay(marker);
           addClickHandler(content, marker);
           markers.push(marker);
@@ -516,6 +518,15 @@ export default {
         let overlaycomplete = function (e) {
           clearAll();
           let point = e.overlay.point;
+          /**围栏标注
+           *
+           */
+          let railIcon = new BMap.Icon(railPosition, new BMap.Size(48, 48));
+          let railMarker = new BMap.Marker(point, { icon: railIcon });
+          let content = "围栏名称：" + modifyRailData.railName;
+          map.addOverlay(railMarker);
+          overlays.push(railMarker);
+          addClickHandler(content, railMarker);
           let radius = parseInt(e.overlay.Da);
           modifyRailData.radius = radius;
           geoc.getLocation(point, function (rs) {
@@ -575,6 +586,13 @@ export default {
         let overlaycomplete = function (e) {
           clearAll();
           let point = e.overlay.point;
+          /**围栏标注
+           *
+           */
+          let railIcon = new BMap.Icon(railPosition, new BMap.Size(48, 48));
+          let railMarker = new BMap.Marker(point, { icon: railIcon });
+          map.addOverlay(railMarker);
+          overlays.push(railMarker);
           let radius = parseInt(e.overlay.Da);
           addRailData.radius = radius;
           addRailData.longitude = point.lng;
