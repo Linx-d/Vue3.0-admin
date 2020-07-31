@@ -6,7 +6,7 @@ $tab-text: #53749a;
 
 $tabNav_color: #4a77ac; //左侧导航栏bgc
 
-$layout-min-width: 1900px;// 统一设置最小宽度
+$layout-min-width: 1621px;// 统一设置最小宽度
 
 @mixin webkit ($type, $value) {
   -webkit-#{$type}: $value;

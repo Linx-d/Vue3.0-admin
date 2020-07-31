@@ -46,7 +46,7 @@ $corporationHeight: 655px;
   .chunk_title {
     height: $corporationHeight;
     padding-top: 12px;
-    min-width: 165px;
+    min-width: 175px;
   }
   .tabNav_item_curr {
     background: $tabNav_color;

@@ -8,14 +8,14 @@
     element-loading-background="rgba(11, 21, 50, 0.8)"
   >
     <div id="mapShow" :class="['map_main', 'frame_center']"></div>
-    <div :class="['tool', { tool_top: full }]">
+    <!-- <div :class="['tool', { tool_top: full }]">
       <ul>
         <li @click="cutFull">
           <svg-icon iconClass="full_screen" class="mapMenu"></svg-icon>
           <i>全屏</i>
         </li>
       </ul>
-    </div>
+    </div> -->
     <!-- alanysis 数据分析模块 login -->
     <div :class="['alanysis']">
       <!-- <div
@@ -76,32 +76,32 @@
             </h1>
 
             <table>
-              <tr>
-                <td style="color: #bf4739; font-size: 26px;">{{ alarmData.alarmSum }}</td>
-                <td style="color: #cd6212; font-size: 26px;">{{ alarmData.personSum }}</td>
-                <td style="color: #1089e7; font-size: 26px;">{{ alarmData.tsum }}</td>
-                <td style="color: #35cbbf; font-size: 26px;">{{ alarmData.psum }}</td>
+              <tr class="tb_top">
+                <td>{{ alarmData.alarmSum }}</td>
+                <td>{{ alarmData.personSum }}</td>
+                <td>{{ alarmData.tsum }}</td>
+                <td>{{ alarmData.psum }}</td>
               </tr>
-              <tr style="height: 30px; font-weight: 700; color: #2d2d2d; font-size: 13px;">
+              <tr class="tb_middle">
                 <td class="tdBgc">累计告警</td>
                 <td class="tdBgc">累计人数</td>
                 <td class="tdBgc">温度告警</td>
                 <td class="tdBgc">位置告警</td>
               </tr>
-              <tr style="font-weight: 700; height: 35px;">
-                <td style="color: #b2b2b2; font-size: 13px;">
+              <tr class="tb_bottom">
+                <td style="color: #b2b2b2;">
                   <span>新增</span>
                   <span style="color: #bf4739;">+{{ alarmData.newSum }}</span>
                 </td>
-                <td style="color: #b2b2b2; font-size: 13px;">
+                <td style="color: #b2b2b2;">
                   <span>新增</span>
                   <span style="color: #cd6212;">+{{ alarmData.newPersonSum }}</span>
                 </td>
-                <td style="color: #b2b2b2; font-size: 13px;">
+                <td style="color: #b2b2b2;">
                   <span>新增</span>
                   <span style="color: #1089e7;">+{{ alarmData.newTSum }}</span>
                 </td>
-                <td style="color: #b2b2b2; font-size: 13px;">
+                <td style="color: #b2b2b2;">
                   <span>新增</span>
                   <span style="color: #35cbbf;">+{{ alarmData.newPSum }}</span>
                 </td>
@@ -123,6 +123,36 @@
         <div class="case_bottom_left"></div>
         <div class="case_bottom_right"></div>
         <div id="system" class="alanysis_right_content echartsIndivi"></div>
+      </div>
+
+      <!-- input search -->
+      <!-- <div class="search_box">
+        <div id="citychangeopt"></div>
+      </div> -->
+
+      <!-- tool_box -->
+      <div class="tool_box">
+        <!-- <div class="tool_left tool-common">城市</div> -->
+        <!-- <span class="frame_operation_dep"></span> -->
+        <!-- <div class="tool_middle tool-common"></div> -->
+        <!-- <span class="frame_operation_dep"></span> -->
+        <div class="tool_right tool-common" @click.stop="tool_active">
+          <span>
+            <svg-icon v-if="!change_boolean.status" iconClass="tool_box"></svg-icon>
+            <svg-icon v-else iconClass="tool_box_active"></svg-icon>
+          </span>
+          <span :class="{tool_right_active: change_boolean.status}">工具箱</span>
+          <span>
+            <svg-icon v-if="!change_boolean.status" iconClass="down_arrow"></svg-icon>
+            <svg-icon v-else iconClass="top_arrow"></svg-icon>
+          </span>
+          <div v-show="change_boolean.status" class="tool_list">
+            <ul>
+              <li @click.stop="hitMap">热力图</li>
+              <li @click.stop="fullScreen">全屏</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
     <!-- alanysis 数据分析模块 end -->
@@ -205,12 +235,13 @@ export default {
     let baiduMap = () => {
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
         let map = new BMap.Map("mapShow"); // 创建Map实例
-        //添加地图类型控件
+        // 添加地图类型控件
         // map.addControl(
         //   new BMap.MapTypeControl({
         //     mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
         //   })
         // );
+
         listUserLocation().then((res) => {
           let code = res.code;
           let data = res.data;
@@ -425,6 +456,26 @@ export default {
       adaptionEchartsV2(onlineChart);
     });
     const loading = ref(true);
+
+    /**工具箱
+     *
+     */
+    const change_boolean = reactive({
+      status: false,
+    });
+    const tool_active = () => {
+      change_boolean.status = !change_boolean.status;
+    };
+    // 热力图
+    const hitMap = () => {
+      change_boolean.status = false;
+      console.log("hit");
+    };
+    // 全屏
+    const fullScreen = () => {
+      change_boolean.status = false;
+      console.log("full");
+    };
     /**
      * 生命周期函数 onMounted
      */
@@ -448,6 +499,10 @@ export default {
       echartsBorder,
       loading,
       scaleStatic,
+      tool_active,
+      change_boolean,
+      hitMap,
+      fullScreen,
     };
   },
 };
@@ -476,6 +531,7 @@ $echartsBorder: 1px solid #146ede;
   height: 100vh;
   min-height: 757px;
   min-width: $layout-min-width;
+  width: 100%;
   position: relative;
   background-color: #fff;
   #mapShow {
@@ -612,6 +668,7 @@ $echartsBorder: 1px solid #146ede;
     bottom: -36px;
     .alanysis_bottom_L {
       width: 20%;
+      // min-width: 330px;
       height: 100%;
       float: $echartsMargin;
       left: $echartsMargin;
@@ -652,6 +709,67 @@ $echartsBorder: 1px solid #146ede;
     }
   }
 }
+
+// 工具栏
+.alanysis {
+  .search_box {
+    height: 26px;
+    width: 240px;
+    background: #5090f1;
+    position: absolute;
+    top: 12%;
+    left: 22%;
+  }
+  .tool_box {
+    height: 26px;
+    position: absolute;
+    top: 13%;
+    right: 22%;
+    .tool-common {
+      display: inline-block;
+      cursor: pointer;
+      background: #fff;
+      text-align: center;
+      padding: 0 10px;
+      line-height: 26px;
+      font-size: 14px;
+      span:nth-child(2) {
+        margin-right: 8px;
+        margin-left: 8px;
+      }
+    }
+    .tool_left {
+      width: 65px;
+    }
+    .tool_middle {
+    }
+    .tool_right {
+      position: relative;
+      .tool_list {
+        position: absolute;
+        width: 100%;
+        top: 35px;
+        right: 0;
+        background-color: #fff;
+        @include webkit("box-shadow", 1px 2px 1px rgba(0, 0, 0, 0.15));
+        ul {
+          li:hover {
+            color: #7da4d1;
+          }
+        }
+      }
+    }
+    .tool_right_active {
+      color: #7da4d1;
+    }
+  }
+}
+.BMap_CityListCtrl.anchorTR {
+  // top: 12%;
+  // right: 18% !important;
+  // line-height: 35px;
+}
+
 .echartsIndivi {
   background: #fff;
   position: absolute;
@@ -699,6 +817,7 @@ $echartsBorder: 1px solid #146ede;
   left: 0;
   top: 0;
   background-image: url("../images/case_header.png");
+  background-size: cover;
   h1 {
     text-align: center;
     color: #fff;
@@ -735,12 +854,38 @@ $echartsBorder: 1px solid #146ede;
   table {
     color: #000;
     padding: 0;
+    font-size: 1.2vw;
     box-sizing: border-box;
     width: 100%;
     text-align: center;
     padding-bottom: 0;
     line-height: 59px;
     background: #0b1532;
+    .tb_top {
+      td:nth-child(1) {
+        color: #bf4739;
+      }
+      td:nth-child(2) {
+        color: #cd6212;
+      }
+      td:nth-child(3) {
+        color: #1089e7;
+      }
+      td:nth-child(4) {
+        color: #35cbbf;
+      }
+    }
+    .tb_middle {
+      height: 20%;
+      font-weight: 700;
+      color: #2d2d2d;
+      font-size: 0.7vw;
+    }
+    .tb_bottom {
+      font-weight: 700;
+      height: 35px;
+      font-size: 1vw;
+    }
   }
 }
 /*---------------------table end-----------------------*/
