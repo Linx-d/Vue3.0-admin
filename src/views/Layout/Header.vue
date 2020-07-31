@@ -125,7 +125,7 @@ export default {
     const logOut = () => {
       sessionStorage.clear();
       // window.location.href="http://www.chinautech.com/";
-      window.location.href="http://iot.chinautech.com/";
+      window.location.href="https://iot.chinautech.com/";
     }
     /**监听路由 */
     watchEffect(() => {

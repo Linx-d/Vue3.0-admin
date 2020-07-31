@@ -3,7 +3,7 @@ import { Message } from 'element-ui';
 import { getParemter } from "@/utils/common" 
 //使用自定义配置新建一个 axios 实例
 const service = axios.create({
-  baseURL: "http://111.231.188.211:8888/api" // http://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api  林 http://111.231.188.211:8888/api
+  baseURL: "https://iot.chinautech.com/api" // https://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api  林 http://111.231.188.211:8888/api
 });
 
 // 添加请求拦截器
@@ -45,7 +45,7 @@ service.interceptors.response.use(
     if(status==403){
       const url = window.location.href;
       Message.error("请先登录！");
-      window.location.href="http://iot.chinautech.com/api/qywx/login?redirectUrl="+url;
+      window.location.href="https://iot.chinautech.com/api/qywx/login?redirectUrl="+url;
     }
     // 对响应错误做点什么
     return Promise.reject(error);
