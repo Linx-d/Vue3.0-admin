@@ -69,6 +69,7 @@
           @click="edit()"
           v-if="!isEdit&&employee.role.id!=1"
         >编辑管理员</a>
+        <!-- &&(loginInfo.role.id==1||loginInfo.role.id==2) -->
         <a
           href="javascript:;"
           class="memberLink"
@@ -184,6 +185,10 @@ export default {
      */
     let dialogTableVisible = ref(false);
     /**
+     * 当前登录用户
+     */
+    let loginInfo = root.$store.state.corporation.adminInfo;
+    /**
      * 部门列表窗口
      */
     let dialogVisible = ref(false);
@@ -259,6 +264,7 @@ export default {
     });
     // -------------------------------------变量-------------------------------------------
 
+    console.log(loginInfo,"login");
     /**
      * 查询所有员工
      */
@@ -535,7 +541,8 @@ export default {
       chooseEmployee,
       delManager,
       roleId,
-      loadWWOpenData
+      loadWWOpenData,
+      loginInfo
     };
   }
 };
