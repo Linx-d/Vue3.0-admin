@@ -30,7 +30,11 @@
                 <el-button type="text" size="mini" @click="() => append(data)">Append</el-button>
                 <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>
                 -->
-                <div class="menu_right" @click.stop="showDepartClick">
+                <div
+                  class="menu_right"
+                  @click.stop="showDepartClick"
+                  v-if="memberData.total !== null"
+                >
                   <el-col :span="12">
                     <el-dropdown>
                       <span class="el-dropdown-link">
@@ -687,7 +691,7 @@ export default {
       total: null,
       status: true,
       data: [],
-      authority: false
+      authority: false,
     });
     let memberListPaging = reactive({
       pageNum: 1,
@@ -713,10 +717,17 @@ export default {
             len = data.length;
           for (i; i < len; i++) {
             data[i].temperature = Number(data[i].temperature).toFixed(1);
+
+            // age
+            let newDate = new Date().getTime();
+            let date = new Date(data[i].age).getTime();
+            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+            let age = parseInt((newDate - date) / oneDay);
+            data[i].age = age;
             memberData.data.push(data[i]);
           }
           //[ ... memberData.data] = data;
-        }else if(code===10004){
+        } else if (code === 10004) {
           memberData.total = res.data;
         }
       });

@@ -74,9 +74,10 @@
       </div>
       <div class="no_member" v-show="!changeModule.status">
         <div class="no_member_top">
-          <svg-icon iconClass="member" class="member"></svg-icon>
-          <p v-if="memberData.total===0">当前部门无任何成员</p>
-          <p v-if="memberData.total===null">暂无权限查看</p>
+          <svg-icon iconClass="member" class="member" v-show="memberData.total===0"></svg-icon>
+          <svg-icon iconClass="no_access" class="no_access" v-show="memberData.total===null"></svg-icon>
+          <p v-show="memberData.total===0">当前部门无任何成员</p>
+          <p v-show="memberData.total===null">暂无权限查看</p>
         </div>
         <div class="no_member_bottom" v-if="memberData.total===0">
           <a class="memberLink" @click="addMemberBtn">添加成员</a>
@@ -182,7 +183,7 @@ export default {
     watchEffect(() => {
       if (props.memberData.total === 0) {
         changeModule.status = false;
-      } else if(props.memberData.total === null) {
+      } else if (props.memberData.total === null) {
         changeModule.status = false;
       } else {
         changeModule.status = true;
@@ -359,6 +360,7 @@ export default {
         let i = 0,
           len = data.length;
         for (i; i < len; i++) {
+          // temperatrue
           data[i].temperature = Number(data[i].temperature).toFixed(1);
           props.memberData.data.push(data[i]);
         }

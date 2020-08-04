@@ -54,12 +54,6 @@ export default {
     a:hover {
       text-decoration: underline;
     }
-    .frame_operation_dep {
-      color: #9e9e9e;
-      height: 10px;
-      width: 8px;
-      padding: 0 6px;
-    }
     .footer_link {
       display: inline-block;
     }
