@@ -63,6 +63,12 @@ export function Map(ak) {
       script5.src =
         "http://api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js";
       document.body.appendChild(script5);
+
+      let script6 = document.createElement("script");
+      script6.type = "text/javascript";
+      script6.src =
+        "http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js";
+      document.body.appendChild(script6);
     } else {
       console.log("BMapLib.DrawingManager is loaded!");
     }

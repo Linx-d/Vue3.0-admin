@@ -127,12 +127,42 @@
 /*
  *表格样式
  */
- #info_table {
+#info_table {
   .el-table .warning-row {
     color: #da5646;
   }
-  
+
   .el-table .success-row {
     background: #f0f9eb;
   }
- }
+}
+
+/**
+  * map search
+  */
+#search_person {
+  .el-input__inner {
+    border-radius: 0;
+    height: 29px;
+    width: 183px;
+    outline: none;
+    border-right: 0;
+    margin-top: 1px;
+  }
+  .el-tooltip {
+    div {
+      display: inline-block;
+    }
+  }
+}
+.el-autocomplete-suggestion {
+  border-radius: 0;
+}
+
+#search_city {
+  .el-tooltip {
+    div {
+      display: inline-block;
+    }
+  }
+}

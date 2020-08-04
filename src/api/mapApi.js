@@ -148,6 +148,41 @@ export function add(data) {
   return service.request({
     method: "post",
     url: "/deviceData/add",
-    data
+    data,
+  });
+}
+
+/**
+ * 模糊搜索用户
+ *
+ * @export
+ * @param {
+  "keyword": "",
+  "scope": "all",
+  "pageNum": 1,
+  "pageSize": 10
+}
+* @returns data
+*/
+export function fuzzySearch(data) {
+  return service.request({
+    method: "get",
+    url: "/user/fuzzySearch",
+    data,
+  });
+}
+
+/**
+ * 根据用户id获取设备最新数据和告警信息
+ *
+ * @export
+ * @param [10001]
+* @returns data
+*/
+export function listDeviceAlarmInfoByUserId(data) {
+  return service.request({
+    method: "post",
+    url: "/device/listDeviceAlarmInfoByUserId",
+    data,
   });
 }

@@ -15,7 +15,7 @@
           <i>全屏</i>
         </li>
       </ul>
-    </div> -->
+    </div>-->
     <!-- alanysis 数据分析模块 login -->
     <div :class="['alanysis']">
       <!-- <div
@@ -126,9 +126,55 @@
       </div>
 
       <!-- input search -->
-      <!-- <div class="search_box">
-        <div id="citychangeopt"></div>
-      </div> -->
+      <div :class="['search_box']">
+        <div id="search_city" :class="{'city_show': search_toggle.city}">
+          <input
+            id="suggestId"
+            class="city-input"
+            type="text"
+            placeholder="请输入地址"
+            ref="address_search"
+            v-model="address"
+          />
+          <div
+            id="searchResultPanel"
+            style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"
+          ></div>
+          <!-- <span class="frame_operation_dep">|</span> -->
+          <el-tooltip class="item" effect="dark" content="搜索用户" placement="bottom">
+            <span class="search_handle" @click="toogle_city">
+              <svg-icon iconClass="search_change2" class="search_change"></svg-icon>
+            </span>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="关闭" placement="bottom">
+            <span class="close_handle" @click="city_close">
+              <svg-icon iconClass="search_close" class="search_close"></svg-icon>
+            </span>
+          </el-tooltip>
+        </div>
+        <div id="search_person" :class="{'person_show': search_toggle.member}">
+          <el-autocomplete
+            class="inline-input"
+            v-model="member"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入用户名"
+            :trigger-on-focus="false"
+            @select="handleSelect"
+            ref="member_search"
+          ></el-autocomplete>
+          <!-- <span class="frame_operation_dep">|</span> -->
+          <el-tooltip class="item" effect="dark" content="搜索地址" placement="bottom">
+            <span class="search_handle" @click="toogle_member">
+              <svg-icon iconClass="search_change2" class="search_change"></svg-icon>
+            </span>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="关闭" placement="bottom">
+            <span class="close_handle" @click="member_close">
+              <svg-icon iconClass="search_close" class="search_close"></svg-icon>
+            </span>
+          </el-tooltip>
+        </div>
+      </div>
 
       <!-- tool_box -->
       <div class="tool_box">
@@ -137,10 +183,12 @@
         <!-- <div class="tool_middle tool-common"></div> -->
         <!-- <span class="frame_operation_dep"></span> -->
         <div class="tool_right tool-common" @click.stop="tool_active">
-          <span>
-            <svg-icon v-if="!change_boolean.status" iconClass="tool_box"></svg-icon>
-            <svg-icon v-else iconClass="tool_box_active"></svg-icon>
-          </span>
+          <el-tooltip class="item" effect="dark" content="工具箱" placement="top">
+            <span>
+              <svg-icon v-if="!change_boolean.status" iconClass="tool_box"></svg-icon>
+              <svg-icon v-else iconClass="tool_box_active"></svg-icon>
+            </span>
+          </el-tooltip>
           <span :class="{tool_right_active: change_boolean.status}">工具箱</span>
           <span>
             <svg-icon v-if="!change_boolean.status" iconClass="down_arrow"></svg-icon>
@@ -148,8 +196,10 @@
           </span>
           <div v-show="change_boolean.status" class="tool_list">
             <ul>
-              <li @click.stop="hitMap">热力图</li>
-              <li @click.stop="fullScreen">全屏</li>
+              <li @click.stop="hitMap" :class="{'item_active': item_active.hitMap}">热力图</li>
+              <li @click.stop="cutFull" :class="{'item_active': item_active.cutFull}">全屏</li>
+              <li @click.stop="searchMeber">搜索用户</li>
+              <li @click.stop="searchCity">搜索地址</li>
             </ul>
           </div>
         </div>
@@ -173,6 +223,8 @@ import {
   getAlarmView,
   listUserLocation,
   add,
+  fuzzySearch,
+  listDeviceAlarmInfoByUserId,
 } from "@/api/mapApi";
 import { listRail, selectRailList, listUserInfoByRail } from "@/api/railApi";
 import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
@@ -185,13 +237,14 @@ import systemOption from "./options/systemOption.js"; // 系统统计模块
 import onLineIcon from "@/views/images/marker_online.png";
 import unLineIcon from "@/views/images/marker_unline.png";
 import dangerIcon from "@/views/images/marker_danger.png";
+import address_location from "@/views/images/address_location.png"; // 搜索地址标注
 import pointAggre from "@/views/images/pointAggre.png"; // 点聚合
 import case_top_right from "@/views/images/case_top_right.png";
 import custom_map_config from "./custom_map_config/custom_map_config2.json";
 import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
-  setup(props, { root }) {
+  setup(props, { root, refs }) {
     /**
      * 图表框
      */
@@ -206,16 +259,6 @@ export default {
       online: 0,
       unline: 0,
     });
-    const cutFull = () => {
-      adaptionEchartsV2(systemChart);
-      adaptionEchartsV2(onlineChart);
-      adaptionEchartsV2(historyChart);
-      // systemChart.resize();
-      // onlineChart.resize();
-      alanysisStatus.status = !alanysisStatus.status;
-      // 切换
-      root.$store.commit("SET_FULL"); // commit 不用指向 map模块
-    };
     // window.onresize = function() {
     //   systemChart.resize();
     //   onlineChart.resize();
@@ -232,7 +275,11 @@ export default {
     /**
      * 百度地图方法
      */
-    let baiduMap = () => {
+    Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
+      let map = new BMap.Map("mapShow"); // 创建Map实例
+    });
+    ((window) => {
+      // lng = null, lat = null, hit = false
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
         let map = new BMap.Map("mapShow"); // 创建Map实例
         // 添加地图类型控件
@@ -241,7 +288,7 @@ export default {
         //     mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
         //   })
         // );
-
+        window.map = map;
         listUserLocation().then((res) => {
           let code = res.code;
           let data = res.data;
@@ -261,9 +308,96 @@ export default {
           map.centerAndZoom(new BMap.Point(107.26569, 28.676057), zoomLevel); // 初始化地图,设置中心点坐标和地图级别
           map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
           map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+
+          /**搜索 地址
+           * login
+           */
+          // 百度地图API功能
+          function G(id) {
+            return document.getElementById(id);
+          }
+
+          let ac = new BMap.Autocomplete({ input: "suggestId", location: map }); //建立一个自动完成的对象
+
+          ac.addEventListener("onhighlight", function (e) {
+            //鼠标放在下拉列表上的事件
+            let str = "";
+            let _value = e.fromitem.value;
+            let value = "";
+            if (e.fromitem.index > -1) {
+              value =
+                _value.province +
+                _value.city +
+                _value.district +
+                _value.street +
+                _value.business;
+            }
+            str =
+              "FromItem<br />index = " +
+              e.fromitem.index +
+              "<br />value = " +
+              value;
+
+            value = "";
+            if (e.toitem.index > -1) {
+              _value = e.toitem.value;
+              value =
+                _value.province +
+                _value.city +
+                _value.district +
+                _value.street +
+                _value.business;
+            }
+            str +=
+              "<br />ToItem<br />index = " +
+              e.toitem.index +
+              "<br />value = " +
+              value;
+            G("searchResultPanel").innerHTML = str;
+          });
+
+          let myValue;
+          ac.addEventListener("onconfirm", function (e) {
+            //鼠标点击下拉列表后的事件
+            let _value = e.item.value;
+            myValue =
+              _value.province +
+              _value.city +
+              _value.district +
+              _value.street +
+              _value.business;
+            G("searchResultPanel").innerHTML =
+              "onconfirm<br />index = " +
+              e.item.index +
+              "<br />myValue = " +
+              myValue;
+
+            setPlace();
+          });
+
+          function setPlace() {
+            map.clearOverlays(); //清除地图上所有覆盖物
+            function myFun() {
+              let pp = local.getResults().getPoi(0).point; //获取第一个智能搜索的结果
+              map.centerAndZoom(pp, 18);
+              let myIcon = new BMap.Icon(
+                address_location,
+                new BMap.Size(85, 48)
+              );
+              map.addOverlay(new BMap.Marker(pp, { icon: myIcon })); //添加标注
+            }
+            let local = new BMap.LocalSearch(map, {
+              //智能搜索
+              onSearchComplete: myFun,
+            });
+            local.search(myValue);
+          }
+          /*----end -----*/
+
           map.setMapStyleV2({ styleJson: custom_map_config });
           let markers = [];
           let pointArray = [];
+          let hitArray = []; // hitArry
           let opts = {
             width: 250,
             height: 80,
@@ -310,6 +444,14 @@ export default {
             addClickHandler(content, marker);
             markers.push(marker);
             pointArray.push(point);
+            if (item.temperature >= 37.3) {
+              let hitObj = {
+                lng: item.longitude,
+                lat: item.latitude,
+                count: item.temperature * 100,
+              };
+              hitArray.push(hitObj);
+            }
           });
           online(status); // 统计表 比例
           loading.value = false;
@@ -328,7 +470,6 @@ export default {
             map.openInfoWindow(infoWindow, point); //开启信息窗口
           }
           //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
-          map.setViewport(pointArray);
           let markerClusterer = new BMapLib.MarkerClusterer(map, {
             markers: markers,
             minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
@@ -339,9 +480,86 @@ export default {
               },
             ],
           });
+          map.setViewport(pointArray);
+          /*----------热力图 login---------*/
+          var points = hitArray;
+
+          if (!isSupportCanvas()) {
+            alert(
+              "热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~"
+            );
+          }
+          //详细的参数,可以查看heatmap.js的文档 https://github.com/pa7/heatmap.js/blob/master/README.md
+          //参数说明如下:
+          /* visible 热力图是否显示,默认为true
+          * opacity 热力的透明度,1-100
+          * radius 势力图的每个点的半径大小   
+          * gradient  {JSON} 热力图的渐变区间 . gradient如下所示
+          *	{
+            .2:'rgb(0, 255, 255)',
+            .5:'rgb(0, 110, 255)',
+            .8:'rgb(100, 0, 255)'
+          }
+          其中 key 表示插值的位置, 0~1. 
+              value 为颜色值. 
+          */
+          let heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
+          map.addOverlay(heatmapOverlay);
+          heatmapOverlay.setDataSet({ data: points, max: 1000 });
+          //是否显示热力图
+          function openHeatmap() {
+            // map.clearOverlays();
+            heatmapOverlay.show();
+            markers.forEach((item) => {
+              item.hide();
+            });
+            loading.value = false;
+          }
+          window.openHeatmap = openHeatmap;
+          function closeHeatmap() {
+            //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
+            let markerClusterer = new BMapLib.MarkerClusterer(map, {
+              markers: markers,
+              minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
+              styles: [
+                {
+                  url: pointAggre,
+                  size: new BMap.Size(48, 48),
+                },
+              ],
+            });
+            heatmapOverlay.hide();
+            markers.forEach((item) => {
+              item.show();
+            });
+            loading.value = false;
+          }
+          window.closeHeatmap = closeHeatmap;
+          closeHeatmap();
+          function setGradient() {
+            /*格式如下所示:
+		{
+	  		0:'rgb(102, 255, 0)',
+	 	 	.5:'rgb(255, 170, 0)',
+		  	1:'rgb(255, 0, 0)'
+		}*/
+            var gradient = {};
+            var colors = document.querySelectorAll("input[type='color']");
+            colors = [].slice.call(colors, 0);
+            colors.forEach(function (ele) {
+              gradient[ele.getAttribute("data-key")] = ele.value;
+            });
+            heatmapOverlay.setOptions({ gradient: gradient });
+          }
+          //判断浏览区是否支持canvas
+          function isSupportCanvas() {
+            var elem = document.createElement("canvas");
+            return !!(elem.getContext && elem.getContext("2d"));
+          }
+          /*----------热力图 end---------*/
         });
       });
-    };
+    })(window);
     /**
      * 在线率 online
      */
@@ -463,18 +681,132 @@ export default {
     const change_boolean = reactive({
       status: false,
     });
+    const item_active = reactive({
+      hitMap: false,
+      cutFull: false,
+      searchMeber: false,
+      searchCity: false,
+    });
+    // 搜索切换
+    const search_toggle = reactive({
+      status: false,
+      member: false,
+      city: false,
+    });
     const tool_active = () => {
       change_boolean.status = !change_boolean.status;
     };
     // 热力图
+    const hit = ref(false);
     const hitMap = () => {
-      change_boolean.status = false;
-      console.log("hit");
+      loading.value = true;
+      hit.value = !hit.value;
+      item_active.hitMap = !item_active.hitMap;
+      if (hit.value) {
+        window.openHeatmap();
+      } else {
+        window.closeHeatmap();
+      }
     };
-    // 全屏
-    const fullScreen = () => {
-      change_boolean.status = false;
-      console.log("full");
+
+    const cutFull = () => {
+      adaptionEchartsV2(systemChart);
+      adaptionEchartsV2(onlineChart);
+      adaptionEchartsV2(historyChart);
+      // systemChart.resize();
+      // onlineChart.resize();
+      item_active.cutFull = !item_active.cutFull;
+      alanysisStatus.status = !alanysisStatus.status;
+      // 切换
+      root.$store.commit("SET_FULL"); // commit 不用指向 map模块
+    };
+    // 搜索用户
+    const searchMeber = () => {
+      item_active.searchMeber = !item_active.searchMeber;
+      member.value = "";
+      // change_boolean.status = false;
+      search_toggle.city = false;
+      search_toggle.member = !search_toggle.member;
+      refs.member_search.focus();
+    };
+    // 搜索地址
+    const searchCity = () => {
+      item_active.searchCity = !item_active.searchCity;
+      address.value = "";
+      // change_boolean.status = false;
+      search_toggle.member = false;
+      search_toggle.city = !search_toggle.city;
+      refs.address_search.focus();
+    };
+
+    /**搜索
+     *
+     */
+    //搜索 地址
+    const address = ref("");
+    const restaurants = reactive([]);
+    const toogle_city = () => {
+      search_toggle.city = false;
+      search_toggle.member = true;
+      refs.member_search.focus();
+      address.value = "";
+    };
+    const city_close = () => {
+      search_toggle.city = false;
+    };
+
+    //搜索 用户
+    const member = ref("");
+    const toogle_member = () => {
+      search_toggle.member = false;
+      search_toggle.city = true;
+      refs.address_search.focus();
+      member.value = "";
+    };
+    const member_close = () => {
+      search_toggle.member = false;
+    };
+    const querySearch = (queryString, cb) => {
+      let queryObj = {
+        keyword: queryString,
+        scope: "all",
+      };
+      fuzzySearch(queryObj).then((res) => {
+        console.log(res.data.list);
+        let data = res.data.list;
+        data.forEach((item) => {
+          item.value = item.name;
+        });
+        let restaurants = data;
+        let results = queryString
+          ? restaurants.filter(createFilter(queryString))
+          : restaurants;
+        // 调用 callback 返回建议列表的数据
+        cb(results);
+      });
+    };
+    const createFilter = (queryString) => {
+      return (restaurant) => {
+        return (
+          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    };
+    const handleSelect = (item) => {
+      let id = [item.id];
+      listDeviceAlarmInfoByUserId(id).then((res) => {
+        if (res.code === 0) {
+          let lng = res.data[0].longitude;
+          let lat = res.data[0].latitude;
+          map.centerAndZoom(new BMap.Point(lng, lat), 19); // 初始化地图,设置中心点坐标和地图级别
+        }else {
+          root.$message({
+            type: 'error',
+            message: res.msg
+          });
+        }
+      });
     };
     /**
      * 生命周期函数 onMounted
@@ -489,10 +821,9 @@ export default {
         temperatureStatic: 0,
         onlineStatic: 0,
       });
-      baiduMap(); // 百度地图
+      // baiduMap(); // 百度地图
     });
     return {
-      cutFull,
       full,
       alarmData,
       alanysisStatus,
@@ -502,7 +833,21 @@ export default {
       tool_active,
       change_boolean,
       hitMap,
-      fullScreen,
+      cutFull,
+      searchMeber,
+      searchCity,
+      search_toggle,
+      member,
+      address,
+      restaurants,
+      querySearch,
+      createFilter,
+      handleSelect,
+      toogle_city,
+      city_close,
+      toogle_member,
+      member_close,
+      item_active,
     };
   },
 };
@@ -713,12 +1058,26 @@ $echartsBorder: 1px solid #146ede;
 // 工具栏
 .alanysis {
   .search_box {
-    height: 26px;
-    width: 240px;
-    background: #5090f1;
+    width: 259px;
+    height: 58px;
     position: absolute;
-    top: 12%;
+    top: 13%;
     left: 22%;
+    opacity: 1;
+    // display: none;
+    .frame_operation_dep {
+      background: #fff;
+      height: 29px;
+      color: #9e9e9e;
+      width: 8px;
+      background: #fff;
+      height: 29px;
+      line-height: 24px;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+      padding: 0;
+    }
   }
   .tool_box {
     height: 26px;
@@ -754,13 +1113,84 @@ $echartsBorder: 1px solid #146ede;
         @include webkit("box-shadow", 1px 2px 1px rgba(0, 0, 0, 0.15));
         ul {
           li:hover {
-            color: #7da4d1;
+            color: #1579f3;
           }
+        }
+        .item_active {
+          color: #1579f3;
         }
       }
     }
     .tool_right_active {
-      color: #7da4d1;
+      color: #1579f3;
+    }
+  }
+  #search_city {
+    position: absolute;
+    left: 0px;
+    top: -78px;
+    opacity: 0;
+    transition: 0.3s;
+    .city-input {
+      -webkit-appearance: none;
+      background-color: #fff;
+      background-image: none;
+      border: 1px solid #dcdfe6;
+      @include webkit("box-sizing", border-box);
+      color: #606266;
+      display: inline-block;
+      font-size: 14px;
+      height: 29px;
+      line-height: 29px;
+      outline: 0;
+      padding: 0 15px;
+      transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+      width: 183px;
+      border-right: 0;
+    }
+  }
+  .city_show {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    opacity: 1 !important;
+  }
+  #search_person {
+    position: absolute;
+    left: 0;
+    top: -78px;
+    opacity: 0;
+    transition: 0.3s;
+  }
+  .person_show {
+    position: absolute !important;
+    left: 0 !important;
+    top: -1px !important;
+    opacity: 1 !important;
+  }
+  #search_city,
+  #search_person {
+    .close_handle {
+      width: 32px;
+      height: 29px;
+      display: inline-block;
+      background: #fff;
+      vertical-align: middle;
+      text-align: center;
+      padding: 5px 5px;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+    .search_handle {
+      width: 43px;
+      height: 29px;
+      display: inline-block;
+      background: #1579f3;
+      vertical-align: middle;
+      text-align: center;
+      padding: 5px 5px;
+      box-sizing: border-box;
+      cursor: pointer;
     }
   }
 }
