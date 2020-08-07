@@ -225,3 +225,31 @@ export function batchDeleteRailUser(data) {
     url: "/rail/batchDeleteRailUser?userId=" + data
   });
 }
+
+/**
+ * 模糊搜索未分组用户
+ *
+ * @export
+ * @param {keyword: '真'}
+ * @returns
+ */
+export function fuzzySearchNotGroup(data) {
+  return service.request({
+    method: "get",
+    url: "/user/fuzzySearchNotGroup" + data,
+  });
+}
+
+/**
+ * 查询用户所属的所有部门
+ *
+ * @export
+ * @param id = 11001
+ * @returns
+ */
+export function listDepartmentByUser(data) {
+  return service.request({
+    method: "post",
+    url: "/dept/listDepartmentByUser" + data,
+  });
+}

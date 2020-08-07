@@ -30,11 +30,7 @@
                 <el-button type="text" size="mini" @click="() => append(data)">Append</el-button>
                 <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>
                 -->
-                <div
-                  class="menu_right"
-                  @click.stop="showDepartClick"
-                  v-if="memberData.total !== null"
-                >
+                <div class="menu_right" @click.stop="showDepartClick" v-if="data.hasAuthority">
                   <el-col :span="12">
                     <el-dropdown>
                       <span class="el-dropdown-link">
@@ -297,6 +293,7 @@ export default {
       corpId: "ww2e7b5f3c87c34c17",
       name: "",
       departmentManagers: null,
+      departArr: [],
       identity: "", // 身份
       corpUserId: 0,
       role: null,
@@ -321,7 +318,8 @@ export default {
           selectEmpDepRoleByEmpId(data.id).then((response) => {
             let len = response.data.length;
             response.data.forEach((item, index) => {
-              employeeInfo.departmentManagers.push(item.depName);
+              employeeInfo.departmentManagers.push(item);
+              employeeInfo.departArr.push(item.departmentId);
             });
           });
         } else {
@@ -397,7 +395,6 @@ export default {
           });
         });
     };
-
     /**
      * 查询子部门
      */
@@ -435,39 +432,69 @@ export default {
      * 查询所有部门
      */
     const selectAllDepart = () => {
-      return listAllDepartment()
-        .then((res) => {
-          let data = res.data.list ? res.data.list : res.data,
-            len = data.length;
-          if (len <= 0) {
-            root.$message({ message: "暂无部门" });
-          } else {
-            let id = data[0].id;
-            companyData.companyId = id;
-            currentDepart.topId = id;
-            departData[0].id = id;
-            let treeData = translateDataToTree(data)[0];
-            if (treeData == undefined) {
-              root.$message({
-                message: "部门信息有误",
-                type: "error",
-              });
-            } else {
-              departData[0].label = currentDepart.label = treeData.name;
-              departData[0].children = treeData.children;
-              departData[0].childrenLen = treeData.childrenLen;
-              departData[0].displayOrder = treeData.displayOrder;
-              departData[0].id = currentDepart.id = treeData.id;
-              departData[0].pid = currentDepart.pid = treeData.pid;
-            }
-          }
-          return companyData;
-        })
-        .then((res) => {
-          memberListPaging.id = companyData.companyId;
-          selectChildMember(memberListPaging);
-          loading.value = false;
-        });
+      return listAllDepartment().then((res) => {
+        let data = res.data.list ? res.data.list : res.data,
+          len = data.length;
+        if (len <= 0) {
+          root.$message({ message: "暂无部门" });
+        } else {
+          getLoginEmployee()
+            .then((res) => {
+              let code = res.code,
+                roleId = res.data.role.id;
+              if (code === 0) {
+                if (roleId === 3) {
+                  let departIdArr = [];
+                  res.data.departmentManagers.forEach((item) => {
+                    departIdArr.push(item.departmentId);
+                  });
+                  data.forEach((item) => {
+                    if (departIdArr.indexOf(item.id) != -1) {
+                      item.hasAuthority = true;
+                    } else {
+                      item.hasAuthority = false;
+                    }
+                  });
+                } else {
+                  data.forEach((item) => {
+                    item.hasAuthority = true;
+                  });
+                }
+                let id = data[0].id;
+                companyData.companyId = id;
+                currentDepart.topId = id;
+                departData[0].id = id;
+              }
+              return roleId;
+            })
+            .then((response) => {
+              let treeData = translateDataToTree(data)[0];
+              if (treeData == undefined) {
+                root.$message({
+                  message: "部门信息有误",
+                  type: "error",
+                });
+              } else {
+                departData[0].label = currentDepart.label = treeData.name;
+                departData[0].children = treeData.children;
+                departData[0].childrenLen = treeData.childrenLen;
+                departData[0].displayOrder = treeData.displayOrder;
+                departData[0].id = currentDepart.id = treeData.id;
+                departData[0].pid = currentDepart.pid = treeData.pid;
+                if (response !== 3) {
+                  departData[0].hasAuthority = true;
+                } else {
+                  departData[0].hasAuthority = false;
+                }
+              }
+            })
+            .then((res) => {
+              memberListPaging.id = companyData.companyId;
+              selectChildMember(memberListPaging);
+              loading.value = false;
+            });
+        }
+      });
     };
     selectAllDepart();
 
