@@ -275,13 +275,10 @@ export default {
     /**
      * 百度地图方法
      */
-    Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
-      let map = new BMap.Map("mapShow"); // 创建Map实例
-    });
     ((window) => {
       // lng = null, lat = null, hit = false
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
-        let map = new BMap.Map("mapShow"); // 创建Map实例
+        let map = new BMap.Map("mapShow", { minZoom: 4, maxZoom: 18 }); // 创建Map实例
         // 添加地图类型控件
         // map.addControl(
         //   new BMap.MapTypeControl({
@@ -503,31 +500,32 @@ export default {
           其中 key 表示插值的位置, 0~1. 
               value 为颜色值. 
           */
+
           let heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
-          map.addOverlay(heatmapOverlay);
-          heatmapOverlay.setDataSet({ data: points, max: 1000 });
+            map.addOverlay(heatmapOverlay);
+            heatmapOverlay.setDataSet({ data: points, max: 1000 });
           //是否显示热力图
           function openHeatmap() {
             // map.clearOverlays();
-            heatmapOverlay.show();
             markers.forEach((item) => {
               item.hide();
             });
+            heatmapOverlay.show();
             loading.value = false;
           }
           window.openHeatmap = openHeatmap;
           function closeHeatmap() {
             //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
-            let markerClusterer = new BMapLib.MarkerClusterer(map, {
-              markers: markers,
-              minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
-              styles: [
-                {
-                  url: pointAggre,
-                  size: new BMap.Size(48, 48),
-                },
-              ],
-            });
+            // let markerClusterer = new BMapLib.MarkerClusterer(map, {
+            //   markers: markers,
+            //   minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
+            //   styles: [
+            //     {
+            //       url: pointAggre,
+            //       size: new BMap.Size(48, 48),
+            //     },
+            //   ],
+            // });
             heatmapOverlay.hide();
             markers.forEach((item) => {
               item.show();
@@ -800,10 +798,10 @@ export default {
           let lng = res.data[0].longitude;
           let lat = res.data[0].latitude;
           map.centerAndZoom(new BMap.Point(lng, lat), 19); // 初始化地图,设置中心点坐标和地图级别
-        }else {
+        } else {
           root.$message({
-            type: 'error',
-            message: res.msg
+            type: "error",
+            message: res.msg,
           });
         }
       });
