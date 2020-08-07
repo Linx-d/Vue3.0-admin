@@ -1,3 +1,4 @@
+// 图表自适应
 var EleResize = {
   _handleResize: function (e) {
     var ele = e.target || e.srcElement

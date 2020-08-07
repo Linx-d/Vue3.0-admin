@@ -491,43 +491,7 @@ $mainWidth: 80%;
     float: left;
     padding-top: 9px;
   }
-  .departManagers {
-    width: 80%;
-    text-overflow: ellipsis;
-    width: $mainWidth;
-    height: 100%;
-    font-size: 14px;
-    color: rgb(0, 0, 0);
-    float: right;
-  }
 }
-.departContent {
-  display: inline-block;
-}
-.depart_item {
-  border: 1px solid #ddd;
-  height: 30px;
-  line-height: 20px;
-  width: 67px;
-  margin-right: 10px;
-  color: #000;
-  padding: 5px;
-  box-sizing: border-box;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: inline-block;
-  @include webkit("box-sizing", border-box);
-  span {
-    font-size: 12px;
-    margin-left: 5px;
-  }
-}
-.item_margin-bottom {
-  margin-bottom: 1px;
-}
-.depart_item:hover {
-  background: #f0f0f0;
-}
+
+
 </style>

@@ -16,7 +16,12 @@
       <div class="info_head">
         <div class="info_head_l">
           <!-- <svg-icon iconClass="info" class="info_svg"></svg-icon> -->
-          <el-image style="height: 70px; width: 70px;" :src="currentMemberInfo.photo" :fit="fit" class="info_svg"></el-image>
+          <el-image
+            style="height: 70px; width: 70px;"
+            :src="currentMemberInfo.photo"
+            :fit="fit"
+            class="info_svg"
+          ></el-image>
         </div>
         <div class="info_head_r">
           <p>
@@ -64,7 +69,10 @@
         </div>
         <div
           :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
-        >{{ currentMemberInfo.temperature }}<span v-show="currentMemberInfo.temperature!='暂无数据'">°C</span></div>
+        >
+          {{ currentMemberInfo.temperature }}
+          <span v-show="currentMemberInfo.temperature!='暂无数据'">°C</span>
+        </div>
       </div>
       <div id="info_personal" class="info_module">
         <ul>
@@ -88,6 +96,21 @@
             <i v-if="tmpHistory.railName" class="railText">{{ tmpHistory.railName }}</i>
             <strong v-if="!tmpHistory.railName" class="modifyInfoBtn" @click="addRail">添加</strong>
             <strong v-else class="modifyInfoBtn" @click="unBindOpen">解绑围栏</strong>
+          </li>
+          <li class="departManagersBoxAll">
+            <span>部门：</span>
+            <div class="departManagers">
+              <div
+                v-for="depart in currentMemberInfo.listDepart"
+                :key="depart.id"
+                class="departContent"
+              >
+                <div class="depart_item item_margin-bottom" :title="depart">
+                  <svg-icon iconClass="depart" class="departSvg"></svg-icon>
+                  <span>{{ depart }}</span>
+                </div>
+              </div>
+            </div>
           </li>
           <li>
             <span>体温告警：</span>
@@ -731,6 +754,14 @@ $contactsHeight: 592px;
         top: -3px;
         left: 3px;
         cursor: pointer;
+      }
+    }
+    .departManagersBoxAll {
+      overflow: auto;
+      line-height: 32px;
+      margin-bottom: 0 !important;
+      .departManagers {
+        width: 92%;
       }
     }
   }

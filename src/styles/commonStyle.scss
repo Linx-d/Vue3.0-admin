@@ -237,9 +237,11 @@ tbody {
   left: 0;
   padding-top: 24px;
   margin-bottom: -150px;
+
   p:first-child {
     font-size: 20px;
   }
+
   .frame_cnt {
     padding: 40px 60px;
     line-height: 1.57;
@@ -273,4 +275,50 @@ b {
   height: 10px;
   width: 8px;
   padding: 0 6px;
+}
+
+/**部门
+ *
+ */
+.departManagers {
+  width: 80%;
+  text-overflow: ellipsis;
+  height: 100%;
+  font-size: 14px;
+  color: rgb(0, 0, 0);
+  float: right;
+
+  .departContent {
+    display: inline-block;
+
+    .depart_item {
+      border: 1px solid #ddd;
+      height: 30px;
+      line-height: 20px;
+      width: 67px;
+      margin-right: 10px;
+      color: #000;
+      padding: 5px;
+      box-sizing: border-box;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      @include webkit("box-sizing", border-box);
+
+      span {
+        font-size: 12px;
+        margin-left: 5px;
+      }
+    }
+
+    .item_margin-bottom {
+      margin-bottom: 1px;
+    }
+
+    .depart_item:hover {
+      background: #f0f0f0;
+    }
+  }
 }

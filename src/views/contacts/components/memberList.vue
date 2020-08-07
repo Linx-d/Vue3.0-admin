@@ -84,21 +84,27 @@
         </div>
       </div>
     </div>
-    <el-dialog title="未分组成员" :visible.sync="dialogTableVisible.status">
+    <el-dialog id="nodepart_dialog" title="未分组成员" :visible.sync="dialogTableVisible.status">
+      <el-input placeholder="请输入名字或电话" v-model="nodepart_input.txt" @input="nodepart_fn" clearable>
+        <i slot="prefix" class="el-input__icon el-icon-search"></i>
+      </el-input>
       <el-table
         ref="multipleTable"
+        v-loading="addNodepart_loading"
         :data="ungrouped.data"
         tooltip-effect="dark"
         style="width: 100%;"
         height="300px"
         @selection-change="handleSelectionChange"
+        :row-class-name="tableRowClassName"
         @scroll="tableScroll"
         class="addScroll"
       >
-        <el-table-column type="selection" width="70"></el-table-column>
+        <el-table-column type="selection" width="45"></el-table-column>
         <el-table-column label="姓名" width="150">
           <template slot-scope="scope">{{ scope.row.name }}</template>
         </el-table-column>
+        <el-table-column prop="temperature" label="体温" width="60"></el-table-column>
         <el-table-column prop="tel" label="电话" width="150"></el-table-column>
         <el-table-column prop="address" label="地址" show-overflow-tooltip></el-table-column>
       </el-table>
@@ -110,7 +116,7 @@
   </div>
 </template>
 <script>
-import { onMounted, reactive, watchEffect } from "@vue/composition-api";
+import { onMounted, ref, reactive, watchEffect } from "@vue/composition-api";
 import { switchModule } from "@/utils/common";
 import {
   listUserLocationById,
@@ -119,6 +125,8 @@ import {
   listUserByDepartment,
   listUserByNoDepartment,
   addMember,
+  fuzzySearchNotGroup,
+  listDepartmentByUser,
 } from "@/api/contactsApi";
 import { Message } from "element-ui";
 import { cloneArray } from "@/utils/common";
@@ -201,6 +209,18 @@ export default {
       for (let key in currentMemberInfo) {
         currentMemberInfo[key] = data[key];
       }
+      /**
+       * 查询用户所属的所有部门
+       */
+      let selectId_str = "?id=" + data.userId;
+      listDepartmentByUser(selectId_str).then((res) => {
+        let listData = res.data;
+        currentMemberInfo.listDepart = [];
+        listData.forEach((item) => {
+          currentMemberInfo.listDepart.push(item.name);
+        });
+        console.log(currentMemberInfo.listDepart)
+      });
       let tmpHistory = props.tmpHistory;
       /**根据用户id获取历史数据信息 */
       let currentObj = {
@@ -243,7 +263,6 @@ export default {
       listDeviceAlarmInfoByUserId(currentArray).then((res) => {
         let data = res.data[0] ? res.data[0] : [];
         props.tmpHistory.railName = data.railName;
-        console.log(data);
         for (let key in data) {
           if (key == "age") {
             let newDate = new Date().getTime();
@@ -285,22 +304,29 @@ export default {
       data: [],
     });
     const addMemberBtn = () => {
+      nodepart_input.txt = "";
       ungrouped.pageNum = 1;
       ungrouped.data.splice(0, ungrouped.data.length);
       dialogTableVisible.status = true;
       noDepart(ungrouped.pageNum, ungrouped.pageSize);
     };
     const noDepart = (pageNum, pageSize) => {
+      addNodepart_loading.value = true;
       listUserByNoDepartment(pageNum, pageSize).then((res) => {
-        let data = res.data.list ? res.data.list : res.data,
-          len = data.length;
-        if (len !== 0) {
-          data.forEach((item) => {
-            ungrouped.data.push(item);
-          });
+        if (res.code === 0) {
+          let data = res.data.list ? res.data.list : res.data,
+            len = data.length;
+          if (len !== 0) {
+            data.forEach((item) => {
+              ungrouped.data.push(item);
+            });
+            addNodepart_loading.value = false;
+          } else {
+            //暂无为分组用户
+            return;
+          }
         } else {
-          //暂无为分组用户
-          return;
+          ungrouped.data = [];
         }
       });
     };
@@ -309,6 +335,38 @@ export default {
         addMemberOpen();
       } else {
         root.$message({ type: "warning", message: "请选择用户在添加" });
+      }
+    };
+    /** 搜索未分组用户输入框
+     *
+     */
+    const nodepart_input = reactive({
+      txt: "",
+    });
+    const addNodepart_loading = ref("true");
+    const nodepart_fn = () => {
+      let txt = nodepart_input.txt;
+      let params = "?keyword=" + txt;
+      addNodepart_loading.value = true;
+      if (txt.length === 0) {
+        ungrouped.data = [];
+        noDepart(ungrouped.pageNum, ungrouped.pageSize);
+        addNodepart_loading.value = false;
+      } else {
+        fuzzySearchNotGroup(params).then((res) => {
+          if (res.code === 0) {
+            let data = res.data || [],
+              len = data.length;
+            ungrouped.data = res.data;
+            addNodepart_loading.value = false;
+          } else {
+            root.$message({
+              type: "error",
+              message: res.msg,
+            });
+            addNodepart_loading.value = false;
+          }
+        });
       }
     };
 
@@ -431,12 +489,14 @@ export default {
         });
     };
     const tableScroll = () => {
-      let tableHeight = refs.multipleTable.bodyWrapper.offsetHeight;
-      let tableScrollTop = refs.multipleTable.bodyWrapper.scrollTop;
-      let tableScrollHeight = refs.multipleTable.bodyWrapper.scrollHeight;
-      if (tableScrollHeight - tableScrollTop <= tableHeight) {
-        ungrouped.pageNum++;
-        noDepart(ungrouped.pageNum, ungrouped.pageSize);
+      if (dialogTableVisible.status) {
+        let tableHeight = refs.multipleTable.bodyWrapper.offsetHeight;
+        let tableScrollTop = refs.multipleTable.bodyWrapper.scrollTop;
+        let tableScrollHeight = refs.multipleTable.bodyWrapper.scrollHeight;
+        if (tableScrollHeight - tableScrollTop <= tableHeight) {
+          ungrouped.pageNum++;
+          noDepart(ungrouped.pageNum, ungrouped.pageSize);
+        }
       }
     };
     window.addEventListener("scroll", tableScroll, true);
@@ -500,6 +560,14 @@ export default {
           });
         });
     };
+    // 异常状态表格
+    const tableRowClassName = ({ row, rowIndex }) => {
+      let temperature = parseFloat(row.temperature);
+      if (temperature >= 37.3) {
+        return "warning-row";
+      }
+      return "";
+    };
 
     onMounted(() => {});
     return {
@@ -513,9 +581,13 @@ export default {
       ungrouped,
       toggleSelection,
       handleSelectionChange,
+      tableRowClassName,
       dialogTableVisible,
       addMemberList,
       tableScroll,
+      nodepart_input,
+      nodepart_fn,
+      addNodepart_loading,
     };
   },
 };

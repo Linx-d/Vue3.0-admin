@@ -27,11 +27,11 @@ export default {
         path: "#/privacy",
         text: "隐私政策",
       },
-      {
-        name: "updateLog",
-        path: "#/updateLog",
-        text: "更新日志",
-      },
+      // {
+      //   name: "updateLog",
+      //   path: "#/updateLog",
+      //   text: "更新日志",
+      // },
     ]);
     return { links };
   },
