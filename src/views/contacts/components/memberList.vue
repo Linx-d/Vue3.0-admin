@@ -212,14 +212,15 @@ export default {
       /**
        * 查询用户所属的所有部门
        */
-      let selectId_str = "?id=" + data.userId;
-      listDepartmentByUser(selectId_str).then((res) => {
+      let selectId = {
+        id: data.userId,
+      };
+      listDepartmentByUser(selectId).then((res) => {
         let listData = res.data;
         currentMemberInfo.listDepart = [];
         listData.forEach((item) => {
           currentMemberInfo.listDepart.push(item.name);
         });
-        console.log(currentMemberInfo.listDepart)
       });
       let tmpHistory = props.tmpHistory;
       /**根据用户id获取历史数据信息 */

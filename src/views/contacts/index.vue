@@ -3,7 +3,7 @@
     <div class="contacts_main frame_center_main" v-loading="loading">
       <div class="chunk_title">
         <div class="chunk_title_top">
-          <el-input class="search" placeholder="搜索部门" v-model="filterText" @input="search_input"></el-input>
+          <el-input class="search" placeholder="搜索成员、部门" v-model="filterText" @input="search_input"></el-input>
           <a href="javascript:;" class="addChildMember" v-show="false">
             <i>+</i>
           </a>
@@ -12,22 +12,17 @@
           <div class="searchResult_member" v-if="searchResult_isShow.status">
             <h1>用户</h1>
             <ul>
-              <li>
+              <li
+                v-for="(item, index) in searchResult_list.data"
+                :key="item.id"
+                @click="searchItem_active_fn(index)"
+              >
                 <a href="javascript:;">
-                  <span class="searchResult_title_peopleName">用户1</span>
-                  <span class="searchResult_title_peopleDepartment" title="测试1;测试2;测试3">测试1;测试2;测试3</span>
-                </a>
-              </li>
-              <li>
-                <a href="javascript:;">
-                  <span class="searchResult_title_peopleName">用户1</span>
-                  <span class="searchResult_title_peopleDepartment" title="测试1;测试2;测试3">测试1;测试2;测试3</span>
-                </a>
-              </li>
-              <li>
-                <a href="javascript:;">
-                  <span class="searchResult_title_peopleName">用户1</span>
-                  <span class="searchResult_title_peopleDepartment" title="测试1;测试2;测试3">测试1;测试2;测试3</span>
+                  <span class="searchResult_title_peopleName" :title="item.name">{{item.name}}</span>
+                  <span
+                    class="searchResult_title_peopleDepartment"
+                    :title="item.departMentStr"
+                  >{{ item.departMentStr }}</span>
                 </a>
               </li>
             </ul>
@@ -44,7 +39,7 @@
             @node-click="handleNodeClick"
             :expand-on-click-node="false"
             default-expand-all
-            :highlight-current="true"
+            :highlight-current="searchResult_list.status"
             ref="tree"
           >
             <span :class="['custom-tree-node']" slot-scope="{ node, data }">
@@ -193,6 +188,9 @@ import {
   listDepartmentByPid,
   getMaxDepartmentId,
   fuzzySearch,
+  listDeviceAlarmInfoByUserId,
+  listUserLocationById,
+  listDepartmentByUser,
 } from "@/api/contactsApi";
 import { getLoginEmployee, selectEmpDepRoleByEmpId } from "@/api/employeeApi";
 import { translateDataToTree, switchModule } from "@/utils/common";
@@ -562,6 +560,8 @@ export default {
      * departData 点击事件
      */
     const handleNodeClick = (data) => {
+      // 选中节点高亮显示
+      searchResult_list.status = true;
       // 当前部门信息
       let id = data.id;
       currentDepart.label = data.label;
@@ -585,6 +585,105 @@ export default {
     const searchResult_isShow = reactive({
       status: false,
     });
+    const searchResult_list = reactive({
+      data: [],
+      status: false,
+    });
+    const searchItem_active_fn = (index) => {
+      // 设置tree节点不高亮显示
+      searchResult_list.status = false;
+      // 激活样式
+      searchResult_list.data.forEach((item, itemIndex) => {
+        if (itemIndex === index) {
+          item.active = true;
+          let userId = parseInt(item.id);
+
+          /**
+           * 查询用户所属的所有部门
+           */
+          let selectId = {
+            id: userId,
+          };
+          listDepartmentByUser(selectId).then((res) => {
+            let listData = res.data;
+            currentMemberInfo.listDepart = [];
+            listData.forEach((item) => {
+              currentMemberInfo.listDepart.push(item.name);
+            });
+          });
+
+          /**根据用户id获取历史数据信息 */
+          let currentObj = {
+            userId: userId,
+          };
+          listUserLocationById(currentObj).then((res) => {
+            let array = res.data.list ? res.data.list : res.data; // 服务器与local切换
+            let newArr_time = [],
+              newArr_tmp = [],
+              newArr_position = [],
+              new_tableData = [];
+            array.forEach((item) => {
+              // temperature
+              newArr_time.push(item.gmtCreate);
+              let temperature = Number(item.temperature).toFixed(1);
+              newArr_tmp.push(temperature); //Number().toFiexd(1)
+
+              // position
+              let positionObj = {
+                lng: item.longitude,
+                lat: item.latitude,
+              };
+              newArr_position.push(positionObj);
+
+              // tableData
+              let tableObj = {
+                name: currentMemberInfo.name,
+                time: item.gmtCreate,
+                temperature: temperature,
+              };
+              new_tableData.push(tableObj);
+            });
+            tmpHistory.newArr_time = newArr_time;
+            tmpHistory.newArr_tmp = newArr_tmp;
+            tmpHistory.newArr_position = newArr_position;
+            tmpHistory.tableData = new_tableData.reverse();
+          });
+
+          /**根据用户id获取设备最新数据和告警信息 */
+          let currentArray = [userId];
+          listDeviceAlarmInfoByUserId(currentArray).then((res) => {
+            let data = res.data[0] ? res.data[0] : [];
+            tmpHistory.railName = data.railName;
+            for (let key in data) {
+              if (key == "age") {
+                let newDate = new Date().getTime();
+                let date = new Date(data[key]).getTime();
+                let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+                let age = parseInt((newDate - date) / oneDay);
+                currentMemberInfo[key] = age;
+              } else {
+                currentMemberInfo[key] = data[key];
+              }
+            }
+            for (let key in currentMemberInfo) {
+              if (key === "railName") {
+                continue;
+              }
+              let verify =
+                currentMemberInfo[key] === null ||
+                currentMemberInfo[key] === undefined ||
+                currentMemberInfo[key] === ""; // 验证值是否为空
+              if (verify) {
+                currentMemberInfo[key] = "暂无数据";
+              }
+            }
+          });
+        } else {
+          item.active = false;
+        }
+      });
+      switchModule(contactsModule, "memberInfo");
+    };
     const search_input = () => {
       let txt = filterText.value,
         len = txt.length;
@@ -598,7 +697,11 @@ export default {
             code = res.code;
           if (code === 0) {
             if (list.length > 0) {
-              console.log(list, 'list');
+              list.forEach((item) => {
+                item.departMentStr = item.departmentList.join(";");
+                item.active = false;
+              });
+              searchResult_list.data = list;
               searchResult_isShow.status = true;
             } else {
               searchResult_isShow.status = false;
@@ -894,6 +997,8 @@ export default {
       treeData,
       search_input,
       searchResult_isShow,
+      searchResult_list,
+      searchItem_active_fn,
       //dialog
       dialogFormVisible,
       form,
@@ -992,6 +1097,8 @@ $contactsHeight: 592px;
         .searchResult_member {
           margin-bottom: 10px;
           ul {
+            max-height: 300px;
+            overflow: auto;
             li {
               a {
                 height: 26px;
@@ -1007,7 +1114,7 @@ $contactsHeight: 592px;
                 background: #f2f2f2;
               }
               a:focus {
-                background: #0c4c7f;
+                background: #3a6291;
                 color: #fff;
                 .searchResult_title_peopleDepartment {
                   color: #fff;
@@ -1017,14 +1124,26 @@ $contactsHeight: 592px;
                 width: 50%;
                 float: left;
                 color: inherit;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
               .searchResult_title_peopleDepartment {
                 width: 50%;
                 float: left;
                 color: #7e7e7e;
                 display: block;
-                overflow: hidden;
                 text-align: right;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+            }
+            .searchItem_active {
+              background: #0c4c7f;
+              color: #fff;
+              .searchResult_title_peopleDepartment {
+                color: #fff;
               }
             }
           }

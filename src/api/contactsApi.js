@@ -264,6 +264,6 @@ export function fuzzySearch(data) {
 export function listDepartmentByUser(data) {
   return service.request({
     method: "post",
-    url: "/dept/listDepartmentByUser" + data,
+    url: "/dept/listDepartmentByUser?id=" + data.id,
   });
 }
