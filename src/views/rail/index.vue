@@ -249,7 +249,7 @@ export default {
       ],
       railAddr: [
         { required: true, message: "请设置围栏地址" },
-        { min: 1, max: 25, message: "长度在 1 到 25 个字符" },
+        { min: 1, max: 50, message: "长度在 1 到 50 个字符" },
       ],
       radius: [{ required: true, message: "请在地图中选取设置围栏半径" }],
     });
