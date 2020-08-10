@@ -16,6 +16,16 @@ Vue.config.productionTip = false
 import echarts from "echarts"
 Vue.prototype.$echarts = echarts
 
+
+// 设置登录人员信息
+import { getLoginEmployee } from "@/api/employeeApi";
+if (!sessionStorage.getItem("adminInfo")) {
+  getLoginEmployee().then((res) => {
+    let data = JSON.stringify(res);
+    sessionStorage.setItem("adminInfo", data);
+  });
+}
+
 new Vue({
   router,
   store,
