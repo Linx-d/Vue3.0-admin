@@ -47,17 +47,17 @@
           <template slot="title">
             <span>{{ role.name }}</span>
           </template>
-            <el-menu-item
-              v-for="employee in role.employees"
-              :index="index + '-' + employee.id"
-              :key="employee.id"
-              :value="employee.id"
-              :unique-opened="true"
-              @click="choose(employee.id)"
-            >
-                <svg-icon iconClass="people" class="peopleSvg"></svg-icon>
-                <span v-html="employee.name">{{ employee.name }}</span>
-            </el-menu-item>
+          <el-menu-item
+            v-for="employee in role.employees"
+            :index="index + '-' + employee.id"
+            :key="employee.id"
+            :value="employee.id"
+            :unique-opened="true"
+            @click="choose(employee.id)"
+          >
+            <svg-icon iconClass="people" class="peopleSvg"></svg-icon>
+            <span v-html="employee.name">{{ employee.name }}</span>
+          </el-menu-item>
         </el-submenu>
       </el-menu>
     </div>
@@ -69,7 +69,6 @@
           @click="edit()"
           v-if="!isEdit&&employee.role.id!=1"
         >编辑管理员</a>
-        <!-- &&(loginInfo.role.id==1||loginInfo.role.id==2) -->
         <a
           href="javascript:;"
           class="memberLink"
@@ -82,14 +81,14 @@
       </div>
       <el-form label-width="120px" style="position: relative;">
         <div class="group">
-            <el-form-item label="管理员姓名">
-              <label class="label-info" v-html="employee.name"></label>
-            </el-form-item>
-            <el-form-item label="联系电话">
-              <label class="label-info">{{employee.tel}}</label>
-            </el-form-item>
+          <el-form-item label="管理员姓名">
+            <label class="label-info" v-html="employee.name"></label>
+          </el-form-item>
+          <el-form-item label="联系电话">
+            <label class="label-info">{{employee.tel}}</label>
+          </el-form-item>
         </div>
-        
+
         <!-- <span
           style="height: 1px;
           width: 100%;
@@ -99,56 +98,56 @@
           left: 0;"
         ></span>-->
         <div class="group">
-        <el-form-item label="管理权限" v-if="!isEdit">
-          <label class="label-info">{{employee.role.name}}</label>
-        </el-form-item>
-        <el-form-item label="管理权限" v-else>
-          <el-radio-group v-model="roleId">
-            <el-radio label="2" style="margin-right:20px;">普通管理员</el-radio>
-            <el-radio label="3">部门管理员</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="管理范围">
-          <template v-if="roleId==3">
-            <div
-              class="department-icon"
-              style="width:50px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"
-              :title="department.label"
-              v-for="department in employee.departments"
-              :key="department.id"
-            >
-              <svg-icon iconClass="depart" class="departSvg"></svg-icon>
-              <label class="label-info">{{department.label}}</label>
-            </div>
-            <br />
-            <div class="department-icon" v-if="isEdit" @click="showDepartments">
-              <i class="el-icon-edit icon"></i>
-              <label class="label-info">编辑</label>
-            </div>
-            <el-dialog
-              title="提示"
-              :visible.sync="dialogVisible"
-              width="640px"
-              center
-              v-if="employee.role.id!=1"
-            >
-              <span>
-                <el-transfer v-model="departmentList" :data="allDepartment"></el-transfer>
-              </span>
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="chooseDepartments(departmentList)">完 成</el-button>
-              </span>
-            </el-dialog>
-          </template>
-          <template v-else>
-            <label class="label-info">所有部门</label>
-          </template>
-        </el-form-item>
+          <el-form-item label="管理权限" v-if="!isEdit">
+            <label class="label-info">{{employee.role.name}}</label>
+          </el-form-item>
+          <el-form-item label="管理权限" v-else>
+            <el-radio-group v-model="roleId">
+              <el-radio label="2" style="margin-right:20px;">普通管理员</el-radio>
+              <el-radio label="3">部门管理员</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="管理范围">
+            <template v-if="roleId==3">
+              <div
+                class="department-icon"
+                style="width:50px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"
+                :title="department.label"
+                v-for="department in employee.departments"
+                :key="department.id"
+              >
+                <svg-icon iconClass="depart" class="departSvg"></svg-icon>
+                <label class="label-info">{{department.label}}</label>
+              </div>
+              <br />
+              <div class="department-icon" v-if="isEdit" @click="showDepartments">
+                <i class="el-icon-edit icon"></i>
+                <label class="label-info">编辑</label>
+              </div>
+              <el-dialog
+                title="提示"
+                :visible.sync="dialogVisible"
+                width="640px"
+                center
+                v-if="employee.role.id!=1"
+              >
+                <span>
+                  <el-transfer v-model="departmentList" :data="allDepartment"></el-transfer>
+                </span>
+                <span slot="footer" class="dialog-footer">
+                  <el-button @click="chooseDepartments(departmentList)">完 成</el-button>
+                </span>
+              </el-dialog>
+            </template>
+            <template v-else>
+              <label class="label-info">所有部门</label>
+            </template>
+          </el-form-item>
         </div>
         <div class="group-tail">
-        <el-form-item label="注册时间">
-          <label class="label-info">{{employee.gmtCreate}}</label>
-        </el-form-item>
+          <el-form-item label="注册时间">
+            <label class="label-info">{{employee.gmtCreate}}</label>
+          </el-form-item>
         </div>
         <el-form-item>
           <template v-if="isEdit">
@@ -173,7 +172,7 @@ import {
   listAllDepartment,
   editAdmin,
   editEmployee,
-  listNotRoleEmployee
+  listNotRoleEmployee,
 } from "@/api/employeeApi";
 import { all } from "cookie_js";
 export default {
@@ -187,7 +186,7 @@ export default {
     /**
      * 当前登录用户
      */
-    let loginInfo = root.$store.state.corporation.adminInfo;
+    let loginInfo = reactive(JSON.parse(sessionStorage.getItem("adminInfo")));
     /**
      * 部门列表窗口
      */
@@ -201,7 +200,7 @@ export default {
      */
     let pageInfo = reactive({
       pageNum: 1,
-      pageSize: 50
+      pageSize: 50,
     });
     /**
      * 修改后的role
@@ -221,16 +220,16 @@ export default {
     let allDepartment = reactive([
       {
         key: 1,
-        label: `备选项 1`
+        label: `备选项 1`,
       },
       {
         key: 2,
-        label: `备选项2`
+        label: `备选项2`,
       },
       {
         key: 3,
-        label: `备选项 3`
-      }
+        label: `备选项 3`,
+      },
     ]);
     /**
      * 员工集合
@@ -244,9 +243,9 @@ export default {
       pageSize: 5,
       list: [
         {
-          id: null
-        }
-      ]
+          id: null,
+        },
+      ],
     });
 
     /**
@@ -257,19 +256,18 @@ export default {
       name: "123",
       role: {
         id: 1,
-        name: "role"
+        name: "role",
       },
       tel: "",
-      gmtCreate: ""
+      gmtCreate: "",
     });
     // -------------------------------------变量-------------------------------------------
 
-    console.log(loginInfo,"login");
     /**
      * 查询所有员工
      */
-    const queryEmployees = pageInfo => {
-      listEmployee(pageInfo).then(res => {
+    const queryEmployees = (pageInfo) => {
+      listEmployee(pageInfo).then((res) => {
         employees.list = reactive(res.data.list);
       });
     };
@@ -280,15 +278,15 @@ export default {
 
     const queryAllDepartment = () => {
       allDepartment.splice(0, allDepartment.length);
-      listAllDepartment().then(res => {
+      listAllDepartment().then((res) => {
         if (res.code == 0) {
           let data = res.data.list;
           let existDepartments = employee.departments;
-          data.forEach(department => {
+          data.forEach((department) => {
             if (department.pid != null && department.pid != 0) {
               let dept = {
                 key: department.id.toString(),
-                label: department.name
+                label: department.name,
               };
               allDepartment.push(dept);
             }
@@ -301,21 +299,21 @@ export default {
      * 查询所有角色及拥有该角色的员工
      */
     const queryAllRole = () => {
-      const that =  this;
+      const that = this;
       roleList.splice(0, roleList.length);
       employee.id = null;
       listAllRole()
-        .then(res => {
+        .then((res) => {
           return res.data;
         })
-        .then(data => {
+        .then((data) => {
           for (const key in data) {
             if (data.hasOwnProperty(key)) {
               const item = data[key];
               roleList.push(item);
-              listEmployeeByRole(item.id).then(res => {
-                item.employees = res.data.list; 
-                roleList.splice(key,1,item);
+              listEmployeeByRole(item.id).then((res) => {
+                item.employees = res.data.list;
+                roleList.splice(key, 1, item);
               });
             }
           }
@@ -326,71 +324,79 @@ export default {
      * 切换为修改界面
      */
     const edit = () => {
-      isEdit.value = !isEdit.value;
+      let authorityId = loginInfo.data.role.id;
+      if (authorityId === 3) {
+        root.$message({
+          type: "warning",
+          message: "没有访问权限",
+        });
+      } else {
+        isEdit.value = !isEdit.value;
+      }
     };
     /**
      * 选择员工 获取详情
      */
-    const choose = id => {
+    const choose = (id) => {
       departmentList.splice(0, departmentList.length);
       queryAllDepartment();
       isEdit.value = false;
       getEmployee(id)
-      .then(res => {
-        if (res.code == 0) {
-          return res.data;
-        }
-        return null;
-      })
-      .then(data => {
-        selectEmpDepRoleByEmpId(data.id).then(res => {
+        .then((res) => {
           if (res.code == 0) {
-            let departments = [];
-            res.data.forEach(p => {
-              let department = {
-                key: p.departmentId,
-                label: p.depName
-              };
-              departments.push(department);
-              allDepartment.forEach((p1, index) => {
-                if (p1.key == department.key) {
-                  departmentList.push(p1.key);
-                  // allDepartment.splice(index,1);
-                }
-              });
-            });
-            data.departments = departments;
-            let role = data.role;
-            if (data.role == null) {
-              data.role = { id: 3 };
-            }
-            roleId.value = data.role.id.toString();
-            for (const key in data) {
-              if (data.hasOwnProperty(key)) {
-                employee[key] = data[key];
-              }
-              if (key === "tel") {
-                if (data[key]) {
-                  employee[key] = data[key];
-                } else {
-                  employee[key] = "暂无";
-                }
-              }
-            }
+            return res.data;
           }
+          return null;
+        })
+        .then((data) => {
+          selectEmpDepRoleByEmpId(data.id).then((res) => {
+            if (res.code == 0) {
+              let departments = [];
+              res.data.forEach((p) => {
+                let department = {
+                  key: p.departmentId,
+                  label: p.depName,
+                };
+                departments.push(department);
+                allDepartment.forEach((p1, index) => {
+                  if (p1.key == department.key) {
+                    departmentList.push(p1.key);
+                    // allDepartment.splice(index,1);
+                  }
+                });
+              });
+              data.departments = departments;
+              let role = data.role;
+              if (data.role == null) {
+                data.role = { id: 3 };
+              }
+              roleId.value = data.role.id.toString();
+              for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                  employee[key] = data[key];
+                }
+                if (key === "tel") {
+                  if (data[key]) {
+                    employee[key] = data[key];
+                  } else {
+                    employee[key] = "暂无";
+                  }
+                }
+              }
+            }
+          });
         });
-      });
       WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
     };
 
     /**
      * 选择部门
      */
-    const chooseDepartments = arg => {
+    const chooseDepartments = (arg) => {
       departmentList = arg;
       employee.departments.splice(0, employee.departments.length);
-      departmentList.forEach(key => {
-        allDepartment.forEach(department => {
+      departmentList.forEach((key) => {
+        allDepartment.forEach((department) => {
           if (department.key == key) {
             employee.departments.push(department);
           }
@@ -421,7 +427,7 @@ export default {
       listNotRoleEmployee(
         employeesNotRole.pageNum,
         employeesNotRole.pageSize
-      ).then(res => {
+      ).then((res) => {
         if (res.code == 0) {
           let notRoleEmployees = res.data;
           cloneObjectToNull(notRoleEmployees, employeesNotRole);
@@ -439,7 +445,7 @@ export default {
     /**
      * 选择员工
      */
-    const chooseEmployee = id => {
+    const chooseEmployee = (id) => {
       if (confirm("确定将该用户添加为管理员？")) {
         dialogTableVisible.value = false;
         choose(id);
@@ -455,10 +461,10 @@ export default {
         let data = {
           id: employee.id,
           roleId: roleId.value,
-          departments: departmentList
+          departments: departmentList,
         };
         if (roleId.value == 2 || employee.role.id == 2) {
-          editAdmin(data).then(res => {
+          editAdmin(data).then((res) => {
             if (res.code == 0) {
               root.$alert("提交成功。", "成功", { confirmButtonText: "确定" });
               queryAllRole();
@@ -467,7 +473,7 @@ export default {
             }
           });
         } else {
-          editEmployee(data).then(res => {
+          editEmployee(data).then((res) => {
             if (res.code == 0) {
               root.$alert("提交成功。", "成功", { confirmButtonText: "确定" });
               queryAllRole();
@@ -483,30 +489,42 @@ export default {
      * 删除管理员
      */
     const delManager = () => {
-      if (confirm("确定删除该管理员？")) {
-        let data = {
-          id: employee.id
-        };
-        if (roleId.value == 2 || employee.role.id == 2) {
-          editAdmin(data).then(res => {
-            if (res.code == 0) {
-              root.$alert("删除成功。", "成功", { confirmButtonText: "确定" });
-              queryAllRole();
-            } else {
-              root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
-            }
-          });
-        } else {
-          editEmployee(data).then(res => {
-            if (res.code == 0) {
-              root.$alert("删除成功。", "成功", { confirmButtonText: "确定" });
-              queryAllRole();
-            } else {
-              root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
-            }
-          });
+      let authorityId = loginInfo.data.role.id;
+      if (authorityId === 3) {
+        root.$message({
+          type: "warning",
+          message: "没有访问权限",
+        });
+      } else {
+        if (confirm("确定删除该管理员？")) {
+          let data = {
+            id: employee.id,
+          };
+          if (roleId.value == 2 || employee.role.id == 2) {
+            editAdmin(data).then((res) => {
+              if (res.code == 0) {
+                root.$alert("删除成功。", "成功", {
+                  confirmButtonText: "确定",
+                });
+                queryAllRole();
+              } else {
+                root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
+              }
+            });
+          } else {
+            editEmployee(data).then((res) => {
+              if (res.code == 0) {
+                root.$alert("删除成功。", "成功", {
+                  confirmButtonText: "确定",
+                });
+                queryAllRole();
+              } else {
+                root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
+              }
+            });
+          }
+          isEdit.value = !isEdit.value;
         }
-        isEdit.value = !isEdit.value;
       }
     };
     // -------------------------企业微信--------------------------------
@@ -542,9 +560,9 @@ export default {
       delManager,
       roleId,
       loadWWOpenData,
-      loginInfo
+      loginInfo,
     };
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -648,19 +666,19 @@ $corporationHeight: 655px;
 .addBtn:hover {
   background: #ededed;
 }
-.peopleSvg{
+.peopleSvg {
   width: 1.5em;
   height: 1.5em;
   margin-right: 10px;
 }
 .group {
-    min-height: 94px;
-    border-bottom: 1px solid #e4e6e9;
-    padding: 30px 0;
+  min-height: 94px;
+  border-bottom: 1px solid #e4e6e9;
+  padding: 30px 0;
 }
-.group-tail{
-    min-height: 60px;
-    // border-bottom: 1px solid #e4e6e9;
-    padding: 30px 0;
+.group-tail {
+  min-height: 60px;
+  // border-bottom: 1px solid #e4e6e9;
+  padding: 30px 0;
 }
 </style>
