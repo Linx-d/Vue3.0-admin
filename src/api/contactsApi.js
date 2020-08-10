@@ -241,6 +241,20 @@ export function fuzzySearchNotGroup(data) {
 }
 
 /**
+ * 模糊搜索用户
+ *
+ * @export
+ * @param {keyword: '真',scope: 'all'}
+ * @returns
+ */
+export function fuzzySearch(data) {
+  return service.request({
+    method: "get",
+    url: "/user/fuzzySearch?scope=all"+"&keyword="+data.keyword,
+  });
+}
+
+/**
  * 查询用户所属的所有部门
  *
  * @export

@@ -77,6 +77,10 @@
 }
 
 // tree 节点
+.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+  background: #3A6291;
+  color: #fff;
+}
 
 /*
  * rail

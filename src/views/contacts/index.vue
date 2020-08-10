@@ -3,12 +3,38 @@
     <div class="contacts_main frame_center_main" v-loading="loading">
       <div class="chunk_title">
         <div class="chunk_title_top">
-          <el-input class="search" placeholder="搜索部门" v-model="filterText"></el-input>
+          <el-input class="search" placeholder="搜索部门" v-model="filterText" @input="search_input"></el-input>
           <a href="javascript:;" class="addChildMember" v-show="false">
             <i>+</i>
           </a>
         </div>
         <div class="chunk_title_bottom">
+          <div class="searchResult_member" v-if="searchResult_isShow.status">
+            <h1>用户</h1>
+            <ul>
+              <li>
+                <a href="javascript:;">
+                  <span class="searchResult_title_peopleName">用户1</span>
+                  <span class="searchResult_title_peopleDepartment" title="测试1;测试2;测试3">测试1;测试2;测试3</span>
+                </a>
+              </li>
+              <li>
+                <a href="javascript:;">
+                  <span class="searchResult_title_peopleName">用户1</span>
+                  <span class="searchResult_title_peopleDepartment" title="测试1;测试2;测试3">测试1;测试2;测试3</span>
+                </a>
+              </li>
+              <li>
+                <a href="javascript:;">
+                  <span class="searchResult_title_peopleName">用户1</span>
+                  <span class="searchResult_title_peopleDepartment" title="测试1;测试2;测试3">测试1;测试2;测试3</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="searchResult_depart" v-if="false">
+            <h1>部门</h1>
+          </div>
           <el-tree
             :class="['filter-tree', 'memberList']"
             :data="departData"
@@ -18,6 +44,7 @@
             @node-click="handleNodeClick"
             :expand-on-click-node="false"
             default-expand-all
+            :highlight-current="true"
             ref="tree"
           >
             <span :class="['custom-tree-node']" slot-scope="{ node, data }">
@@ -165,6 +192,7 @@ import {
   removeMember,
   listDepartmentByPid,
   getMaxDepartmentId,
+  fuzzySearch,
 } from "@/api/contactsApi";
 import { getLoginEmployee, selectEmpDepRoleByEmpId } from "@/api/employeeApi";
 import { translateDataToTree, switchModule } from "@/utils/common";
@@ -181,7 +209,7 @@ import {
 export default {
   name: "contacts",
   components: { contactsInfo, contactsList },
-  setup(props, { root, refs, set }) {
+  setup(props, { root, refs, set, nextTick }) {
     /**
      * contacts模块管理
      */
@@ -553,6 +581,39 @@ export default {
       if (!value) return true;
       return data.label.indexOf(value) !== -1;
     };
+    // 搜索部门、成员
+    const searchResult_isShow = reactive({
+      status: false,
+    });
+    const search_input = () => {
+      let txt = filterText.value,
+        len = txt.length;
+      let params = {
+        keyword: txt,
+      };
+      if (len > 0) {
+        fuzzySearch(params).then((res) => {
+          let data = res.data,
+            list = data.list,
+            code = res.code;
+          if (code === 0) {
+            if (list.length > 0) {
+              console.log(list, 'list');
+              searchResult_isShow.status = true;
+            } else {
+              searchResult_isShow.status = false;
+            }
+          } else {
+            root.$message({
+              type: "error",
+              message: res.msg,
+            });
+          }
+        });
+      } else {
+        searchResult_isShow.status = false;
+      }
+    };
 
     /**
      * 成功提示函数
@@ -831,6 +892,8 @@ export default {
       append,
       remove,
       treeData,
+      search_input,
+      searchResult_isShow,
       //dialog
       dialogFormVisible,
       form,
@@ -898,6 +961,11 @@ $contactsHeight: 592px;
       }
       .chunk_title_bottom {
         padding: 10px 0;
+        h1 {
+          font-size: 14px;
+          padding: 5px 12px;
+          color: #787878;
+        }
         .memberList {
           font-size: 14px;
         }
@@ -920,6 +988,46 @@ $contactsHeight: 592px;
           //overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+        .searchResult_member {
+          margin-bottom: 10px;
+          ul {
+            li {
+              a {
+                height: 26px;
+                font-size: 14px;
+                line-height: 26px;
+                padding: 0 12px;
+                cursor: pointer;
+                overflow: hidden;
+                display: block;
+                color: #000;
+              }
+              a:hover {
+                background: #f2f2f2;
+              }
+              a:focus {
+                background: #0c4c7f;
+                color: #fff;
+                .searchResult_title_peopleDepartment {
+                  color: #fff;
+                }
+              }
+              .searchResult_title_peopleName {
+                width: 50%;
+                float: left;
+                color: inherit;
+              }
+              .searchResult_title_peopleDepartment {
+                width: 50%;
+                float: left;
+                color: #7e7e7e;
+                display: block;
+                overflow: hidden;
+                text-align: right;
+              }
+            }
+          }
         }
       }
     }
