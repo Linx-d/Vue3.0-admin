@@ -598,6 +598,8 @@ export default {
           item.active = true;
           let userId = parseInt(item.id);
 
+          // 获得成员个人信息
+          currentMemberInfo.name = item.name;
           /**
            * 查询用户所属的所有部门
            */
