@@ -32,6 +32,14 @@
       </div>
     </div>
     <div class="info">
+      <div class="info_item_center">
+        <div class="info_item_center_a">企业ID</div>
+        <div class="info_item_center_b">{{ employeeInfo.corpId }}</div>
+      </div>
+      <div class="info_item">
+        <div class="info_item_a">管理员ID</div>
+        <div class="info_item_b">{{ employeeInfo.corpUserId }}</div>
+      </div>
       <div class="departManagersBox" v-if="employeeInfo.roleId!=3">
         <div class="departManagers_title">管理的部门</div>
         <div class="departManagers" :title="employeeInfo.departmentManagers">
@@ -39,7 +47,7 @@
         </div>
       </div>
       <div class="departManagersBoxAll" v-else>
-        <div class="departManagers_title">管理的部门</div>
+        <div class="departManagers_title">管理范围</div>
         <div class="departManagers">
           <div
             v-for="depart in employeeInfo.departmentManagers"
@@ -52,14 +60,6 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="info_item_center">
-        <div class="info_item_center_a">企业ID</div>
-        <div class="info_item_center_b">{{ employeeInfo.corpId }}</div>
-      </div>
-      <div class="info_item">
-        <div class="info_item_a">管理员ID</div>
-        <div class="info_item_b">{{ employeeInfo.corpUserId }}</div>
       </div>
     </div>
     <div class="tail">
@@ -480,6 +480,7 @@ $mainWidth: 80%;
     }
   }
   .departManagersBoxAll {
+    margin-top: 8px;
     overflow: auto;
   }
   .departManagers_title {
@@ -492,6 +493,4 @@ $mainWidth: 80%;
     padding-top: 9px;
   }
 }
-
-
 </style>

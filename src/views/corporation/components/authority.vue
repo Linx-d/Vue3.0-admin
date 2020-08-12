@@ -111,7 +111,6 @@
             <template v-if="roleId==3">
               <div
                 class="department-icon"
-                style="width:50px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"
                 :title="department.label"
                 v-for="department in employee.departments"
                 :key="department.id"
@@ -631,6 +630,10 @@ $corporationHeight: 655px;
   margin-right: 20px;
   padding: 0 8px;
   cursor: pointer;
+  width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   .departSvg {
     margin-right: 5px;
   }
@@ -674,11 +677,11 @@ $corporationHeight: 655px;
 .group {
   min-height: 94px;
   border-bottom: 1px solid #e4e6e9;
-  padding: 30px 0;
+  padding: 30px 0 0;
 }
 .group-tail {
   min-height: 60px;
   // border-bottom: 1px solid #e4e6e9;
-  padding: 30px 0;
+  padding: 30px 0 0;
 }
 </style>

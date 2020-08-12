@@ -281,24 +281,25 @@ b {
  *
  */
 .departManagers {
-  width: 80%;
+  width: 70%;
   text-overflow: ellipsis;
   height: 100%;
   font-size: 14px;
   color: rgb(0, 0, 0);
-  float: right;
+  float: left;
+  margin-left: 45px;
 
   .departContent {
     display: inline-block;
-
     .depart_item {
       border: 1px solid #ddd;
-      height: 30px;
-      line-height: 20px;
-      width: 67px;
-      margin-right: 10px;
+      height: 32px;
+      line-height: 32px;
+      width: 78px;
       color: #000;
-      padding: 5px;
+      padding: 0 8px;
+      margin-right: 20px;
+      margin-bottom: 15px;
       box-sizing: border-box;
       cursor: pointer;
       overflow: hidden;
@@ -314,7 +315,7 @@ b {
     }
 
     .item_margin-bottom {
-      margin-bottom: 1px;
+      margin-bottom: 15px;
     }
 
     .depart_item:hover {
