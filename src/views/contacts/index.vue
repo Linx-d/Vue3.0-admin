@@ -325,34 +325,38 @@ export default {
       role: null,
       roleId: null,
     });
-    getLoginEmployee().then((res) => {
-      let data = res.data;
-      let roleId = data.role.id;
-      employeeInfo.id = data.id;
-      employeeInfo.name = data.name;
-      employeeInfo.corpUserId = data.corpUserId || "暂无";
-      employeeInfo.identity = data.role.name || "暂无";
-      employeeInfo.role = data.role || "暂无";
-      employeeInfo.roleId = employeeInfo.role.id;
-      employeeInfo.corpId = employeeInfo.corpId;
-      if (roleId === 1 || roleId === 2) {
-        employeeInfo.departmentManagers = "所有部门";
-      } else {
-        let departManagers = data.departmentManagers;
-        employeeInfo.departmentManagers = [];
-        if (departManagers.length > 0) {
-          selectEmpDepRoleByEmpId(data.id).then((response) => {
-            let len = response.data.length;
-            response.data.forEach((item, index) => {
-              employeeInfo.departmentManagers.push(item);
-              employeeInfo.departArr.push(item.departmentId);
-            });
-          });
+    getEmployeeInfo();
+    function getEmployeeInfo() {
+      getLoginEmployee().then((res) => {
+        let data = res.data;
+        let roleId = data.role ? data.role.id : null;
+        employeeInfo.id = data.id;
+        employeeInfo.name = data.name;
+        employeeInfo.corpUserId = data.corpUserId || "暂无";
+        employeeInfo.identity = data.role ? data.role.name : "暂无";
+        employeeInfo.role = data.role || "暂无";
+        employeeInfo.roleId = employeeInfo.role.id || null;
+        employeeInfo.corpId = employeeInfo.corpId;
+        if (roleId === 1 || roleId === 2) {
+          employeeInfo.departmentManagers = "所有部门";
         } else {
-          employeeInfo.departmentManagers = "暂无";
+          let departManagers = data.departmentManagers;
+          employeeInfo.departmentManagers = [];
+          if (departManagers != null && departManagers.length > 0) {
+            selectEmpDepRoleByEmpId(data.id).then((response) => {
+              let len = response.data.length;
+              employeeInfo.departArr = [];
+              response.data.forEach((item, index) => {
+                employeeInfo.departmentManagers.push(item);
+                employeeInfo.departArr.push(item.departmentId);
+              });
+            });
+          } else {
+            employeeInfo.departmentManagers = "暂无";
+          }
         }
-      }
-    });
+      });
+    }
     /**---------------------------------- 部门 end---------------------------------- */
     /**
      * 函数
@@ -363,32 +367,37 @@ export default {
      * 添加子部门 btn
      */
     const append = (data) => {
-      addDepart(form.name, data.id).then((res) => {
-        let resData = res.data;
-        let code = res.code;
-        if (code === 0) {
-          const newChild = {
-            id: resData.id,
-            pid: resData.pid,
-            label: resData.name,
-            displayOrder: resData.displayOrder,
-            children: [],
-          };
-          if (!data.children) {
-            set(data, "children", []);
+      addDepart(form.name, data.id)
+        .then((res) => {
+          let resData = res.data;
+          let code = res.code;
+          if (code === 0) {
+            const newChild = {
+              id: resData.id,
+              pid: resData.pid,
+              label: resData.name,
+              displayOrder: resData.displayOrder,
+              children: [],
+            };
+            if (!data.children) {
+              set(data, "children", []);
+            }
+            data.children.push(newChild);
+            root.$message({
+              message: "成功添加部门",
+              type: "success",
+            });
+          } else {
+            root.$message({
+              message: res.msg,
+              type: "error",
+            });
           }
-          data.children.push(newChild);
-          root.$message({
-            message: "成功添加部门",
-            type: "success",
-          });
-        } else {
-          root.$message({
-            message: res.msg,
-            type: "error",
-          });
-        }
-      });
+        })
+        .then((response) => {
+          getEmployeeInfo(); // 重新获取登录人员管理的部门
+          selectAllDepart(); // 添加子部门成功后，重新渲染一遍doom树
+        });
     };
 
     /**
@@ -467,10 +476,10 @@ export default {
           getLoginEmployee()
             .then((res) => {
               let code = res.code,
-                roleId = res.data.role.id;
+                roleId = res.data.role ? res.data.role.id : null;
               if (code === 0) {
                 if (roleId === 3) {
-                  let departIdArr = [];
+                  let departIdArr = []; // 新建数组存储，employeeInfo中的数据是异步的，在这里获取不到。
                   res.data.departmentManagers.forEach((item) => {
                     departIdArr.push(item.departmentId);
                   });
@@ -480,6 +489,11 @@ export default {
                     } else {
                       item.hasAuthority = false;
                     }
+                  });
+                } else if (roleId === null) {
+                  // 角色无权限
+                  data.forEach((item) => {
+                    item.hasAuthority = false;
                   });
                 } else {
                   data.forEach((item) => {
@@ -507,7 +521,8 @@ export default {
                 departData[0].displayOrder = treeData.displayOrder;
                 departData[0].id = currentDepart.id = treeData.id;
                 departData[0].pid = currentDepart.pid = treeData.pid;
-                if (response !== 3) {
+                // 判断是否拥有顶级部门权限：部门管理员没有，普通超级管理员有
+                if (response == 1 || response == 2) {
                   departData[0].hasAuthority = true;
                 } else {
                   departData[0].hasAuthority = false;
