@@ -746,6 +746,7 @@ $contactsHeight: 592px;
       margin-bottom: 0 !important;
       .departManagers {
         width: 92%;
+        float: right;
       }
     }
   }

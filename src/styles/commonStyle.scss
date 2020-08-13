@@ -286,8 +286,6 @@ b {
   height: 100%;
   font-size: 14px;
   color: rgb(0, 0, 0);
-  float: left;
-  margin-left: 45px;
 
   .departContent {
     display: inline-block;
@@ -298,8 +296,6 @@ b {
       width: 78px;
       color: #000;
       padding: 0 8px;
-      margin-right: 20px;
-      margin-bottom: 15px;
       box-sizing: border-box;
       cursor: pointer;
       overflow: hidden;
@@ -315,7 +311,7 @@ b {
     }
 
     .item_margin-bottom {
-      margin-bottom: 15px;
+      // margin-bottom: 15px;
     }
 
     .depart_item:hover {

@@ -474,6 +474,7 @@ $mainWidth: 80%;
     }
   }
   .departManagersBox {
+    margin-top: 16px;
     height: 21px;
     .departManagers_title {
       padding-top: 0;
@@ -482,6 +483,14 @@ $mainWidth: 80%;
   .departManagersBoxAll {
     margin-top: 8px;
     overflow: auto;
+    .departManagers {
+      float: left;
+      margin-left: 45px;
+      .depart_item {
+        margin-right: 20px;
+        margin-bottom: 15px;
+      }
+    }
   }
   .departManagers_title {
     width: 120px;
