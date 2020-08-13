@@ -28,7 +28,7 @@
       <p class="MsoNormal"><span>3.数据统计图标</span></p>
       <img :src="urlList.statistics_icon">
       <p class="MsoNormal"><span><b>三、部门管理</b></span></p>
-      <p class="MsoNormal"><span>1.点击部门后面的三个小点进行部门的增删改操作，部门管理员对于所管辖的部门拥有删除和修改的权力，没有添加子部门呢权限。对于非管辖部门无操作权限。并且无添加成员权限和查看未分组权限。</span></p>
+      <p class="MsoNormal"><span>1.点击部门后面的三个小点进行部门的增删改操作，部门管理员对于所管辖的部门拥有删除、修改和添加子部门的权限。对于非管辖部门无操作权限。并且无添加成员权限和查看未分组权限。</span></p>
       <img :src="urlList.department_operating">
       <p class="MsoNormal"><span>2.成员信息详情查看按钮和移除按钮。移除则回把用户放入未分组用户，等待普通管理员和超级管理员重新分配部门</span></p>
       <img :src="urlList.member_display">
