@@ -61,7 +61,7 @@
         </el-submenu>
       </el-menu>
     </div>
-    <div class="detail" v-if="employee.id !=null">
+    <div class="detail">
       <div class="cnt_tool">
         <a
           href="javascript:;"
@@ -159,7 +159,7 @@
   </div>
 </template>
 <script>
-import { reactive, ref, watchEffect } from "@vue/composition-api";
+import { reactive, ref, watchEffect, onMounted } from "@vue/composition-api";
 import { cloneObjectToNull } from "@/utils/common";
 import { jssdk } from "@/utils/wxwork";
 import {
@@ -260,6 +260,8 @@ export default {
       tel: "",
       gmtCreate: "",
     });
+    employee = JSON.parse(sessionStorage.getItem("adminInfo")).data;
+    console.log(JSON.parse(sessionStorage.getItem("adminInfo")));
     // -------------------------------------变量-------------------------------------------
 
     /**
@@ -387,7 +389,7 @@ export default {
         });
       WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
     };
-
+    choose(employee.id);
     /**
      * 选择部门
      */
