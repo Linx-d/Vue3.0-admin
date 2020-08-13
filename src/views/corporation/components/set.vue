@@ -162,14 +162,14 @@ export default {
 
     getLoginEmployee().then((res) => {
       let data = res.data;
-      let roleId = data.role.id;
+      let roleId = data.role ? data.role.id : null;
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
       employeeInfo.tel = data.tel;
       employeeInfo.gmtCreate = data.gmtCreate || "暂无";
       employeeInfo.gmtModified = data.gmtModified || "暂无";
       employeeInfo.corpUserId = data.corpUserId || "暂无";
-      employeeInfo.identity = data.role.name || "暂无";
+      employeeInfo.identity = data.role ? data.role.name : "暂无";
       employeeInfo.role = data.role || "暂无";
       employeeInfo.roleId = employeeInfo.role.id;
       employeeInfo.corpId = employeeInfo.corpId;
@@ -183,7 +183,7 @@ export default {
         employeeInfo.photo = departPng;
         let departManagers = data.departmentManagers;
         employeeInfo.departmentManagers = [];
-        if (departManagers.length > 0) {
+        if (departManagers != null && departManagers.length > 0) {
           selectEmpDepRoleByEmpId(data.id).then((response) => {
             let len = response.data.length;
             if (len > 5) {
@@ -478,6 +478,10 @@ $mainWidth: 80%;
     height: 21px;
     .departManagers_title {
       padding-top: 0;
+    }
+    .departManagers {
+      float: right;
+      width: 80%;
     }
   }
   .departManagersBoxAll {

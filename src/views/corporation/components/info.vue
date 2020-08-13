@@ -11,7 +11,12 @@
         <div class="info_item_a">企业名称</div>
         <div class="info_item_b">
           <i v-show="corpInfo.name">{{ corpInfo.name }}</i>
-          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpName" v-if="employeeInfo.roleId!=3">
+          <a
+            hefr="javascript:;"
+            class="modifyInfoBtn"
+            @click="modifycorpName"
+            v-if="employeeInfo.roleId!=3&&employeeInfo.roleId!=null"
+          >
             <span v-if="corpInfo.name">修改</span>
             <span v-else>添加</span>
           </a>
@@ -21,7 +26,12 @@
         <div class="info_item_center_a">企业地址</div>
         <div class="info_item_center_b">
           <i v-show="corpInfo.address">{{ corpInfo.address }}</i>
-          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpAddress" v-if="employeeInfo.roleId!=3">
+          <a
+            hefr="javascript:;"
+            class="modifyInfoBtn"
+            @click="modifycorpAddress"
+            v-if="employeeInfo.roleId!=3&&employeeInfo.roleId!=null"
+          >
             <span v-if="corpInfo.address">修改</span>
             <span v-else>添加</span>
           </a>
@@ -31,7 +41,12 @@
         <div class="info_item_a">联系电话</div>
         <div class="info_item_b">
           <i v-show="corpInfo.tel">{{ corpInfo.tel }}</i>
-          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifycorpTel" v-if="employeeInfo.roleId!=3">
+          <a
+            hefr="javascript:;"
+            class="modifyInfoBtn"
+            @click="modifycorpTel"
+            v-if="employeeInfo.roleId!=3&&employeeInfo.roleId!=null"
+          >
             <span v-if="corpInfo.tel">修改</span>
             <span v-else>添加</span>
           </a>
@@ -141,7 +156,7 @@ export default {
   name: "corporationInfo",
   setup(props, { root, refs }) {
     /**登录人员信息
-     * 
+     *
      */
     let employeeInfo = reactive({
       id: null,
@@ -155,11 +170,11 @@ export default {
       identity: "", // 身份
       corpUserId: 0,
       role: null,
-      roleId: null
+      roleId: null,
     });
-    getLoginEmployee().then(res => {
+    getLoginEmployee().then((res) => {
       let data = res.data;
-      let roleId = data.role.id;
+      let roleId = data.role ? data.role.id : null;
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
       //employeeInfo.photo = data.photo;
@@ -167,12 +182,12 @@ export default {
       employeeInfo.gmtCreate = data.gmtCreate || "暂无";
       employeeInfo.gmtModified = data.gmtModified || "暂无";
       employeeInfo.corpUserId = data.corpUserId || "暂无";
-      employeeInfo.identity = data.role.name || "暂无";
+      employeeInfo.identity = data.role ? data.role.name : "暂无";
       employeeInfo.role = data.role || "暂无";
-      employeeInfo.roleId = employeeInfo.role.id;
+      employeeInfo.roleId = employeeInfo.role ? employeeInfo.role.id : null;
     });
     /**企业信息
-     * 
+     *
      */
     let corpInfo = reactive({
       id: "ww2e7b5f3c87c34c17",
@@ -185,9 +200,9 @@ export default {
       gmtModified: "2020-06-11T16:29:08",
       member: 1000,
       employeeNum: 0,
-      departmentNum: 0
+      departmentNum: 0,
     });
-    getCorpInfo().then(response => {
+    getCorpInfo().then((response) => {
       let data = response.data;
       for (let key in data) {
         corpInfo[key] = data[key];
@@ -198,39 +213,39 @@ export default {
       dialogNameVisible: false,
       dialogTelVisible: false,
       dialogAddressVisible: false,
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
     });
     const rules = reactive({
       name: [
         { required: true, message: "请输入名称" },
-        { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
+        { min: 2, max: 5, message: "长度在 2 到 5 个字符" },
       ],
       tel: [
         { required: true, message: "请输入联系电话" },
-        { min: 2, max: 25, message: "长度在 2 到 25 个字符" }
+        { min: 2, max: 25, message: "长度在 2 到 25 个字符" },
       ],
       address: [
         { required: true, message: "请输入地址" },
-        { min: 2, max: 25, message: "长度在 2 到 25 个字符" }
-      ]
+        { min: 2, max: 25, message: "长度在 2 到 25 个字符" },
+      ],
     });
     const submitForm = (formName, key, val, status) => {
-      refs[formName].validate(valid => {
+      refs[formName].validate((valid) => {
         if (valid) {
           let modifyData = {};
           modifyData[key] = val;
-          updateCorporation(modifyData).then(res => {
+          updateCorporation(modifyData).then((res) => {
             let code = res.code;
             if (code === 0) {
               root.$message({
                 type: "success",
-                message: "修改成功"
+                message: "修改成功",
               });
               modifyCorpData[status] = false;
             } else {
               root.$message({
                 type: "warning",
-                message: res.msg
+                message: res.msg,
               });
             }
           });
@@ -239,7 +254,7 @@ export default {
         }
       });
     };
-    const resetForm = formName => {
+    const resetForm = (formName) => {
       refs[formName].resetFields();
     };
     const modifycorpName = () => {
@@ -252,13 +267,18 @@ export default {
       modifyCorpData.dialogAddressVisible = true;
     };
     const confirmNameOpen = () => {
-      submitForm('corpInfo', 'name', corpInfo.name, 'dialogNameVisible');
+      submitForm("corpInfo", "name", corpInfo.name, "dialogNameVisible");
     };
     const confirmTelOpen = () => {
-      submitForm('corpInfo', 'tel', corpInfo.tel, 'dialogTelVisible');
+      submitForm("corpInfo", "tel", corpInfo.tel, "dialogTelVisible");
     };
     const confirmAddressOpen = () => {
-      submitForm('corpInfo', 'address', corpInfo.address, 'dialogAddressVisible');
+      submitForm(
+        "corpInfo",
+        "address",
+        corpInfo.address,
+        "dialogAddressVisible"
+      );
     };
     const modifyNameCancle = () => {
       resetForm("corpInfo");
@@ -285,12 +305,18 @@ export default {
       rules,
       modifyCorpData,
       modifyBefore,
-      modifyNameCancle, modifyTelCancle, modifyAddressCancle,
-      modifycorpName, modifycorpTel, modifycorpAddress,
-      confirmNameOpen, confirmTelOpen, confirmAddressOpen,
-      employeeInfo
+      modifyNameCancle,
+      modifyTelCancle,
+      modifyAddressCancle,
+      modifycorpName,
+      modifycorpTel,
+      modifycorpAddress,
+      confirmNameOpen,
+      confirmTelOpen,
+      confirmAddressOpen,
+      employeeInfo,
     };
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
