@@ -21,6 +21,21 @@ export function translateDataToTree(data, parentId = 0) {
         obj.childrenLen = obj.children.length;
       }
       tree.push(obj);
+
+      if (item.hasAuthority) {
+        recursive(item);
+      }
+      function recursive(item) {
+        item.children.forEach((element) => {
+          element.hasAuthority = true;
+          if(element.hasAuthority) {
+            let len = element.children.length;
+            if(len>0) {
+              recursive(element);
+            }
+          }
+        });
+      }
     }
   });
   return tree;
@@ -116,8 +131,8 @@ export function cloneArray(arr, data) {
  * data: 被拷贝对象
  */
 export function cloneObject(obj, data) {
-  let key = '';
-  for(key in obj) {
+  let key = "";
+  for (key in obj) {
     obj[key] = data[key];
   }
 }
@@ -128,31 +143,31 @@ export function cloneObject(obj, data) {
  * @parms target: 目标对象
  */
 export function cloneObjectToNull(source, target) {
-  let key = '';
-  for(key in source) {
+  let key = "";
+  for (key in source) {
     target[key] = source[key];
   }
 }
 
-export function getParemter(key){
-    const url =  window.location.href;
-    if(url.indexOf(key)==-1){
-      return null;
+export function getParemter(key) {
+  const url = window.location.href;
+  if (url.indexOf(key) == -1) {
+    return null;
+  }
+  if (url.indexOf("?") != -1) {
+    if (url.indexOf("#") != -1 && url.indexOf("#") > url.indexOf("?")) {
+      var str = url.substring(url.indexOf("?") + 1, url.indexOf("#"));
+    } else {
+      var str = url.substring(url.indexOf("?") + 1);
     }
-    if(url.indexOf("?")!=-1){
-      if(url.indexOf("#")!=-1&&url.indexOf("#")>url.indexOf("?")){
-        var str = url.substring(url.indexOf("?")+1,url.indexOf("#"));
-      }else{
-        var str = url.substring(url.indexOf("?")+1);
+    let params = str.split("&");
+    let value = null;
+    params.forEach((param) => {
+      if (param.split("=")[0] == key) {
+        value = param.split("=")[1];
+        return;
       }
-      let params = str.split("&");
-      let value =null;
-      params.forEach(param=>{
-        if(param.split("=")[0]==key){
-          value =  param.split("=")[1];
-          return;
-        }
-      })
-      return value;
-    }
+    });
+    return value;
+  }
 }
