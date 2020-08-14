@@ -35,10 +35,10 @@
             :data="departData"
             :props="defaultProps"
             node-key="id"
+            :default-expanded-keys="[0]"
             :filter-node-method="filterNode"
             @node-click="handleNodeClick"
             :expand-on-click-node="false"
-            default-expand-all
             :highlight-current="searchResult_list.status"
             ref="tree"
           >
@@ -268,6 +268,7 @@ export default {
       {
         label: "",
         displayOrder: 10001,
+        id:0,
         pid: 0,
         children: [],
         childrenLen: 0,
