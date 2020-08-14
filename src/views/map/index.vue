@@ -502,8 +502,8 @@ export default {
           */
 
           let heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
-            map.addOverlay(heatmapOverlay);
-            heatmapOverlay.setDataSet({ data: points, max: 1000 });
+          map.addOverlay(heatmapOverlay);
+          heatmapOverlay.setDataSet({ data: points, max: 1000 });
           //是否显示热力图
           function openHeatmap() {
             // map.clearOverlays();
@@ -708,16 +708,44 @@ export default {
     };
 
     const cutFull = () => {
-      adaptionEchartsV2(systemChart);
-      adaptionEchartsV2(onlineChart);
-      adaptionEchartsV2(historyChart);
-      // systemChart.resize();
-      // onlineChart.resize();
+      loading.value = true;
       item_active.cutFull = !item_active.cutFull;
       alanysisStatus.status = !alanysisStatus.status;
       // 切换
       root.$store.commit("SET_FULL"); // commit 不用指向 map模块
+      adaptionEchartsV2(systemChart);
+      adaptionEchartsV2(onlineChart);
+      adaptionEchartsV2(historyChart);
+      if (alanysisStatus.status) {
+        fullScreen(document.body);
+        loading.value = false;
+      } else {
+        exitFullscreen();
+        loading.value = false;
+      }
     };
+    function fullScreen(ele) {
+      if (ele.requestFullscreen) {
+        ele.requestFullscreen();
+      } else if (ele.mozRequestFullScreen) {
+        ele.mozRequestFullScreen();
+      } else if (ele.webkitRequestFullscreen) {
+        ele.webkitRequestFullscreen();
+      } else if (ele.msRequestFullscreen) {
+        ele.msRequestFullscreen();
+      }
+    }
+    function exitFullscreen() {
+      if (document.exitFullScreen) {
+        document.exitFullScreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (element.msExitFullscreen) {
+        element.msExitFullscreen();
+      }
+    }
     // 搜索用户
     const searchMeber = () => {
       item_active.searchMeber = !item_active.searchMeber;
@@ -770,7 +798,6 @@ export default {
         scope: "all",
       };
       fuzzySearch(queryObj).then((res) => {
-        console.log(res.data.list);
         let data = res.data.list;
         data.forEach((item) => {
           item.value = item.name;
