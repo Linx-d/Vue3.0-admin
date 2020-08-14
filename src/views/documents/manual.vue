@@ -50,7 +50,7 @@
       <img :src="urlList.company_info">
       <p class="MsoNormal"><span>2.个人信息查看， 可修改管理员名称和联系电话</span></p>
       <img :src="urlList.user_info">
-      <p class="MsoNormal"><span>3.权限管理，部门管理员和普通管理员无编辑管理员和删除管理员的权限</span></p>
+      <p class="MsoNormal"><span>3.权限管理，部门管理员无编辑管理员和删除管理员的权限</span></p>
       <img :src="urlList.permissions">
       </div>
       <p class="version">© 2009&nbsp;-&nbsp;2020&nbsp;Utech Inc. All Rights Reserved</p>

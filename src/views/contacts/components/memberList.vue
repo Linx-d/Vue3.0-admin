@@ -329,6 +329,7 @@ export default {
             addNodepart_loading.value = false;
           } else {
             //暂无为分组用户
+            addNodepart_loading.value = false;
             return;
           }
         } else {
