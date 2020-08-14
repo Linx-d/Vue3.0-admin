@@ -32,7 +32,15 @@
       src="//api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js"
     ></script>
     <!-- 热力图 -->
-    <script type="text/javascript" src="//api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+    <script
+      type="text/javascript"
+      src="//api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"
+    ></script>
+    <!-- 地图拖出该区域后会重新弹回 -->
+    <script
+      type="text/javascript"
+      src="//api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"
+    ></script>
     <!-- 企业微信sdk -->
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script src="https://open.work.weixin.qq.com/wwopen/js/jwxwork-1.0.0.js"></script>
@@ -48,5 +56,41 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <script>
+      function myBrowser() {
+        let userAgent = navigator.userAgent;
+        let isOpera = userAgent.indexOf("Opera") > -1;
+        if (isOpera) {
+          return "Opera";
+        }
+        if (userAgent.indexOf("Firfox") > -1) {
+          return "Firfox";
+        }
+        if (userAgent.indexOf("Chrome") > -1) {
+          return "Chrome";
+        }
+        if (userAgent.indexOf("Safari") > -1) {
+          return "Safari";
+        }
+        if (
+          userAgent.indexOf("compatible") > -1 &&
+          userAgent.indexOf("MSIE") > -1 &&
+          !isOpera
+        ) {
+          return "IE";
+        }
+        if (userAgent.indexOf("Trident/7.0") > -1) {
+          return "IE";
+        }
+        return userAgent;
+      }
+      let mb = myBrowser();
+      console.log(mb, "mb");
+      if ("IE" == mb) {
+        alert(
+          "疫情防控中心部分功能暂不支持IE浏览器，请使用Chrome、Safari、Firfox、Samsung Internet、Opera、Edge等浏览器进行访问!"
+        );
+      }
+    </script>
   </body>
 </html>
