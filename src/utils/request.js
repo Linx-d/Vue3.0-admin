@@ -3,7 +3,7 @@ import { Message } from 'element-ui';
 import { getParemter } from "@/utils/common" 
 //使用自定义配置新建一个 axios 实例
 const service = axios.create({
-  baseURL: "https://iot.chinautech.com/api" // https://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api  林 http://111.231.188.211:8888/api
+  baseURL: "http://192.168.0.180:8888/api" // https://iot.chinautech.com/api http://192.168.0.192:8888/api http://192.168.0.180:8888/api  林 http://111.231.188.211:8888/api
 });
 
 // 添加请求拦截器

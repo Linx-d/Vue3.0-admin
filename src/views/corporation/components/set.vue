@@ -3,7 +3,8 @@
     <div class="tab_cnt">个人信息</div>
     <div class="logo">
       <div class="logo_zi">
-        <img :src="employeeInfo.photo" />
+        <!-- <img :src="employeeInfo.photo" /> -->
+        <svg-icon :iconClass="employeeInfo.photo" className="auth_icon"></svg-icon>
       </div>
     </div>
     <div class="info">
@@ -41,14 +42,17 @@
         <div class="info_item_b">{{ employeeInfo.corpUserId }}</div>
       </div>
       <div class="departManagersBox" v-if="employeeInfo.roleId!=3">
-        <div class="departManagers_title">管理的部门</div>
+        <div class="departManagers_title">管理范围</div>
         <div class="departManagers" :title="employeeInfo.departmentManagers">
-          <div>{{ employeeInfo.departmentManagers }}</div>
+          <div v-if="employeeInfo.departmentManagers">{{ employeeInfo.departmentManagers }}</div>
+          <div v-else>
+            <div>暂无</div>
+          </div>
         </div>
       </div>
       <div class="departManagersBoxAll" v-else>
         <div class="departManagers_title">管理范围</div>
-        <div class="departManagers">
+        <div class="departManagers" v-if="employeeInfo.departmentManagers">
           <div
             v-for="depart in employeeInfo.departmentManagers"
             :key="depart.id"
@@ -59,6 +63,9 @@
               <span>{{ depart }}</span>
             </div>
           </div>
+        </div>
+        <div v-else>
+          <div class="depart_none">暂无</div>
         </div>
       </div>
     </div>
@@ -134,9 +141,6 @@ import {
 } from "@/api/employeeApi";
 import { jssdk } from "@/utils/wxwork";
 import { reactive, onMounted, watchEffect, ref } from "@vue/composition-api";
-import departPng from "@/views/images/departManager.png";
-import superPng from "@/views/images/superManager.png";
-import normalPng from "@/views/images/normalManager.png";
 export default {
   name: "corporationInfo",
   setup(props, { root, refs }) {
@@ -175,12 +179,15 @@ export default {
       employeeInfo.corpId = employeeInfo.corpId;
       if (roleId === 1) {
         employeeInfo.departmentManagers = "所有部门";
-        employeeInfo.photo = superPng;
+        employeeInfo.photo = 'superManager';
       } else if (roleId === 2) {
         employeeInfo.departmentManagers = "所有部门";
-        employeeInfo.photo = normalPng;
+        employeeInfo.photo = 'normalManager';
+      } else if (roleId === null) {
+        employeeInfo.departmentManagers = null;
+        employeeInfo.photo = 'departManager_no';
       } else {
-        employeeInfo.photo = departPng;
+        employeeInfo.photo = 'departManager';
         let departManagers = data.departmentManagers;
         employeeInfo.departmentManagers = [];
         if (departManagers != null && departManagers.length > 0) {
@@ -194,7 +201,7 @@ export default {
             });
           });
         } else {
-          employeeInfo.departmentManagers = "暂无";
+          employeeInfo.departmentManagers = null;
         }
       }
     });
@@ -374,11 +381,11 @@ $mainWidth: 80%;
     .logo_zi {
       height: 128px;
       width: 120px;
-      padding-top: 30px;
       color: #787878;
       font-size: 14px;
-      img {
-        width: 200px;
+      .auth_icon {
+        width: 150%;
+        height: 100%;
       }
     }
   }
@@ -486,7 +493,7 @@ $mainWidth: 80%;
   }
   .departManagersBoxAll {
     margin-top: 8px;
-    overflow: auto;
+    overflow: hidden;
     .departManagers {
       float: left;
       margin-left: 45px;
@@ -494,6 +501,15 @@ $mainWidth: 80%;
         margin-right: 20px;
         margin-bottom: 15px;
       }
+    }
+    .depart_none {
+      width: 120px;
+      height: 100%;
+      padding-right: 9px;
+      font-size: 14px;
+      float: left;
+      padding-top: 9px;
+      margin-left: 48px;
     }
   }
   .departManagers_title {

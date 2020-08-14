@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="702" height="180" viewBox="0 0 702 180">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 90px;
+        fill: #345e8c;
+        text-anchor: middle;
+        font-family: "Microsoft YaHei";
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <text id="暂无管理权限" class="cls-1" x="351" y="121"><tspan x="351">暂无管理权限</tspan></text>
+</svg>
