@@ -305,11 +305,16 @@ export default {
       data: [],
     });
     const addMemberBtn = () => {
-      nodepart_input.txt = "";
-      ungrouped.pageNum = 1;
-      ungrouped.data.splice(0, ungrouped.data.length);
-      dialogTableVisible.status = true;
-      noDepart(ungrouped.pageNum, ungrouped.pageSize);
+      let role = JSON.parse(sessionStorage.getItem("adminInfo")).data.role;
+      if (role.id === 3 || role == null) {
+        root.$message({ type: "warning", message: "没有访问权限" });
+      } else {
+        nodepart_input.txt = "";
+        ungrouped.pageNum = 1;
+        ungrouped.data.splice(0, ungrouped.data.length);
+        dialogTableVisible.status = true;
+        noDepart(ungrouped.pageNum, ungrouped.pageSize);
+      }
     };
     const noDepart = (pageNum, pageSize) => {
       addNodepart_loading.value = true;
@@ -328,6 +333,7 @@ export default {
           }
         } else {
           ungrouped.data = [];
+          addNodepart_loading.value = false;
         }
       });
     };
