@@ -113,22 +113,30 @@
             </div>
           </li>
           <li>
-            <span>体温告警：</span>
-            <i>
-              {{ currentMemberInfo.tnumber }}&nbsp;
-              <span
-                v-show="currentMemberInfo.tnumber!='暂无数据'"
-              >次</span>
-            </i>
+            <el-tooltip class="item" effect="dark" :content="content.tmp.txt" placement="left">
+              <a href="javascript:;" @click="toggleAbnormal">
+                <span>体温告警：</span>
+                <i>
+                  {{ currentMemberInfo.tnumber }}&nbsp;
+                  <span
+                    v-show="currentMemberInfo.tnumber!='暂无数据'"
+                  >次</span>
+                </i>
+              </a>
+            </el-tooltip>
           </li>
           <li>
-            <span>位置告警：</span>
-            <i>
-              {{ currentMemberInfo.pnumber }}&nbsp;
-              <span
-                v-show="currentMemberInfo.pnumber!='暂无数据'"
-              >次</span>
-            </i>
+            <el-tooltip class="item" effect="dark" :content="content.position.txt" placement="left">
+              <a href="javascript:;">
+                <span>位置告警：</span>
+                <i>
+                  {{ currentMemberInfo.pnumber }}&nbsp;
+                  <span
+                    v-show="currentMemberInfo.pnumber!='暂无数据'"
+                  >次</span>
+                </i>
+              </a>
+            </el-tooltip>
           </li>
         </ul>
       </div>
@@ -136,7 +144,7 @@
         <div id="info_temperature" class="info_module" v-show="temperature"></div>
         <div id="info_table" v-show="!temperature">
           <el-table
-            :data="tmpHistory.tableData"
+            :data="tableData"
             style="width: 100%"
             :row-class-name="tableRowClassName"
             height="430"
@@ -146,10 +154,12 @@
             <el-table-column prop="temperature" label="温度"></el-table-column>
           </el-table>
         </div>
-        <div class="table_svg" @click="toggleTable" title="数据视图">
-          <svg-icon iconClass="table_menu" class="table_menu" v-if="temperature"></svg-icon>
-          <svg-icon iconClass="line_chart" class="line_chart" v-else></svg-icon>
-        </div>
+        <el-tooltip class="item" effect="dark" :content="content.table.txt" placement="right">
+          <div class="table_svg" @click="toggleTable">
+            <svg-icon iconClass="table_menu" class="table_menu" v-if="temperature"></svg-icon>
+            <svg-icon iconClass="line_chart" class="line_chart" v-else></svg-icon>
+          </div>
+        </el-tooltip>
       </div>
       <div class="info_module mapBox" v-loading="loading">
         <div id="mapShow"></div>
@@ -220,6 +230,17 @@ export default {
     let contactsModule = props.contactsModule; // contacts 模块
     const dialogRailVisible = reactive({
       status: false,
+    });
+    const content = reactive({
+      tmp: {
+        txt: "切换异常温度图表",
+      },
+      position: {
+        txt: "显示异常位置图表",
+      },
+      table: {
+        txt: '数据表格'
+      }
     });
     /**
      * 查询围栏列表
@@ -364,6 +385,20 @@ export default {
         }
       });
     };
+
+    /**
+     * 切换异常体温显示
+     */
+    let abnormal = ref(false);
+    const toggleAbnormal = () => {
+      abnormal.value = !abnormal.value;
+      temperature.value = true;
+      if (abnormal.value) {
+        content.tmp.txt = "点击切换正常温度图表";
+      } else {
+        content.tmp.txt = "点击切换异常温度图表";
+      }
+    };
     /**
      *  成员个人信息温度变化图表
      */
@@ -374,8 +409,14 @@ export default {
         let myChart = root.$echarts.init(
           document.getElementById("info_temperature")
         ); // root.$echarts
-        let newArr_time = tmpHistory.newArr_time;
-        let newArr_tmp = tmpHistory.newArr_tmp;
+        let newArr_time, newArr_tmp;
+        if (abnormal.value) {
+          newArr_time = tmpHistory.error_time;
+          newArr_tmp = tmpHistory.error_tmp;
+        } else {
+          newArr_time = tmpHistory.newArr_time;
+          newArr_tmp = tmpHistory.newArr_tmp;
+        }
         // 指定图表的配置项和数据
         let option = {
           title: {
@@ -524,9 +565,27 @@ export default {
     const tableData = reactive([]);
     const toggleTable = () => {
       temperature.value = !temperature.value;
+
+      if (abnormal.value) {
+        tableData.splice(0, tableData.length);
+        props.tmpHistory.error_tableData.forEach((item) => {
+          tableData.push(item);
+        });
+      } else {
+        tableData.splice(0, tableData.length);
+        props.tmpHistory.tableData.forEach((item) => {
+          tableData.push(item);
+        });
+      }
+
+      if(temperature.value) {
+        content.table.txt = '数据表格';
+      }else {
+        content.table.txt = '数据趋势图';
+      }
     };
     const tableRowClassName = ({ row, rowIndex }) => {
-      let temperature = parseInt(row.temperature);
+      let temperature = parseFloat(row.temperature);
       if (temperature >= 37.3) {
         return "warning-row";
       }
@@ -645,6 +704,8 @@ export default {
       toggleTable,
       tableData,
       tableRowClassName,
+      toggleAbnormal,
+      content,
     };
   },
 };
@@ -754,6 +815,9 @@ $contactsHeight: 592px;
     ul {
       li {
         font-size: 14px;
+        a {
+          color: #000;
+        }
         span {
           color: #787878;
           margin-right: 15px;

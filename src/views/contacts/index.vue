@@ -111,7 +111,7 @@
                   </div>
                 </el-dialog>
 
-                <el-dialog title="修改部门名称" :visible.sync="modifyData.visibel" class="modifyDialog">
+                <el-dialog title="修改部门名称" :visible.sync="modifyData.visibel" class="modifyDialog" @click="console.log('11');">
                   <el-form :model="modifyData">
                     <el-form-item label="部门名称" :label-width="formLabelWidth">
                       <el-input
@@ -237,6 +237,8 @@ export default {
     let tmpHistory = reactive({
       newArr_time: [],
       newArr_tmp: [],
+      error_time: [],
+      error_tmp: [],
       newArr_position: [],
       online: false,
       temperature: "33.78",
