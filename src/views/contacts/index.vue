@@ -111,7 +111,14 @@
                   </div>
                 </el-dialog>
 
-                <el-dialog title="修改部门名称" :visible.sync="modifyData.visibel" class="modifyDialog" @click="console.log('11');">
+                <el-dialog
+                  title="修改部门名称"
+                  :visible.sync="modifyData.visibel"
+                  class="modifyDialog"
+                  :close-on-click-modal="false"
+                  :append-to-body="true"
+                  :destroy-on-close="true"
+                >
                   <el-form :model="modifyData">
                     <el-form-item label="部门名称" :label-width="formLabelWidth">
                       <el-input
@@ -270,7 +277,7 @@ export default {
       {
         label: "",
         displayOrder: 10001,
-        id:0,
+        id: 0,
         pid: 0,
         children: [],
         childrenLen: 0,
