@@ -278,7 +278,11 @@ export default {
     ((window) => {
       // lng = null, lat = null, hit = false
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
-        let map = new BMap.Map("mapShow", { minZoom: 4, maxZoom: 18 }); // 创建Map实例
+        let map = new BMap.Map("mapShow", {
+          minZoom: 4,
+          maxZoom: 18,
+          enableMapClick: false,
+        }); // 创建Map实例
         // 添加地图类型控件
         // map.addControl(
         //   new BMap.MapTypeControl({
@@ -711,6 +715,7 @@ export default {
       loading.value = true;
       item_active.cutFull = !item_active.cutFull;
       alanysisStatus.status = !alanysisStatus.status;
+      change_boolean.status = false;
       // 切换
       root.$store.commit("SET_FULL"); // commit 不用指向 map模块
       adaptionEchartsV2(systemChart);
@@ -882,7 +887,7 @@ export default {
 $mapHeight: 81%; // main的自适应高度
 
 // 地图height、width的min，max 设置
-$mapMinWidth: 1532px;
+$mapMinWidth: 1366px;
 $mapMinHeight: 454px;
 
 // alanysis 顶部模块 height、width的min，max 设置
@@ -1040,6 +1045,7 @@ $echartsBorder: 1px solid #146ede;
       width: 20%;
       // min-width: 330px;
       height: 100%;
+      // margin: 15px;
       float: $echartsMargin;
       left: $echartsMargin;
       bottom: 0;
@@ -1047,7 +1053,7 @@ $echartsBorder: 1px solid #146ede;
       border: $echartsBorder;
     }
     .alanysis_bottom_R {
-      width: 77.2%;
+      width: 76.9%;
       height: 100%;
       float: right;
       right: $echartsMargin;
@@ -1296,7 +1302,6 @@ $echartsBorder: 1px solid #146ede;
 #grandTotal {
   display: block;
   width: 94%;
-  background-color: #0b1532;
   margin-top: 10px;
   border: 1px solid #0b1532;
   margin: 9.2px auto;
@@ -1315,7 +1320,12 @@ $echartsBorder: 1px solid #146ede;
     text-align: center;
     padding-bottom: 0;
     line-height: 59px;
-    background: #0b1532;
+    td {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 30px;
+    }
     .tb_top {
       td:nth-child(1) {
         color: #bf4739;
