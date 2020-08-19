@@ -32,8 +32,8 @@
           <div class="case_bottom_right"></div>
           <div id="abnormal" class="alanysis_top_a echartsIndivi">
             <h1>
-              设备总量:
-              <span>{{ scaleStatic.person }}</span>台
+              <span>用户:{{ scaleStatic.person }}</span>人
+              <span>管理用户:{{ scaleStatic.managerPerson }}</span>人
             </h1>
             <span class="onlineLine"></span>
             <p class="abnormal_top">
@@ -41,8 +41,8 @@
               <span>离线</span>
             </p>
             <p class="abnormal_bottom">
-              <span>{{ scaleStatic.online }}台</span>
-              <span>{{ scaleStatic.unline }}台</span>
+              <span>{{ scaleStatic.online }}人</span>
+              <span>{{ scaleStatic.unline }}人</span>
             </p>
           </div>
         </div>
@@ -127,7 +127,10 @@
 
       <!-- input search -->
       <div :class="['search_box']">
-        <div id="search_city" :class="{'city_show': search_toggle.city}">
+        <div
+          id="search_city"
+          :class="{'city_show': search_toggle.city, 'city_none': search_toggle.city_none,'city_block': search_toggle.city_block }"
+        >
           <input
             id="suggestId"
             class="city-input"
@@ -152,7 +155,10 @@
             </span>
           </el-tooltip>
         </div>
-        <div id="search_person" :class="{'person_show': search_toggle.member}">
+        <div
+          id="search_person"
+          :class="{'person_show': search_toggle.member, 'person_none': search_toggle.person_none,'person_block': search_toggle.person_block}"
+        >
           <el-autocomplete
             class="inline-input"
             v-model="member"
@@ -227,6 +233,7 @@ import {
   listDeviceAlarmInfoByUserId,
 } from "@/api/mapApi";
 import { listRail, selectRailList, listUserInfoByRail } from "@/api/railApi";
+import { getCorpInfo } from "@/api/corporationApi";
 import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
 import { adaptionEchartsV2 } from "@/utils/common"; // 图表自适应
 import alarmOption from "./options/alarmOption.js"; // 告警模块
@@ -256,15 +263,13 @@ export default {
      */
     const scaleStatic = reactive({
       person: 0,
+      managerPerson: 0,
       online: 0,
       unline: 0,
     });
-    // window.onresize = function() {
-    //   systemChart.resize();
-    //   onlineChart.resize();
-    //   historyChart.resize();
-    //   //myChart1.resize();    //若有多个图表变动，可多写
-    // };
+    getCorpInfo().then(res=> {
+      scaleStatic.person = res.data.member;
+    });
     const full = computed(() => {
       return root.$store.state.map.full;
     });
@@ -412,7 +417,7 @@ export default {
             temperatureStatic: 0,
             onlineStatic: 0,
           };
-          scaleStatic.person = data.length;
+          scaleStatic.managerPerson = data.length;
           data.forEach((item) => {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
@@ -650,9 +655,9 @@ export default {
           let option = historyOption;
           option.xAxis.data = gmtCreate;
           option.series[0].data = alarmSum;
-          option.series[1].data = personSum;
-          option.series[2].data = psum;
-          option.series[3].data = tsum;
+          // option.series[1].data = personSum;
+          option.series[1].data = psum;
+          option.series[2].data = tsum;
           historyChart.setOption(option);
         });
     };
@@ -694,6 +699,10 @@ export default {
       status: false,
       member: false,
       city: false,
+      city_none: false,
+      city_block: false,
+      person_none: false,
+      person_block: false,
     });
     const tool_active = () => {
       change_boolean.status = !change_boolean.status;
@@ -1138,7 +1147,6 @@ $echartsBorder: 1px solid #146ede;
       .tool_list {
         position: absolute;
         width: 100%;
-        top: 35px;
         right: 0;
         background-color: #fff;
         @include webkit("box-shadow", 1px 2px 1px rgba(0, 0, 0, 0.15));
@@ -1186,6 +1194,12 @@ $echartsBorder: 1px solid #146ede;
     top: 0 !important;
     opacity: 1 !important;
   }
+  .city_none {
+    display: none !important;
+  }
+  .city_block {
+    display: block !important;
+  }
   #search_person {
     position: absolute;
     left: 0;
@@ -1198,6 +1212,12 @@ $echartsBorder: 1px solid #146ede;
     left: 0 !important;
     top: -1px !important;
     opacity: 1 !important;
+  }
+  .person_none {
+    display: none !important;
+  }
+  .person_block {
+    display: block !important;
   }
   #search_city,
   #search_person {
