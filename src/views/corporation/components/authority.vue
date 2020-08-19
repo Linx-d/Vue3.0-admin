@@ -61,7 +61,7 @@
         </el-submenu>
       </el-menu>
     </div>
-    <div class="detail">
+    <div class="detail" v-if="employee.id">
       <div class="cnt_tool">
         <a
           href="javascript:;"
@@ -103,13 +103,14 @@
           </el-form-item>
           <el-form-item label="管理权限" v-else>
             <el-radio-group v-model="roleId">
-              <el-radio label="2" style="margin-right:20px;">普通管理员</el-radio>
+              <el-radio label="2" style="margin-right:20px;" v-if="loginEmployeeInfo.role.id==1">普通管理员</el-radio>
               <el-radio label="3">部门管理员</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="管理范围">
             <template v-if="roleId==3">
               <div
+                v-show="employee.departments.length>=0"
                 class="department-icon"
                 :title="department.label"
                 v-for="department in employee.departments"
@@ -118,6 +119,7 @@
                 <svg-icon iconClass="depart" class="departSvg"></svg-icon>
                 <label class="label-info">{{department.label}}</label>
               </div>
+              <div v-show="employee.departments.length<=0">暂无</div>
               <br />
               <div class="department-icon" v-if="isEdit" @click="showDepartments">
                 <i class="el-icon-edit icon"></i>
@@ -172,6 +174,7 @@ import {
   editAdmin,
   editEmployee,
   listNotRoleEmployee,
+  getLoginEmployee,
 } from "@/api/employeeApi";
 import { all } from "cookie_js";
 export default {
@@ -185,7 +188,6 @@ export default {
     /**
      * 当前登录用户
      */
-    let loginInfo = reactive(JSON.parse(sessionStorage.getItem("adminInfo")));
     /**
      * 部门列表窗口
      */
@@ -260,8 +262,64 @@ export default {
       tel: "",
       gmtCreate: "",
     });
-    employee = JSON.parse(sessionStorage.getItem("adminInfo")).data;
-    console.log(JSON.parse(sessionStorage.getItem("adminInfo")));
+    /**
+     * 登录人员详情
+     */
+    let loginEmployeeInfo = reactive({
+      id: null,
+      name: "123",
+      role: {
+        id: 1,
+        name: "role",
+      },
+      tel: "",
+      gmtCreate: "",
+    });
+    getLoginEmployee()
+      .then((res) => {
+        let data = res.data;
+        let roleId = data.role ? data.role.id : null;
+        loginEmployeeInfo.id = data.id;
+        loginEmployeeInfo.name = data.name;
+        loginEmployeeInfo.tel = data.tel;
+        loginEmployeeInfo.gmtCreate = data.gmtCreate || "暂无";
+        loginEmployeeInfo.gmtModified = data.gmtModified || "暂无";
+        loginEmployeeInfo.corpUserId = data.corpUserId || "暂无";
+        loginEmployeeInfo.identity = data.role ? data.role.name : "暂无";
+        loginEmployeeInfo.role = data.role || "暂无";
+        loginEmployeeInfo.roleId = loginEmployeeInfo.role.id;
+        loginEmployeeInfo.corpId = loginEmployeeInfo.corpId;
+        if (roleId === 1) {
+          loginEmployeeInfo.departmentManagers = "所有部门";
+          loginEmployeeInfo.photo = "superManager";
+        } else if (roleId === 2) {
+          loginEmployeeInfo.departmentManagers = "所有部门";
+          loginEmployeeInfo.photo = "normalManager";
+        } else if (roleId === null) {
+          loginEmployeeInfo.departmentManagers = null;
+          loginEmployeeInfo.photo = "departManager_no";
+        } else {
+          loginEmployeeInfo.photo = "departManager";
+          let departManagers = data.departmentManagers;
+          loginEmployeeInfo.departmentManagers = [];
+          if (departManagers != null && departManagers.length > 0) {
+            selectEmpDepRoleByEmpId(data.id).then((response) => {
+              let len = response.data.length;
+              if (len > 5) {
+                loginEmployeeInfo.managersStatus = true;
+              }
+              response.data.forEach((item, index) => {
+                loginEmployeeInfo.departmentManagers.push(item.depName);
+              });
+            });
+          } else {
+            loginEmployeeInfo.departmentManagers = null;
+          }
+        }
+      })
+      .then((response) => {
+        // choose(loginEmployeeInfo.id);
+      });
     // -------------------------------------变量-------------------------------------------
 
     /**
@@ -325,8 +383,9 @@ export default {
      * 切换为修改界面
      */
     const edit = () => {
-      let authorityId = loginInfo.data.role.id;
-      if (authorityId === 3) {
+      let authorityId = loginEmployeeInfo.role.id;
+      let employeeRoleId = employee.role.id;
+      if (authorityId === 3 || authorityId === employeeRoleId) {
         root.$message({
           type: "warning",
           message: "没有访问权限",
@@ -339,6 +398,7 @@ export default {
      * 选择员工 获取详情
      */
     const choose = (id) => {
+      console.log(employee,'emp')
       departmentList.splice(0, departmentList.length);
       queryAllDepartment();
       isEdit.value = false;
@@ -389,7 +449,6 @@ export default {
         });
       WWOpenData.bindAll(document.getElementsByTagName("ww-open-data"));
     };
-    choose(employee.id);
     /**
      * 选择部门
      */
@@ -490,8 +549,9 @@ export default {
      * 删除管理员
      */
     const delManager = () => {
-      let authorityId = loginInfo.data.role.id;
-      if (authorityId === 3) {
+      let authorityId = loginEmployeeInfo.role.id;
+      let employeeRoleId = employee.role.id;
+      if (authorityId === 3 || authorityId === employeeRoleId) {
         root.$message({
           type: "warning",
           message: "没有访问权限",
@@ -561,7 +621,7 @@ export default {
       delManager,
       roleId,
       loadWWOpenData,
-      loginInfo,
+      loginEmployeeInfo
     };
   },
 };
