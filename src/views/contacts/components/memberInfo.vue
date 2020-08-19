@@ -7,6 +7,9 @@
       <a class="memberLink" href="javascript:;" @click="memberInfoBack">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
+      <a class="memberLink" href="javascript:;">
+        <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>编辑
+      </a>
       <!--
       <a class="memberLink" href="javascript:;">编辑</a>
       <a class="memberLink" href="javascript:;">移除</a>
@@ -32,53 +35,63 @@
           </p>
           <div class="info_status">
             <span v-if="currentMemberInfo.online">
-              <svg-icon iconClass="online1" class="online my_icon"></svg-icon>
+              <svg-icon iconClass="online1" class="online my_icon online_icon"></svg-icon>在线
             </span>
             <span v-if="!currentMemberInfo.online">
-              <svg-icon iconClass="unline" class="unline"></svg-icon>
+              <svg-icon iconClass="unline" class="unline online_icon"></svg-icon>离线
             </span>
-            <span>
-              <svg-icon
-                iconClass="electric0"
-                class="electric my_icon"
-                v-if="currentMemberInfo.electric==='0'"
-              ></svg-icon>
-            </span>
-            <span>
-              <svg-icon
-                iconClass="electric1"
-                class="electric my_icon"
-                v-if="currentMemberInfo.electric==='1'"
-              ></svg-icon>
-            </span>
-            <span>
-              <svg-icon
-                iconClass="electric2"
-                class="electric my_icon"
-                v-if="currentMemberInfo.electric==='2'"
-              ></svg-icon>
-            </span>
-            <span>
-              <svg-icon
-                iconClass="electric3"
-                class="electric my_icon"
-                v-if="currentMemberInfo.electric==='3'"
-              ></svg-icon>
-            </span>
+            <div v-if="currentMemberInfo.online">
+              <span>
+                <svg-icon
+                  iconClass="electric0"
+                  class="electric my_icon online_icon"
+                  v-if="currentMemberInfo.electric==='0'"
+                ></svg-icon>
+              </span>
+              <span>
+                <svg-icon
+                  iconClass="electric1"
+                  class="electric my_icon online_icon"
+                  v-if="currentMemberInfo.electric==='1'"
+                ></svg-icon>
+              </span>
+              <span>
+                <svg-icon
+                  iconClass="electric2"
+                  class="electric my_icon online_icon"
+                  v-if="currentMemberInfo.electric==='2'"
+                ></svg-icon>
+              </span>
+              <span>
+                <svg-icon
+                  iconClass="electric3"
+                  class="electric my_icon"
+                  v-if="currentMemberInfo.electric==='3'"
+                ></svg-icon>
+              </span>
+            </div>
           </div>
         </div>
-        <div
-          :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
-        >
-          {{ currentMemberInfo.temperature }}
-          <span v-show="currentMemberInfo.temperature!='暂无数据'">°C</span>
-        </div>
+        <el-tooltip class="item" effect="light" content="最新温度" placement="top">
+          <div
+            :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
+          >
+            {{ currentMemberInfo.temperature }}
+            <span
+              v-show="currentMemberInfo.temperature!='暂无数据'"
+            >°C</span>
+          </div>
+        </el-tooltip>
       </div>
       <div id="info_personal" class="info_module">
         <ul>
           <li>
             <span>年龄：</span>
             <i>{{ currentMemberInfo.age }}&nbsp;岁</i>
+          </li>
+          <li>
+            <span>性别：</span>
+            <i>{{ currentMemberInfo.sex }}</i>
           </li>
           <li>
             <span>电话：</span>
@@ -113,7 +126,7 @@
             </div>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark" :content="content.tmp.txt" placement="left">
+            <el-tooltip class="item" effect="light" :content="content.tmp.txt" placement="left">
               <a href="javascript:;" @click="toggleAbnormal">
                 <span>体温告警：</span>
                 <i>
@@ -126,7 +139,7 @@
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark" :content="content.position.txt" placement="left">
+            <el-tooltip class="item" effect="light" :content="content.position.txt" placement="left">
               <a href="javascript:;">
                 <span>位置告警：</span>
                 <i>
@@ -154,7 +167,7 @@
             <el-table-column prop="temperature" label="温度"></el-table-column>
           </el-table>
         </div>
-        <el-tooltip class="item" effect="dark" :content="content.table.txt" placement="right">
+        <el-tooltip class="item" effect="light" :content="content.table.txt" placement="right">
           <div class="table_svg" @click="toggleTable">
             <svg-icon iconClass="table_menu" class="table_menu" v-if="temperature"></svg-icon>
             <svg-icon iconClass="line_chart" class="line_chart" v-else></svg-icon>
@@ -239,8 +252,8 @@ export default {
         txt: "显示异常位置图表",
       },
       table: {
-        txt: '数据表格'
-      }
+        txt: "数据表格",
+      },
     });
     /**
      * 查询围栏列表
@@ -394,9 +407,9 @@ export default {
       abnormal.value = !abnormal.value;
       temperature.value = true;
       if (abnormal.value) {
-        content.tmp.txt = "点击切换正常温度图表";
+        content.tmp.txt = "切换正常温度图表";
       } else {
-        content.tmp.txt = "点击切换异常温度图表";
+        content.tmp.txt = "切换异常温度图表";
       }
     };
     /**
@@ -578,10 +591,10 @@ export default {
         });
       }
 
-      if(temperature.value) {
-        content.table.txt = '数据表格';
-      }else {
-        content.table.txt = '数据趋势图';
+      if (temperature.value) {
+        content.table.txt = "数据表格";
+      } else {
+        content.table.txt = "数据趋势图";
       }
     };
     const tableRowClassName = ({ row, rowIndex }) => {
@@ -616,51 +629,7 @@ export default {
           map.addOverlay(marker); //添加一个标注
           map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
           map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
-          let lushu;
-          // 实例化一个驾车导航用来生成路线
-          let drv = new BMap.DrivingRoute("北京", {
-            onSearchComplete: function (res) {
-              if (drv.getStatus() == BMAP_STATUS_SUCCESS) {
-                let plan = res.getPlan(0);
-                let arrPois = [];
-                for (let j = 0; j < plan.getNumRoutes(); j++) {
-                  let route = plan.getRoute(j);
-                  arrPois = arrPois.concat(route.getPath());
-                }
-                map.addOverlay(
-                  new BMap.Polyline(arrPois, { strokeColor: "#111" })
-                );
-                map.setViewport(arrPois);
-                lushu = new BMapLib.LuShu(map, arrPois, {
-                  defaultContent: "从出发地到目的地", //"从天安门到百度大厦"
-                  autoView: true, //是否开启自动视野调整，如果开启那么路书在运动过程中会根据视野自动调整
-                  icon: new BMap.Icon(personTravel, new BMap.Size(48, 48), {
-                    anchor: new BMap.Size(20, 35),
-                  }),
-                  speed: 10000,
-                  enableRotation: false, //是否设置marker随着道路的走向进行旋转props.tmpHistory.newArr_position
-                  landmarkPois: props.tmpHistory.newArr_position,
-                });
-              }
-            },
-          });
-          // 数据为监听数据，第一次获取不到会报错 'lng' of undefined
-          let start = new BMap.Point(
-            props.tmpHistory.newArr_position[0].lng,
-            props.tmpHistory.newArr_position[0].lat
-          );
-          let end = new BMap.Point(
-            props.tmpHistory.newArr_position[
-              props.tmpHistory.newArr_position.length - 1
-            ].lng,
-            props.tmpHistory.newArr_position[
-              props.tmpHistory.newArr_position.length - 1
-            ].lat
-          );
-          drv.search(start, end);
-          function $(element) {
-            return document.getElementById(element);
-          }
+
           //添加圆
           let railPoint = new BMap.Point(railInfo.lng, railInfo.lat); //圆的中心坐标
           let verify =
@@ -763,12 +732,16 @@ $contactsHeight: 592px;
         }
       }
       .info_status {
+        .online_icon {
+          vertical-align: middle;
+          margin-right: 5px;
+        }
         span:first-child {
           color: #787878;
-          margin-right: 8px;
+          margin-right: 5px;
         }
         span:last-child {
-          color: #5090f1;
+          color: #787878;
         }
         margin-bottom: 10px;
       }
@@ -808,6 +781,9 @@ $contactsHeight: 592px;
       .departManagers {
         width: 92%;
         float: right;
+        .depart_item {
+          margin-right: 15px;
+        }
       }
     }
   }
