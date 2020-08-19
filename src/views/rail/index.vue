@@ -527,8 +527,12 @@ export default {
           map.addOverlay(railMarker);
           overlays.push(railMarker);
           addClickHandler(content, railMarker);
-          let radius = parseInt(e.overlay.Da);
+          let radius = parseInt(e.overlay.Da),
+            longitude = e.overlay.point.lng,
+            latitude = e.overlay.point.lat;
           modifyRailData.radius = radius;
+          modifyRailData.longitude = longitude;
+          modifyRailData.latitude = latitude;
           geoc.getLocation(point, function (rs) {
             let addComp = rs.addressComponents;
             modifyRailData.railAddr =
@@ -582,7 +586,6 @@ export default {
         let overlays = []; // 围栏
         map.centerAndZoom(point, 16);
         map.enableScrollWheelZoom();
-
         let overlaycomplete = function (e) {
           clearAll();
           let point = e.overlay.point;
@@ -633,6 +636,7 @@ export default {
         //添加鼠标绘制工具监听事件，用于获取绘制结果
         drawingManager.addEventListener("overlaycomplete", overlaycomplete);
         const clearAll = () => {
+          console.log("1");
           for (let i = 0; i < overlays.length; i++) {
             map.removeOverlay(overlays[i]);
           }
