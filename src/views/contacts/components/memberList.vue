@@ -107,6 +107,7 @@
         <el-table-column prop="temperature" label="体温" width="60"></el-table-column>
         <el-table-column prop="tel" label="电话" width="150"></el-table-column>
         <el-table-column prop="address" label="地址" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
       </el-table>
       <div slot="footer" class="dialog-footer">
         <el-button @click="toggleSelection()">取 消</el-button>
@@ -340,6 +341,10 @@ export default {
             len = data.length;
           if (len !== 0) {
             data.forEach((item) => {
+              let temperature = parseFloat(item.temperature); 
+              if(temperature>=37.3) {
+                item.remark = '温度异常';
+              }
               ungrouped.data.push(item);
             });
             addNodepart_loading.value = false;

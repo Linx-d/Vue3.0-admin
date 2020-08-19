@@ -77,7 +77,9 @@
         >删除管理员</a>
       </div>
       <div class="group">
-        <el-image :src="employee.photo" class="photo"></el-image>
+        <svg-icon iconClass="superManager" v-show="employee.role.id===1" class="managerHead"></svg-icon>
+        <svg-icon iconClass="normalManager" v-show="employee.role.id===2" class="managerHead"></svg-icon>
+        <svg-icon iconClass="departManager" v-show="employee.role.id===3" class="managerHead"></svg-icon>
       </div>
       <el-form label-width="120px" style="position: relative;">
         <div class="group">
@@ -260,7 +262,7 @@ export default {
         name: "role",
       },
       tel: "",
-      gmtCreate: "",
+      gmtCreate: ""
     });
     /**
      * 登录人员详情
@@ -632,6 +634,10 @@ export default {
  */
 $border: 1px rgb(230, 230, 230) solid;
 $corporationHeight: 655px;
+.managerHead {
+  width: 215px;
+  height: 65px;
+}
 .label-info {
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
