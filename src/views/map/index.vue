@@ -421,20 +421,23 @@ export default {
           enableGeolocation: true,
         });
         map.addControl(navigationControl);
-
-        let geolocation = new BMap.Geolocation();
-        geolocation.getCurrentPosition(
-          function (r) {
-            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-              let mk = new BMap.Marker(r.point);
-              map.panTo(r.point);
-              map.centerAndZoom(r.point, 10);
-            } else {
-              alert("定位失败" + this.getStatus());
-            }
-          },
-          { enableHighAccuracy: true }
-        );
+        let locationPermission = sessionStorage.getItem("locationPermission");
+        if (locationPermission=='false') {
+          let geolocation = new BMap.Geolocation();
+          geolocation.getCurrentPosition(
+            function (r) {
+              if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                let mk = new BMap.Marker(r.point);
+                map.panTo(r.point);
+                map.centerAndZoom(r.point, 10);
+                sessionStorage.setItem("locationPermission", true);
+              } else {
+                alert("定位失败" + this.getStatus());
+              }
+            },
+            { enableHighAccuracy: true }
+          );
+        }
         // 添加地图类型控件
         // map.addControl(
         //   new BMap.MapTypeControl({

@@ -26,6 +26,10 @@ if (!sessionStorage.getItem("adminInfo")) {
   });
 }
 
+// 获取位置权限
+sessionStorage.setItem("locationPermission", 'false');
+
+
 new Vue({
   router,
   store,
