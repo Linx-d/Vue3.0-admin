@@ -434,6 +434,32 @@ export default {
           maxZoom: 18,
           enableMapClick: false,
         }); // 创建Map实例
+        let navigationControl = new BMap.NavigationControl({
+          // 靠左上角位置
+          anchor: BMAP_ANCHOR_TOP_LEFT,
+          offset: {
+            width: 430,
+            height: 220
+          },
+          // LARGE类型
+          type: BMAP_NAVIGATION_CONTROL_LARGE,
+          // 启用显示定位
+          enableGeolocation: true,
+        });
+        map.addControl(navigationControl);
+        let geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition(
+          function (r) {
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+              let mk = new BMap.Marker(r.point);
+              map.panTo(r.point);
+              map.centerAndZoom(r.point, 10);
+            } else {
+              alert("定位失败" + this.getStatus());
+            }
+          },
+          { enableHighAccuracy: true }
+        );
         // 添加地图类型控件
         // map.addControl(
         //   new BMap.MapTypeControl({
