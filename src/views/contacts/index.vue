@@ -648,13 +648,26 @@ export default {
             let newArr_time = [],
               newArr_tmp = [],
               newArr_position = [],
-              new_tableData = [];
+              new_tableData = [],
+              error_time = [],
+              error_tmp = [],
+              new_errorTableData = [];
             array.forEach((item) => {
               // temperature
               newArr_time.push(item.gmtCreate);
               let temperature = Number(item.temperature).toFixed(1);
               newArr_tmp.push(temperature); //Number().toFiexd(1)
-
+              let errorObj = {};
+              if (temperature >= 37.3) {
+                error_time.push(item.gmtCreate);
+                error_tmp.push(temperature);
+                errorObj = {
+                  name: currentMemberInfo.name,
+                  time: item.gmtCreate,
+                  temperature: temperature,
+                };
+                new_errorTableData.push(errorObj);
+              }
               // position
               let positionObj = {
                 lng: item.longitude,
@@ -672,13 +685,17 @@ export default {
             });
             tmpHistory.newArr_time = newArr_time;
             tmpHistory.newArr_tmp = newArr_tmp;
+            tmpHistory.error_time = error_time;
+            tmpHistory.error_tmp = error_tmp;
             tmpHistory.newArr_position = newArr_position;
             tmpHistory.tableData = new_tableData.reverse();
+            tmpHistory.error_tableData = new_errorTableData.reverse();
           });
 
           /**根据用户id获取设备最新数据和告警信息 */
           let currentArray = [userId];
           listDeviceAlarmInfoByUserId(currentArray).then((res) => {
+            console.log(res,'res')
             let data = res.data[0] ? res.data[0] : [];
             tmpHistory.railName = data.railName;
             for (let key in data) {
