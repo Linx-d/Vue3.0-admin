@@ -234,7 +234,7 @@
         <el-table-column prop="userName" label="姓名" width="120"></el-table-column>
         <el-table-column prop="userId" label="用户Id" width="120"></el-table-column>
         <el-table-column prop="temperature" label="体温" width="120"></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="300"></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="350"></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -313,7 +313,7 @@ export default {
         pageSize: 15,
       },
       onlineContent: [],
-      temperatureContent: []
+      temperatureContent: [],
     });
     const onlineHandle = () => {
       database.online.visible = true;
@@ -323,19 +323,6 @@ export default {
       database.online.data.splice(0, len);
       database.online.title = "在线用户";
       database.onlineContent.forEach((item) => {
-        let lng = item.longitude,
-          lat = item.latitude;
-        let point = new BMap.Point(lng, lat);
-        let geoc = new BMap.Geocoder();
-        geoc.getLocation(point, function (rs) {
-          let addComp = rs.addressComponents;
-          item.address =
-            addComp.province +
-            addComp.city +
-            addComp.district +
-            addComp.street +
-            addComp.streetNumber;
-        });
         let temperature = parseFloat(item.temperature),
           gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
         let step = 1000 * 60 * 5 + 1;
@@ -358,19 +345,6 @@ export default {
       database.online.data.splice(0, len);
       database.online.title = "离线用户";
       database.onlineContent.forEach((item) => {
-        let lng = item.longitude,
-          lat = item.latitude;
-        let point = new BMap.Point(lng, lat);
-        let geoc = new BMap.Geocoder();
-        geoc.getLocation(point, function (rs) {
-          let addComp = rs.addressComponents;
-          item.address =
-            addComp.province +
-            addComp.city +
-            addComp.district +
-            addComp.street +
-            addComp.streetNumber;
-        });
         let temperature = parseFloat(item.temperature),
           gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
         let step = 1000 * 60 * 5 + 1;
@@ -439,7 +413,7 @@ export default {
           anchor: BMAP_ANCHOR_TOP_LEFT,
           offset: {
             width: 430,
-            height: 220
+            height: 220,
           },
           // LARGE类型
           type: BMAP_NAVIGATION_CONTROL_LARGE,
@@ -447,6 +421,7 @@ export default {
           enableGeolocation: true,
         });
         map.addControl(navigationControl);
+
         let geolocation = new BMap.Geolocation();
         geolocation.getCurrentPosition(
           function (r) {
@@ -599,6 +574,21 @@ export default {
             if (gmtTime < step) {
               deviceOline = true;
             }
+            // 地址逆解析
+            let lng = item.longitude,
+              lat = item.latitude;
+            let pt = new BMap.Point(lng, lat);
+            let geoc = new BMap.Geocoder();
+            geoc.getLocation(pt, function (rs) {
+              let addComp = rs.addressComponents;
+              item.address =
+                addComp.province +
+                addComp.city +
+                addComp.district +
+                addComp.street +
+                addComp.streetNumber;
+            });
+
             let temperature = parseFloat(item.temperature);
             let electric = item.electric;
             let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
