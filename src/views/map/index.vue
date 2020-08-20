@@ -36,14 +36,16 @@
               <span>管理用户:{{ scaleStatic.managerPerson }}</span>人
             </h1>
             <span class="onlineLine"></span>
-            <p class="abnormal_top">
+            <div class="abnormal_top" @click="onlineHandle">
               <span>在线</span>
-              <span>离线</span>
-            </p>
-            <p class="abnormal_bottom">
+              <br />
               <span>{{ scaleStatic.online }}人</span>
+            </div>
+            <div class="abnormal_bottom" @click="unlineHandle">
+              <span>离线</span>
+              <br />
               <span>{{ scaleStatic.unline }}人</span>
-            </p>
+            </div>
           </div>
         </div>
         <div class="alanysis-b">
@@ -212,6 +214,41 @@
       </div>
     </div>
     <!-- alanysis 数据分析模块 end -->
+
+    <!-- 用户在线情况 -->
+
+    <el-dialog
+      :title="database.online.title"
+      :visible.sync="database.online.visible"
+      :close-on-click-modal="false"
+      class="online_dialog"
+    >
+      <el-table
+        :data="database.online.show"
+        style="width: 100%"
+        max-height="500"
+        height="500"
+        v-loading="database.online.loading"
+      >
+        <el-table-column fixed prop="gmtCreate" label="最新上传数据时间" width="200"></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="120"></el-table-column>
+        <el-table-column prop="userId" label="用户Id" width="120"></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="120"></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="300"></el-table-column>
+      </el-table>
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="database.online.pageNum"
+          :page-sizes="database.online.pageSizes"
+          :page-size="database.online.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="database.online.total"
+        ></el-pagination>
+      </div>
+    </el-dialog>
+    <!-- 用户温度情况 -->
   </main>
 </template>
 
@@ -252,6 +289,115 @@ import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
   setup(props, { root, refs }) {
+    const database = reactive({
+      online: {
+        title: "",
+        visible: false,
+        loading: true,
+        data: [],
+        show: [],
+        total: 0,
+        pageSizes: [15, 20, 30, 40],
+        pageNum: 1,
+        pageSize: 15,
+      },
+      temperature: {
+        title: "",
+        visible: false,
+        loading: true,
+        data: [],
+        show: [],
+        total: 0,
+        pageSizes: [15, 20, 30, 40],
+        pageNum: 1,
+        pageSize: 15,
+      },
+      onlineContent: [],
+      temperatureContent: []
+    });
+    const onlineHandle = () => {
+      database.online.visible = true;
+      database.online.pageNum = 1;
+      database.online.pageSize = 15;
+      let len = database.online.data.length;
+      database.online.data.splice(0, len);
+      database.online.title = "在线用户";
+      database.onlineContent.forEach((item) => {
+        let lng = item.longitude,
+          lat = item.latitude;
+        let point = new BMap.Point(lng, lat);
+        let geoc = new BMap.Geocoder();
+        geoc.getLocation(point, function (rs) {
+          let addComp = rs.addressComponents;
+          item.address =
+            addComp.province +
+            addComp.city +
+            addComp.district +
+            addComp.street +
+            addComp.streetNumber;
+        });
+        let temperature = parseFloat(item.temperature),
+          gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
+        let step = 1000 * 60 * 5 + 1;
+        if (gmt < step) {
+          database.online.data.push(item);
+        }
+      });
+      database.online.total = database.online.data.length;
+      database.online.show = database.online.data.slice(
+        0,
+        database.online.pageSize
+      );
+      database.online.loading = false;
+    };
+    const unlineHandle = () => {
+      database.online.visible = true;
+      database.online.pageNum = 1;
+      database.online.pageSize = 15;
+      let len = database.online.data.length;
+      database.online.data.splice(0, len);
+      database.online.title = "离线用户";
+      database.onlineContent.forEach((item) => {
+        let lng = item.longitude,
+          lat = item.latitude;
+        let point = new BMap.Point(lng, lat);
+        let geoc = new BMap.Geocoder();
+        geoc.getLocation(point, function (rs) {
+          let addComp = rs.addressComponents;
+          item.address =
+            addComp.province +
+            addComp.city +
+            addComp.district +
+            addComp.street +
+            addComp.streetNumber;
+        });
+        let temperature = parseFloat(item.temperature),
+          gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
+        let step = 1000 * 60 * 5 + 1;
+        if (gmt >= step) {
+          database.online.data.push(item);
+        }
+      });
+      database.online.total = database.online.data.length;
+      database.online.show = database.online.data.slice(
+        0,
+        database.online.pageSize
+      );
+      database.online.loading = false;
+    };
+    const handleSizeChange = (val) => {
+      database.online.pageSize = val;
+      let start = database.online.pageSize * (database.online.pageNum - 1);
+      let end = database.online.pageSize * database.online.pageNum;
+      database.online.show = database.online.data.slice(start, end);
+    };
+    const handleCurrentChange = (val) => {
+      console.log(`当前页: ${val}`);
+      database.online.pageNum = val;
+      let start = database.online.pageSize * (database.online.pageNum - 1);
+      let end = database.online.pageSize * database.online.pageNum;
+      database.online.show = database.online.data.slice(start, end);
+    };
     /**
      * 图表框
      */
@@ -267,7 +413,7 @@ export default {
       online: 0,
       unline: 0,
     });
-    getCorpInfo().then(res=> {
+    getCorpInfo().then((res) => {
       scaleStatic.person = res.data.member;
     });
     const full = computed(() => {
@@ -418,11 +564,13 @@ export default {
             onlineStatic: 0,
           };
           scaleStatic.managerPerson = data.length;
+          database.onlineContent = data;
           data.forEach((item) => {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
             let deviceOline = false;
-            if (gmtTime < 1800001) {
+            let step = 1000 * 60 * 5 + 1;
+            if (gmtTime < step) {
               deviceOline = true;
             }
             let temperature = parseFloat(item.temperature);
@@ -486,7 +634,7 @@ export default {
               },
             ],
           });
-          map.setViewport(pointArray);
+          // map.setViewport(pointArray);
           /*----------热力图 login---------*/
           var points = hitArray;
 
@@ -887,6 +1035,11 @@ export default {
       toogle_member,
       member_close,
       item_active,
+      database,
+      onlineHandle,
+      unlineHandle,
+      handleSizeChange,
+      handleCurrentChange,
     };
   },
 };
@@ -1004,26 +1157,34 @@ $echartsBorder: 1px solid #146ede;
       font-size: 20px;
       text-align: center;
       .abnormal_top {
+        float: left;
+        width: 50%;
         margin-top: 10px;
+        cursor: pointer;
         span {
           display: inline-block;
           width: 50%;
           text-align: center;
           line-height: 20px;
           color: #95dbff;
+          margin-bottom: 10px;
         }
         span:last-child {
           color: #dcb917;
         }
       }
       .abnormal_bottom {
+        float: left;
+        width: 50%;
         margin-top: 10px;
+        cursor: pointer;
         span {
           display: inline-block;
           width: 50%;
           text-align: center;
           line-height: 20px;
           color: #95dbff;
+          margin-bottom: 10px;
         }
         span:last-child {
           color: #dcb917;
