@@ -139,7 +139,12 @@
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="light" :content="content.position.txt" placement="left">
+            <el-tooltip
+              class="item"
+              effect="light"
+              :content="content.position.txt"
+              placement="left"
+            >
               <a href="javascript:;">
                 <span>位置告警：</span>
                 <i>
@@ -157,14 +162,15 @@
         <div id="info_temperature" class="info_module" v-show="temperature"></div>
         <div id="info_table" v-show="!temperature">
           <el-table
-            :data="tableData"
+            :data="paging.data"
             style="width: 100%"
             :row-class-name="tableRowClassName"
             height="430"
           >
             <el-table-column prop="time" label="日期" width="180"></el-table-column>
-            <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-            <el-table-column prop="temperature" label="温度"></el-table-column>
+            <el-table-column prop="name" label="姓名" width="120"></el-table-column>
+            <el-table-column prop="temperature" label="温度" width="120"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
           </el-table>
         </div>
         <el-tooltip class="item" effect="light" :content="content.table.txt" placement="right">
@@ -173,6 +179,14 @@
             <svg-icon iconClass="line_chart" class="line_chart" v-else></svg-icon>
           </div>
         </el-tooltip>
+        <el-pagination
+          background
+          @current-change="handleCurrentChange"
+          layout="prev, pager, next"
+          :total="paging.total"
+          :page-size="paging.pageSize"
+          v-if="!temperature"
+        ></el-pagination>
       </div>
       <div class="info_module mapBox" v-loading="loading">
         <div id="mapShow"></div>
@@ -240,6 +254,30 @@ export default {
      *
      */
     const loading = ref(true);
+    // 分页配置
+    const paging = reactive({
+      pageNum: 1,
+      pageSize: 15,
+      data: [],
+      total: 0,
+    });
+    const handleCurrentChange = (val) => {
+      paging.pageNum = val;
+      if (abnormal.value) {
+        paging.data.splice(0, paging.data.length);
+        let start = paging.pageSize * (paging.pageNum - 1);
+        let end = paging.pageSize * paging.pageNum;
+        paging.data = props.tmpHistory.error_tableData.slice(start, end);
+        paging.total = props.tmpHistory.error_tableData.length;
+      } else {
+        paging.data.splice(0, paging.data.length);
+        let start = paging.pageSize * (paging.pageNum - 1);
+        let end = paging.pageSize * paging.pageNum;
+        paging.data = props.tmpHistory.tableData.slice(start, end);
+        paging.total = props.tmpHistory.tableData.length;
+      }
+    };
+
     let contactsModule = props.contactsModule; // contacts 模块
     const dialogRailVisible = reactive({
       status: false,
@@ -578,17 +616,18 @@ export default {
     const tableData = reactive([]);
     const toggleTable = () => {
       temperature.value = !temperature.value;
-
       if (abnormal.value) {
-        tableData.splice(0, tableData.length);
-        props.tmpHistory.error_tableData.forEach((item) => {
-          tableData.push(item);
-        });
+        paging.data.splice(0, paging.data.length);
+        let start = paging.pageSize * (paging.pageNum - 1);
+        let end = paging.pageSize * paging.pageNum;
+        paging.data = props.tmpHistory.error_tableData.slice(start, end);
+        paging.total = props.tmpHistory.error_tableData.length;
       } else {
-        tableData.splice(0, tableData.length);
-        props.tmpHistory.tableData.forEach((item) => {
-          tableData.push(item);
-        });
+        paging.data.splice(0, paging.data.length);
+        let start = paging.pageSize * (paging.pageNum - 1);
+        let end = paging.pageSize * paging.pageNum;
+        paging.data = props.tmpHistory.tableData.slice(start, end);
+        paging.total = props.tmpHistory.tableData.length;
       }
 
       if (temperature.value) {
@@ -607,7 +646,8 @@ export default {
     /**
      * 百度地图方法
      */
-    const baiduMap = () => {
+    let map = null;
+    ((window) => {
       watchEffect(() => {
         // 成员坐标
         let location = {
@@ -621,7 +661,7 @@ export default {
           radius: props.currentMemberInfo.radius,
         };
         Map("ak").then((BMap) => {
-          let map = new BMap.Map("mapShow"); // 创建Map实例
+          map = new BMap.Map("mapShow"); // 创建Map实例
           let pointArray = [];
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
           pointArray.push(point);
@@ -653,14 +693,52 @@ export default {
           map.addOverlay(circle);
         });
       });
-    };
+    })(window);
+
     onMounted(() => {
-      baiduMap();
       memberInfoEcharts();
       loading.value = false;
     });
+    watchEffect(() => {
+      // 逆解析地址
+      let len = props.tmpHistory.newArr_position.length;
+      if (len != 0) {
+        props.tmpHistory.newArr_position.forEach((item, index) => {
+          // 地址逆解析
+          let lng = item.lng,
+            lat = item.lat;
+          let pt = new BMap.Point(lng, lat);
+          let geoc = new BMap.Geocoder();
+          geoc.getLocation(pt, function (rs) {
+            let addComp = rs.addressComponents;
+            props.tmpHistory.tableData[index].address =
+              addComp.province +
+              addComp.city +
+              addComp.district +
+              addComp.street +
+              addComp.streetNumber;
+            if (props.tmpHistory.error_tableData[index] != undefined) {
+              props.tmpHistory.error_tableData[index].address =
+                addComp.province +
+                addComp.city +
+                addComp.district +
+                addComp.street +
+                addComp.streetNumber;
+            }
+          });
+        });
+      }
+
+      // 切换个人信息温度表格
+      if (!contactsModule.memberInfo) {
+        temperature.value = true; // 显示趋势图
+        abnormal.value = false;
+      }
+    });
     return {
       loading,
+      paging,
+      handleCurrentChange,
       memberInfoBack,
       bindOpen,
       unBindOpen,

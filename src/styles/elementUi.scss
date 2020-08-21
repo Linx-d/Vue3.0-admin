@@ -212,6 +212,12 @@
     }
   }
 }
+#temperature_box {
+  .el-pagination {
+    margin-bottom: 15px;
+    transform: translateX(350px) translateY(-11px);
+  }
+}
 
 // 权限管理菜单项
 .el-menu-item.is-active {
