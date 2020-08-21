@@ -4,7 +4,7 @@
     <div class="logo">
       <div class="logo_zi">
         <!-- <img :src="employeeInfo.photo" /> -->
-        <svg-icon :iconClass="employeeInfo.photo" className="auth_icon"></svg-icon>
+        <svg-icon :iconClass="employeeInfo.photo" class="auth_icon"></svg-icon>
       </div>
     </div>
     <div class="info">
@@ -18,11 +18,21 @@
         </div>
       </div>
       <div class="info_item_center">
-        <div class="info_item_center_a">联系电话</div>
+        <div class="info_item_center_a">联系方式</div>
         <div class="info_item_center_b">
           <i v-show="employeeInfo.tel">{{ employeeInfo.tel }}</i>
           <a hefr="javascript:;" class="modifyInfoBtn" @click="modifyStaffTel">
             <span v-if="employeeInfo.tel">修改</span>
+            <span v-else>添加</span>
+          </a>
+        </div>
+      </div>
+      <div class="info_item_center memberEmail">
+        <div class="info_item_center_a">电子邮箱</div>
+        <div class="info_item_center_b">
+          <i v-show="employeeInfo.email">{{ employeeInfo.email }}</i>
+          <a hefr="javascript:;" class="modifyInfoBtn" @click="modifyStaffEmail">
+            <span v-if="employeeInfo.email">修改</span>
             <span v-else>添加</span>
           </a>
         </div>
@@ -108,11 +118,11 @@
       </div>
     </el-dialog>
 
-    <!-- 修改电话 弹出框 -->
+    <!-- 修改联系方式 弹出框 -->
     <el-dialog
-      title="修改电话"
+      title="修改联系方式"
       :visible.sync="modifyStaffData.dialogTelVisible"
-      :before-close="modifyBefore"
+      :before-close="modifyTelBefore"
     >
       <el-form
         :model="employeeInfo"
@@ -121,13 +131,36 @@
         label-width="100px"
         class="employeeInfoClass"
       >
-        <el-form-item label="电话" :label-width="modifyStaffData.formLabelWidth" prop="tel">
+        <el-form-item label="联系方式" :label-width="modifyStaffData.formLabelWidth" prop="tel">
           <el-input v-model="employeeInfo.tel" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyTelCancle()">取 消</el-button>
         <el-button type="primary" @click="confirmTelOpen('employeeInfo')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 修改电子邮箱 弹出框 -->
+    <el-dialog
+      title="修改电子邮箱"
+      :visible.sync="modifyStaffData.dialogEmailVisible"
+      :before-close="modifyEmailBefore"
+    >
+      <el-form
+        :model="employeeInfo"
+        :rules="rules"
+        ref="employeeInfo"
+        label-width="100px"
+        class="employeeInfoClass"
+      >
+        <el-form-item label="Email" :label-width="modifyStaffData.formLabelWidth" prop="email">
+          <el-input v-model="employeeInfo.email" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="modifyEmailCancle()">取 消</el-button>
+        <el-button type="primary" @click="confirmEmailOpen('employeeInfo')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -150,6 +183,7 @@ export default {
       name: "",
       photo:
         "https://p.qlogo.cn/bizmail/x9CrcRIuFWvA8VQcstTibfPAsrpcpFulOZwapfGCNwjkJMVUibNl0kWA/0",
+      email: "",
       tel: null,
       departmentManagers: null,
       gmtCreate: "2020-06-11 16:29:08",
@@ -170,6 +204,7 @@ export default {
       employeeInfo.id = data.id;
       employeeInfo.name = data.name;
       employeeInfo.tel = data.tel;
+      employeeInfo.email = data.email;
       employeeInfo.gmtCreate = data.gmtCreate || "暂无";
       employeeInfo.gmtModified = data.gmtModified || "暂无";
       employeeInfo.corpUserId = data.corpUserId || "暂无";
@@ -179,15 +214,15 @@ export default {
       employeeInfo.corpId = employeeInfo.corpId;
       if (roleId === 1) {
         employeeInfo.departmentManagers = "所有部门";
-        employeeInfo.photo = 'superManager';
+        employeeInfo.photo = "superManager";
       } else if (roleId === 2) {
         employeeInfo.departmentManagers = "所有部门";
-        employeeInfo.photo = 'normalManager';
+        employeeInfo.photo = "normalManager";
       } else if (roleId === null) {
         employeeInfo.departmentManagers = null;
-        employeeInfo.photo = 'departManager_no';
+        employeeInfo.photo = "departManager_no";
       } else {
-        employeeInfo.photo = 'departManager';
+        employeeInfo.photo = "departManager";
         let departManagers = data.departmentManagers;
         employeeInfo.departmentManagers = [];
         if (departManagers != null && departManagers.length > 0) {
@@ -209,11 +244,12 @@ export default {
     const modifyStaffData = reactive({
       dialogNameVisible: false,
       dialogTelVisible: false,
+      dialogEmailVisible: false,
       formLabelWidth: "120px",
     });
     const rules = reactive({
       name: [
-        { required: true, message: "请输入名称" },
+        {  message: "请输入名称" },
         // { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
       tel: [
@@ -274,6 +310,32 @@ export default {
         }
       });
     };
+    const submitEmailForm = (formName) => {
+      refs[formName].validate((valid) => {
+        if (valid) {
+          let modifyData = new URLSearchParams();
+          modifyData.append("email", employeeInfo.email);
+          modifyData.append("id", employeeInfo.id);
+          updateEmployeeNotAuth(modifyData).then((res) => {
+            let code = res.code;
+            if (code === 0) {
+              root.$message({
+                type: "success",
+                message: "修改成功",
+              });
+              modifyStaffData.dialogEmailVisible = false;
+            } else {
+              root.$message({
+                type: "warning",
+                message: res.msg,
+              });
+            }
+          });
+        } else {
+          return false;
+        }
+      });
+    };
     const resetForm = (formName) => {
       refs[formName].resetFields();
     };
@@ -287,6 +349,9 @@ export default {
     };
     const modifyStaffTel = () => {
       modifyStaffData.dialogTelVisible = true;
+    };
+    const modifyStaffEmail = () => {
+      modifyStaffData.dialogEmailVisible = true;
     };
     const confirmNameOpen = (data) => {
       let patrn = /[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、''；‘'，。、]/im;
@@ -302,7 +367,14 @@ export default {
     const confirmTelOpen = (data) => {
       submitTelForm(data);
     };
+    const confirmEmailOpen = (data) => {
+      submitEmailForm(data);
+    };
     const modifyNameCancle = () => {
+      resetForm("employeeInfo");
+      modifyStaffData.dialogNameVisible = false;
+    };
+    const modifyNameBefore = () => {
       resetForm("employeeInfo");
       modifyStaffData.dialogNameVisible = false;
     };
@@ -310,13 +382,17 @@ export default {
       resetForm("employeeInfo");
       modifyStaffData.dialogTelVisible = false;
     };
-    const modifyBefore = () => {
+    const modifyTelBefore = () => {
       resetForm("employeeInfo");
-      modifyStaffData.dialogNameVisible = false;
+      modifyStaffData.dialogTelVisible = false;
     };
-    const modifyNameBefore = () => {
+    const modifyEmailCancle = () => {
       resetForm("employeeInfo");
-      modifyStaffData.dialogNameVisible = false;
+      modifyStaffData.dialogEmailVisible = false;
+    };
+    const modifyEmailBefore = () => {
+      resetForm("employeeInfo");
+      modifyStaffData.dialogEmailVisible = false;
     };
 
     /**修改名称限制输入特殊字符 */
@@ -348,17 +424,21 @@ export default {
       employeeInfo,
       employeeName,
       modifyStaffData,
+      modifyStaffEmail,
       modifyStaffName,
       modifyStaffTel,
       confirmNameOpen,
       rules,
       modifyNameCancle,
-      modifyBefore,
       modifyNameBefore,
       modifyTelCancle,
       confirmTelOpen,
+      confirmEmailOpen,
       loadWWOpenData,
       inputDetection,
+      modifyEmailCancle,
+      modifyEmailBefore,
+      modifyTelBefore,
     };
   },
 };
@@ -430,6 +510,9 @@ $mainWidth: 80%;
         color: rgb(0, 0, 0);
         float: right;
       }
+    }
+    .memberEmail {
+      padding-top: 0;
     }
     i {
       font-style: normal;

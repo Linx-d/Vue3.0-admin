@@ -29,6 +29,7 @@
               <th>温度</th>
               <th>电话</th>
               <th>住址</th>
+              <th>备注</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -50,6 +51,7 @@
               <td :title="member.temperature">{{ member.temperature }}</td>
               <td :title="member.tel">{{ member.tel }}</td>
               <td :title="member.address">{{ member.address }}</td>
+              <td title="温度异常"> <svg-icon iconClass="warning1" v-if="member.temperature>=37.3"></svg-icon>   </td>
               <td class="tdTool">
                 <a href="javascript:;" @click.stop="compileTool(member)">查看</a>
                 <a href="javascript:;" @click.stop="delMember(member.userId, index)">移除</a>
