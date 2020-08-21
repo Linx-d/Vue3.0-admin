@@ -575,7 +575,7 @@ export default {
       let data = modifyNodeData.data;
       return updateDepartment({
         id: data.id,
-        name: data.label,
+        name: data.name,
         pid: data.pid,
         displayOrder: data.displayOrder,
       });
@@ -695,7 +695,6 @@ export default {
           /**根据用户id获取设备最新数据和告警信息 */
           let currentArray = [userId];
           listDeviceAlarmInfoByUserId(currentArray).then((res) => {
-            console.log(res,'res')
             let data = res.data[0] ? res.data[0] : [];
             tmpHistory.railName = data.railName;
             for (let key in data) {
@@ -893,7 +892,6 @@ export default {
         modifyData.status = true;
       } else {
         let inputTxt = refs.partmentChangeContent.value;
-        modifyNodeData.data.label = inputTxt;
         modifyNodeData.data.name = inputTxt;
         updateDepart(modifyNodeData)
           .then((res) => {
@@ -904,6 +902,7 @@ export default {
               });
               currentDepart.label = inputTxt; // 修改memberList中的名称
               modifyData.visibel = false;
+              modifyNodeData.data.label = inputTxt;
             } else {
               root.$message({
                 message: res.msg,

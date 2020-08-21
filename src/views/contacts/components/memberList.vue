@@ -51,7 +51,11 @@
               <td :title="member.temperature">{{ member.temperature }}</td>
               <td :title="member.tel">{{ member.tel }}</td>
               <td :title="member.address">{{ member.address }}</td>
-              <td title="温度异常"> <svg-icon iconClass="warning1" v-if="member.temperature>=37.3"></svg-icon>   </td>
+              <td>
+                <span title="温度异常">
+                  <svg-icon iconClass="warning1" v-if="member.temperature>=37.3"></svg-icon>
+                </span>
+              </td>
               <td class="tdTool">
                 <a href="javascript:;" @click.stop="compileTool(member)">查看</a>
                 <a href="javascript:;" @click.stop="delMember(member.userId, index)">移除</a>
@@ -343,9 +347,9 @@ export default {
             len = data.length;
           if (len !== 0) {
             data.forEach((item) => {
-              let temperature = parseFloat(item.temperature); 
-              if(temperature>=37.3) {
-                item.remark = '温度异常';
+              let temperature = parseFloat(item.temperature);
+              if (temperature >= 37.3) {
+                item.remark = "温度异常";
               }
               ungrouped.data.push(item);
             });
