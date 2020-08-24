@@ -654,9 +654,15 @@ $corporationHeight: 655px;
 }
 .list {
   min-height: $corporationHeight;
+  max-height: $scrollHeight_corporation;
   width: 23%;
   // height: 100%;
   border-right: $border;
+  .roleMenu {
+    height: 100%;
+    overflow: scroll;
+    overflow-x: hidden;
+  }
 }
 .detail {
   min-height: $corporationHeight;

@@ -1086,6 +1086,7 @@ $contactsHeight: 592px;
     .chunk_title {
       min-width: 257px;
       height: $contactsHeight;
+      max-height: $scrollHeight_corporation;
       .chunk_title_top {
         padding: 10px;
         border-bottom: 1px solid #e4e6e9;

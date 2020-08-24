@@ -22,40 +22,46 @@ export default {
       {
         name: "企业信息",
         path: "/corporation/corporation_info",
-        current: false
+        current: false,
       },
       {
         name: "权限管理",
         path: "/corporation/corporation_authority",
-        current: false
+        current: false,
       },
       {
         name: "个人信息",
         path: "/corporation/corporation_set",
-        current: false
-      }
+        current: false,
+      },
     ]);
     return { tabNavs };
-  }
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 $corporationHeight: 655px;
-.corporation_main {
-  .chunk_title {
-    height: $corporationHeight;
-    padding-top: 12px;
-    min-width: 175px;
-  }
-  .tabNav_item_curr {
-    background: $tabNav_color;
-    a {
-      color: #fff;
+#corporation {
+  max-height: $scrollHeight_corporation;
+  overflow: hidden;
+  .corporation_main {
+    .chunk_title {
+      height: $corporationHeight;
+      padding-top: 12px;
+      min-width: 175px;
+      max-height: $scrollHeight_corporation;
+    }
+    .tabNav_item_curr {
+      background: $tabNav_color;
+      a {
+        color: #fff;
+      }
+    }
+    .chunk_cnt {
+      padding: 0;
+      max-height: $scrollHeight_corporation;
     }
   }
-}
-.chunk_cnt {
-  padding: 0;
 }
 </style>
