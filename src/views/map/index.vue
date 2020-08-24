@@ -228,12 +228,13 @@
         max-height="500"
         height="500"
         v-loading="database.online.loading"
+        :row-class-name="tableRowClassName"
       >
-        <el-table-column fixed prop="gmtCreate" label="最新上传数据时间" width="200" sortable></el-table-column>
-        <el-table-column prop="userName" label="姓名" width="120" sortable></el-table-column>
-        <el-table-column prop="userId" label="用户Id" width="120" sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="120" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="350" sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="250" sortable></el-table-column>
+        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="300" sortable></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -260,12 +261,13 @@
         max-height="500"
         height="500"
         v-loading="database.temperature.loading"
+        :row-class-name="tableRowClassName"
       >
-        <el-table-column fixed prop="gmtCreate" label="最新上传数据时间" width="200" sortable></el-table-column>
-        <el-table-column prop="userName" label="姓名" width="120" sortable></el-table-column>
-        <el-table-column prop="userId" label="用户Id" width="120" sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="120" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="350" sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="250" sortable></el-table-column>
+        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="300" sortable></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -478,6 +480,14 @@ export default {
         database.temperature.pageSize * (database.temperature.pageNum - 1);
       let end = database.temperature.pageSize * database.temperature.pageNum;
       database.temperature.show = database.temperature.data.slice(start, end);
+    };
+    // 异常状态表格
+    const tableRowClassName = ({ row, rowIndex }) => {
+      let temperature = parseFloat(row.temperature);
+      if (temperature >= 37.3) {
+        return "warning-row";
+      }
+      return "";
     };
     /**
      * 图表框
@@ -862,9 +872,7 @@ export default {
       onlineChart.on("click", function (params) {
         if (params.name == "体温正常人数") {
           normalHandle();
-          console.log(database, 'database');
         } else {
-          console.log(database, 'ab');
           abnormalHandle();
         }
       });
@@ -1185,6 +1193,7 @@ export default {
       handleCurrentChange_online,
       handleSizeChange_normal,
       handleCurrentChange_abnormal,
+      tableRowClassName
     };
   },
 };
