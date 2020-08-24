@@ -271,6 +271,7 @@ import {
 } from "@/api/mapApi";
 import { listRail, selectRailList, listUserInfoByRail } from "@/api/railApi";
 import { getCorpInfo } from "@/api/corporationApi";
+import { select } from "@/api/contactsApi";
 import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
 import { adaptionEchartsV2 } from "@/utils/common"; // 图表自适应
 import alarmOption from "./options/alarmOption.js"; // 告警模块
@@ -289,6 +290,24 @@ import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
   setup(props, { root, refs }) {
+    /**
+     * 设备频率
+     */
+    let deviceStep = reactive({
+      step: 0,
+    });
+    select().then((res) => {
+      let hours = new Date().getHours(),
+        dayInterval = res.data.dayInterval,
+        dayTime = res.data.dayTime,
+        nightInterval = res.data.nightInterval,
+        nightTime = res.data.nightTime;
+      if (hours >= dayTime && hours <= nightTime) {
+        deviceStep.step = dayInterval * 60 * 1000 * 2;
+      } else {
+        deviceStep.step = nightInterval * 60 * 1000 * 2;
+      }
+    });
     const database = reactive({
       online: {
         title: "",
@@ -325,7 +344,7 @@ export default {
       database.onlineContent.forEach((item) => {
         let temperature = parseFloat(item.temperature),
           gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
-        let step = 1000 * 60 * 5 + 1;
+        let step = deviceStep.step;
         if (gmt < step) {
           database.online.data.push(item);
         }
@@ -347,7 +366,7 @@ export default {
       database.onlineContent.forEach((item) => {
         let temperature = parseFloat(item.temperature),
           gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
-        let step = 1000 * 60 * 5 + 1;
+        let step = deviceStep.step;
         if (gmt >= step) {
           database.online.data.push(item);
         }

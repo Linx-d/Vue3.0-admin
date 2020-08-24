@@ -267,3 +267,17 @@ export function listDepartmentByUser(data) {
     url: "/dept/listDepartmentByUser?id=" + data.id,
   });
 }
+
+/**
+ * 查询当前企业的设备上传频率
+ *
+ * @export
+ * @param null
+ * @returns
+ */
+export function select(data) {
+  return service.request({
+    method: "get",
+    url: "/upload/select",
+  });
+}

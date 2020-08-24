@@ -134,6 +134,7 @@ import {
   addMember,
   fuzzySearchNotGroup,
   listDepartmentByUser,
+  select,
 } from "@/api/contactsApi";
 import { getLoginEmployee } from "@/api/employeeApi";
 import { Message } from "element-ui";
@@ -168,6 +169,24 @@ export default {
     },
   },
   setup(props, { root, refs }) {
+    /**
+     * 设备频率
+     */
+    let deviceStep = reactive({
+      step: 0,
+    });
+    select().then((res) => {
+      let hours = new Date().getHours(),
+        dayInterval = res.data.dayInterval,
+        dayTime = res.data.dayTime,
+        nightInterval = res.data.nightInterval,
+        nightTime = res.data.nightTime;
+      if (hours >= dayTime && hours <= nightTime) {
+        deviceStep.step = dayInterval * 60 * 1000 * 2;
+      } else {
+        deviceStep.step = nightInterval * 60 * 1000 * 2;
+      }
+    });
     /**检测当前管理员是否有权限查看当前部门
      *
      */
@@ -214,12 +233,12 @@ export default {
 
       // 获得成员个人信息
       let currentMemberInfo = props.currentMemberInfo;
+      let step = deviceStep.step;
       for (let key in currentMemberInfo) {
-        let step = 6*1000*5*2;
         let time = new Date().getTime() - new Date(data.gmtCreate).getTime();
-        if(time<step) {
+        if (time < step) {
           currentMemberInfo.online = true;
-        }else {
+        } else {
           currentMemberInfo.online = false;
         }
         currentMemberInfo[key] = data[key];
@@ -307,7 +326,7 @@ export default {
           }
         }
         for (let key in currentMemberInfo) {
-          if (key === "railName" || key =="online") {
+          if (key === "railName" || key == "online") {
             continue;
           }
           let verify =
@@ -328,9 +347,9 @@ export default {
      */
     // 获取登录人员权限ID
     const loginEmployeeInfo = reactive({
-      role: null
+      role: null,
     });
-    getLoginEmployee().then(res => {
+    getLoginEmployee().then((res) => {
       loginEmployeeInfo.role = res.data.role;
     });
     /**
