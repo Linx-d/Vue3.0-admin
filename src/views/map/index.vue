@@ -216,7 +216,6 @@
     <!-- alanysis 数据分析模块 end -->
 
     <!-- 用户在线情况 -->
-
     <el-dialog
       :title="database.online.title"
       :visible.sync="database.online.visible"
@@ -238,8 +237,8 @@
       </el-table>
       <div class="block">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange_online"
+          @current-change="handleCurrentChange_online"
           :current-page="database.online.pageNum"
           :page-sizes="database.online.pageSizes"
           :page-size="database.online.pageSize"
@@ -249,6 +248,37 @@
       </div>
     </el-dialog>
     <!-- 用户温度情况 -->
+    <el-dialog
+      :title="database.temperature.title"
+      :visible.sync="database.temperature.visible"
+      :close-on-click-modal="false"
+      class="temperature_dialog"
+    >
+      <el-table
+        :data="database.temperature.show"
+        style="width: 100%"
+        max-height="500"
+        height="500"
+        v-loading="database.temperature.loading"
+      >
+        <el-table-column fixed prop="gmtCreate" label="最新上传数据时间" width="200" sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="120" sortable></el-table-column>
+        <el-table-column prop="userId" label="用户Id" width="120" sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="120" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="350" sortable></el-table-column>
+      </el-table>
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange_normal"
+          @current-change="handleCurrentChange_abnormal"
+          :current-page="database.temperature.pageNum"
+          :page-sizes="database.temperature.pageSizes"
+          :page-size="database.temperature.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="database.temperature.total"
+        ></el-pagination>
+      </div>
+    </el-dialog>
   </main>
 </template>
 
@@ -295,6 +325,7 @@ export default {
      */
     let deviceStep = reactive({
       step: 0,
+      marking: 37.3,
     });
     select().then((res) => {
       let hours = new Date().getHours(),
@@ -378,18 +409,75 @@ export default {
       );
       database.online.loading = false;
     };
-    const handleSizeChange = (val) => {
+    const normalHandle = () => {
+      database.temperature.visible = true;
+      database.temperature.pageNum = 1;
+      database.temperature.pageSize = 15;
+      let len = database.temperature.data.length;
+      database.temperature.data.splice(0, len);
+      database.temperature.title = "体温正常用户";
+      database.temperatureContent.forEach((item) => {
+        let temperature = parseFloat(item.temperature);
+        let marking = deviceStep.marking;
+        if (temperature <= marking) {
+          database.temperature.data.push(item);
+        }
+      });
+      database.temperature.total = database.temperature.data.length;
+      database.temperature.show = database.temperature.data.slice(
+        0,
+        database.temperature.pageSize
+      );
+      database.temperature.loading = false;
+    };
+    const abnormalHandle = () => {
+      database.temperature.visible = true;
+      database.temperature.pageNum = 1;
+      database.temperature.pageSize = 15;
+      let len = database.temperature.data.length;
+      database.temperature.data.splice(0, len);
+      database.temperature.title = "体温异常用户";
+      database.temperatureContent.forEach((item) => {
+        let temperature = parseFloat(item.temperature);
+        let marking = deviceStep.marking;
+        if (temperature > marking) {
+          database.temperature.data.push(item);
+        }
+      });
+      database.temperature.total = database.temperature.data.length;
+      database.temperature.show = database.temperature.data.slice(
+        0,
+        database.temperature.pageSize
+      );
+      database.temperature.loading = false;
+    };
+    const handleSizeChange_online = (val) => {
       database.online.pageSize = val;
       let start = database.online.pageSize * (database.online.pageNum - 1);
       let end = database.online.pageSize * database.online.pageNum;
       database.online.show = database.online.data.slice(start, end);
     };
-    const handleCurrentChange = (val) => {
+    const handleCurrentChange_online = (val) => {
       console.log(`当前页: ${val}`);
       database.online.pageNum = val;
       let start = database.online.pageSize * (database.online.pageNum - 1);
       let end = database.online.pageSize * database.online.pageNum;
       database.online.show = database.online.data.slice(start, end);
+    };
+    const handleSizeChange_normal = (val) => {
+      database.temperature.pageSize = val;
+      let start =
+        database.temperature.pageSize * (database.temperature.pageNum - 1);
+      let end = database.temperature.pageSize * database.temperature.pageNum;
+      database.temperature.show = database.temperature.data.slice(start, end);
+    };
+    const handleCurrentChange_abnormal = (val) => {
+      console.log(`当前页: ${val}`);
+      database.temperature.pageNum = val;
+      let start =
+        database.temperature.pageSize * (database.temperature.pageNum - 1);
+      let end = database.temperature.pageSize * database.temperature.pageNum;
+      database.temperature.show = database.temperature.data.slice(start, end);
     };
     /**
      * 图表框
@@ -592,6 +680,7 @@ export default {
           };
           scaleStatic.managerPerson = data.length;
           database.onlineContent = data;
+          database.temperatureContent = data;
           data.forEach((item) => {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
@@ -760,7 +849,7 @@ export default {
       });
     })(window);
     /**
-     * 在线率 online
+     * 温度异常 abnormal
      */
     let onlineChart = null;
     const online = (status) => {
@@ -769,6 +858,16 @@ export default {
         "dark"
       );
       adaptionEchartsV2(onlineChart);
+      // 处理点击事件并且跳转到相应的开始
+      onlineChart.on("click", function (params) {
+        if (params.name == "体温正常人数") {
+          normalHandle();
+          console.log(database, 'database');
+        } else {
+          console.log(database, 'ab');
+          abnormalHandle();
+        }
+      });
       let option = onlineOption;
       onlineOption.series[0].data[0].value =
         status.personStatic - status.temperatureStatic;
@@ -1082,8 +1181,10 @@ export default {
       database,
       onlineHandle,
       unlineHandle,
-      handleSizeChange,
-      handleCurrentChange,
+      handleSizeChange_online,
+      handleCurrentChange_online,
+      handleSizeChange_normal,
+      handleCurrentChange_abnormal,
     };
   },
 };
