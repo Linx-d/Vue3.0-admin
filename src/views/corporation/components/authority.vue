@@ -7,13 +7,13 @@
         </el-row>
         <el-dialog width="900px" title="选择用户" :visible.sync="dialogTableVisible" center>
           <el-table :data="employeesNotRole.list">
-            <el-table-column property="name" label="姓名" width="150">
+            <el-table-column property="name" label="姓名" width="150" sortable>
               <template slot-scope="scope">
                 <p v-html="scope.row.name"></p>
               </template>
             </el-table-column>
-            <el-table-column property="tel" label="电话" width="200"></el-table-column>
-            <el-table-column property="gmtCreate" label="创建时间"></el-table-column>
+            <el-table-column property="tel" label="电话" width="200" sortable></el-table-column>
+            <el-table-column property="gmtCreate" label="创建时间" sortable></el-table-column>
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
                 <el-button

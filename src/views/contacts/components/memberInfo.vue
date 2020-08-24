@@ -167,10 +167,10 @@
             :row-class-name="tableRowClassName"
             height="430"
           >
-            <el-table-column prop="time" label="日期" width="180"></el-table-column>
+            <el-table-column prop="time" label="日期" width="180" sortable></el-table-column>
             <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-            <el-table-column prop="temperature" label="温度" width="120"></el-table-column>
-            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="temperature" label="温度" width="120" sortable></el-table-column>
+            <el-table-column prop="address" label="地址" width="300" sortable></el-table-column>
           </el-table>
         </div>
         <el-tooltip class="item" effect="light" :content="content.table.txt" placement="right">
@@ -198,11 +198,11 @@
         id="memberRailList"
       >
         <el-table :data="railList.data" style="width: 100%" max-height="400">
-          <el-table-column fixed prop="gmtCreate" label="日期" width="220"></el-table-column>
-          <el-table-column prop="railName" label="围栏名称" width="120"></el-table-column>
-          <el-table-column prop="personSum" label="人数" width="120"></el-table-column>
-          <el-table-column prop="radius" label="半径" width="120"></el-table-column>
-          <el-table-column prop="railAddr" label="地址" width="300"></el-table-column>
+          <el-table-column fixed prop="gmtCreate" label="日期" width="220" sortable></el-table-column>
+          <el-table-column prop="railName" label="围栏名称" width="120" sortable></el-table-column>
+          <el-table-column prop="personSum" label="人数" width="120" sortable></el-table-column>
+          <el-table-column prop="radius" label="半径" width="120" sortable></el-table-column>
+          <el-table-column prop="railAddr" label="地址" width="300" sortable></el-table-column>
           <el-table-column fixed="right" label="操作" width="120">
             <template slot-scope="scope">
               <el-button
@@ -305,7 +305,10 @@ export default {
     const addRail = () => {
       dialogRailVisible.status = true;
       listRail().then((res) => {
-        cloneArray(railList.data, res.data.list);
+        railList.data = res.data.list;
+        railList.data.forEach((item) => {
+          item.radius = parseInt(item.radius);
+        });
       });
     };
     const selectRow = (index, rows) => {

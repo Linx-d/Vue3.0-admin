@@ -107,13 +107,13 @@
         class="addScroll"
       >
         <el-table-column type="selection" width="45"></el-table-column>
-        <el-table-column label="姓名" width="150">
+        <el-table-column label="姓名" width="100" sortable>
           <template slot-scope="scope">{{ scope.row.name }}</template>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="60"></el-table-column>
-        <el-table-column prop="tel" label="电话" width="150"></el-table-column>
-        <el-table-column prop="address" label="地址" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
+        <el-table-column prop="tel" label="电话" width="170" sortable></el-table-column>
+        <el-table-column prop="address" label="地址" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="remark" label="备注" show-overflow-tooltip sortable></el-table-column>
       </el-table>
       <div slot="footer" class="dialog-footer">
         <el-button @click="toggleSelection()">取 消</el-button>
@@ -135,6 +135,7 @@ import {
   fuzzySearchNotGroup,
   listDepartmentByUser,
 } from "@/api/contactsApi";
+import { getLoginEmployee } from "@/api/employeeApi";
 import { Message } from "element-ui";
 import { cloneArray } from "@/utils/common";
 export default {
@@ -214,6 +215,13 @@ export default {
       // 获得成员个人信息
       let currentMemberInfo = props.currentMemberInfo;
       for (let key in currentMemberInfo) {
+        let step = 6*1000*5*2;
+        let time = new Date().getTime() - new Date(data.gmtCreate).getTime();
+        if(time<step) {
+          currentMemberInfo.online = true;
+        }else {
+          currentMemberInfo.online = false;
+        }
         currentMemberInfo[key] = data[key];
       }
       /**
@@ -299,7 +307,7 @@ export default {
           }
         }
         for (let key in currentMemberInfo) {
-          if (key === "railName") {
+          if (key === "railName" || key =="online") {
             continue;
           }
           let verify =
@@ -318,6 +326,13 @@ export default {
     /**
      * 添加成员
      */
+    // 获取登录人员权限ID
+    const loginEmployeeInfo = reactive({
+      role: null
+    });
+    getLoginEmployee().then(res => {
+      loginEmployeeInfo.role = res.data.role;
+    });
     /**
      * 查询未分组用户
      */
@@ -328,8 +343,8 @@ export default {
       data: [],
     });
     const addMemberBtn = () => {
-      let role = JSON.parse(sessionStorage.getItem("adminInfo")).data.role;
-      if (role.id === 3 || role == null) {
+      let role = loginEmployeeInfo.role;
+      if (role.id == 3 || role == null) {
         root.$message({ type: "warning", message: "没有访问权限" });
       } else {
         nodepart_input.txt = "";

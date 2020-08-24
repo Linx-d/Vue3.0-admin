@@ -230,11 +230,11 @@
         height="500"
         v-loading="database.online.loading"
       >
-        <el-table-column fixed prop="gmtCreate" label="最新上传数据时间" width="200"></el-table-column>
-        <el-table-column prop="userName" label="姓名" width="120"></el-table-column>
-        <el-table-column prop="userId" label="用户Id" width="120"></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="120"></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="350"></el-table-column>
+        <el-table-column fixed prop="gmtCreate" label="最新上传数据时间" width="200" sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="120" sortable></el-table-column>
+        <el-table-column prop="userId" label="用户Id" width="120" sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="120" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="350" sortable></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -422,7 +422,7 @@ export default {
         });
         map.addControl(navigationControl);
         let locationPermission = sessionStorage.getItem("locationPermission");
-        if (locationPermission=='false') {
+        if (locationPermission == "false") {
           let geolocation = new BMap.Geolocation();
           geolocation.getCurrentPosition(
             function (r) {
@@ -432,7 +432,11 @@ export default {
                 map.centerAndZoom(r.point, 10);
                 sessionStorage.setItem("locationPermission", true);
               } else {
-                alert("定位失败" + this.getStatus());
+                root.$message({
+                  type: "error",
+                  message: "定位失败",
+                });
+                // sessionStorage.setItem("locationPermission", true);
               }
             },
             { enableHighAccuracy: true }
@@ -653,7 +657,9 @@ export default {
               },
             ],
           });
-          // map.setViewport(pointArray);
+          if (locationPermission == "false") {
+            map.setViewport(pointArray);
+          }
           /*----------热力图 login---------*/
           var points = hitArray;
 
