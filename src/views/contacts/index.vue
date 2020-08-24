@@ -88,7 +88,12 @@
                   </el-col>
                 </div>
 
-                <el-dialog title="添加部门" :visible.sync="dialogFormVisible" class="addDialog">
+                <el-dialog
+                  title="添加部门"
+                  :visible.sync="dialogFormVisible"
+                  class="addDialog"
+                  :close-on-click-modal="false"
+                >
                   <el-form :model="form">
                     <el-form-item label="部门名称" :label-width="formLabelWidth">
                       <el-input
@@ -147,6 +152,7 @@
                   width="30%"
                   :before-close="handleClose"
                   class="addDialog"
+                  :close-on-click-modal="false"
                 >
                   <span>{{ memberLabel }}</span>
                   <span slot="footer" class="dialog-footer">

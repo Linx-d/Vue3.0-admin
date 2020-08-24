@@ -5,7 +5,13 @@
         <el-row>
           <el-button class="addBtn" size="mini" @click="showEmployees()">添加管理员</el-button>
         </el-row>
-        <el-dialog width="900px" title="选择用户" :visible.sync="dialogTableVisible" center>
+        <el-dialog
+          width="900px"
+          title="选择用户"
+          :visible.sync="dialogTableVisible"
+          center
+          :close-on-click-modal="false"
+        >
           <el-table :data="employeesNotRole.list">
             <el-table-column property="name" label="姓名" width="150" sortable>
               <template slot-scope="scope">
@@ -105,7 +111,11 @@
           </el-form-item>
           <el-form-item label="管理权限" v-else>
             <el-radio-group v-model="roleId">
-              <el-radio label="2" style="margin-right:20px;" v-if="loginEmployeeInfo.role.id==1">普通管理员</el-radio>
+              <el-radio
+                label="2"
+                style="margin-right:20px;"
+                v-if="loginEmployeeInfo.role.id==1"
+              >普通管理员</el-radio>
               <el-radio label="3">部门管理员</el-radio>
             </el-radio-group>
           </el-form-item>
@@ -133,6 +143,7 @@
                 width="640px"
                 center
                 v-if="employee.role.id!=1"
+                :close-on-click-modal="false"
               >
                 <span>
                   <el-transfer v-model="departmentList" :data="allDepartment"></el-transfer>
@@ -262,7 +273,7 @@ export default {
         name: "role",
       },
       tel: "",
-      gmtCreate: ""
+      gmtCreate: "",
     });
     /**
      * 登录人员详情
@@ -400,7 +411,7 @@ export default {
      * 选择员工 获取详情
      */
     const choose = (id) => {
-      console.log(employee,'emp')
+      console.log(employee, "emp");
       departmentList.splice(0, departmentList.length);
       queryAllDepartment();
       isEdit.value = false;
@@ -623,7 +634,7 @@ export default {
       delManager,
       roleId,
       loadWWOpenData,
-      loginEmployeeInfo
+      loginEmployeeInfo,
     };
   },
 };

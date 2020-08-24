@@ -90,7 +90,12 @@
         </div>
       </div>
     </div>
-    <el-dialog id="nodepart_dialog" title="未分组成员" :visible.sync="dialogTableVisible.status">
+    <el-dialog
+      id="nodepart_dialog"
+      title="未分组成员"
+      :visible.sync="dialogTableVisible.status"
+      :close-on-click-modal="false"
+    >
       <el-input placeholder="请输入名字或电话" v-model="nodepart_input.txt" @input="nodepart_fn" clearable>
         <i slot="prefix" class="el-input__icon el-icon-search"></i>
       </el-input>

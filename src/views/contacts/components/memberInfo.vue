@@ -196,6 +196,7 @@
         :visible.sync="dialogRailVisible.status"
         class="railTable"
         id="memberRailList"
+        :close-on-click-modal="false"
       >
         <el-table :data="railList.data" style="width: 100%" max-height="400">
           <el-table-column fixed prop="gmtCreate" label="日期" width="220" sortable></el-table-column>

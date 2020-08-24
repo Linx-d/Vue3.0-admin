@@ -95,6 +95,7 @@
       title="修改名称"
       :visible.sync="modifyStaffData.dialogNameVisible"
       :before-close="modifyNameBefore"
+      :close-on-click-modal="false"
     >
       <el-form
         :model="employeeInfo"
@@ -123,6 +124,7 @@
       title="修改联系方式"
       :visible.sync="modifyStaffData.dialogTelVisible"
       :before-close="modifyTelBefore"
+      :close-on-click-modal="false"
     >
       <el-form
         :model="employeeInfo"
@@ -146,6 +148,7 @@
       title="修改电子邮箱"
       :visible.sync="modifyStaffData.dialogEmailVisible"
       :before-close="modifyEmailBefore"
+      :close-on-click-modal="false"
     >
       <el-form
         :model="employeeInfo"
