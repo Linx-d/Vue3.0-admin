@@ -32,8 +32,8 @@
           <div class="case_bottom_right"></div>
           <div id="abnormal" class="alanysis_top_a echartsIndivi">
             <h1>
-              <span>用户:{{ scaleStatic.person }}</span>人
-              <span>管理用户:{{ scaleStatic.managerPerson }}</span>人
+              <div><span>企业成员:</span>{{ scaleStatic.person }}人</div>
+              <div><span>管理成员:</span>{{ scaleStatic.managerPerson }}人</div>
             </h1>
             <span class="onlineLine"></span>
             <div class="abnormal_top" @click="onlineHandle">
@@ -1313,7 +1313,7 @@ $echartsBorder: 1px solid #146ede;
       .abnormal_top {
         float: left;
         width: 50%;
-        margin-top: 10px;
+        margin-top: 5px;
         cursor: pointer;
         span {
           display: inline-block;
@@ -1330,7 +1330,7 @@ $echartsBorder: 1px solid #146ede;
       .abnormal_bottom {
         float: left;
         width: 50%;
-        margin-top: 10px;
+        margin-top: 5px;
         cursor: pointer;
         span {
           display: inline-block;
@@ -1353,10 +1353,17 @@ $echartsBorder: 1px solid #146ede;
       }
       h1 {
         color: #0f9ae2;
-        font-size: 22px;
+        font-size: 19px;
         font-weight: 400;
-        text-align: center;
-        margin-top: 15px;
+        text-align: left;
+        margin-top: 10px;
+        padding-left: 76px;
+        div {
+          margin-bottom: 5px;
+          span {
+            margin-right: 50px;
+          }
+        }
       }
     }
   }
