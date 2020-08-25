@@ -167,10 +167,9 @@
             :row-class-name="tableRowClassName"
             height="430"
           >
-            <el-table-column prop="time" label="日期" width="180" sortable></el-table-column>
-            <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-            <el-table-column prop="temperature" label="温度" width="120" sortable></el-table-column>
-            <el-table-column prop="address" label="地址" width="300" sortable></el-table-column>
+            <el-table-column prop="time" label="日期" width="250" sortable></el-table-column>
+            <el-table-column prop="temperature" label="温度" width="130" sortable></el-table-column>
+            <el-table-column prop="address" label="地址" width="340" sortable></el-table-column>
           </el-table>
         </div>
         <el-tooltip class="item" effect="light" :content="content.table.txt" placement="right">
@@ -487,45 +486,6 @@ export default {
           toolbox: {
             show: true,
             feature: {
-              // dataZoom: {
-              //   yAxisIndex: "none",
-              // },
-              // dataView: {
-              //   readOnly: true,
-              //   optionToContent: function (opt) {
-              //     let axisData = opt.xAxis[0].data;
-              //     let table =
-              //       '<table style="width:70%;text-align:left;line-height: 28px;" class="tmp_table"><tbody><tr>' +
-              //       "<td>时间</td>" +
-              //       "<td>温度</td>" +
-              //       //+ '<td>' + series[1].name + '</td>'
-              //       "</tr>";
-              //     for (let len = newArr_time.length, i = len - 1; i >= 0; i--) {
-              //       if (newArr_tmp[i] >= 37.3) {
-              //         table += '<tr style="color: red;">';
-              //       } else {
-              //         table += "<tr>";
-              //       }
-              //       table +=
-              //         "<td>" +
-              //         newArr_time[i] +
-              //         "</td>" +
-              //         "<td>" +
-              //         newArr_tmp[i] +
-              //         "</td>" +
-              //         //+ '<td>' + series[1].data[i] + '</td>'
-              //         "</tr>";
-              //     }
-              //     table += "</tbody></table>";
-              //     return table;
-              //   },
-              //   contentToOption: function (opts) {
-              //     //this.optionToContent();
-              //   },
-              // },
-              //magicType: {type: ['line', 'bar']}, // 柱状图
-              //restore: {}
-              // saveAsImage: {},
             },
           },
           xAxis: {
@@ -551,8 +511,8 @@ export default {
           dataZoom: [
             {
               type: "inside",
-              start: 0,
-              end: 10,
+              start: 90,
+              end: 100,
             },
             {
               start: 0,
