@@ -519,44 +519,40 @@ export default {
      * 选择员工
      */
     const chooseEmployee = (id) => {
-      if (confirm("确定将该用户添加为管理员？")) {
-        dialogTableVisible.value = false;
-        choose(id);
-        isEdit.value = true;
-      }
+      dialogTableVisible.value = false;
+      choose(id);
+      isEdit.value = true;
     };
     /**
      * 提交修改
      */
     const submit = () => {
       const that = this;
-      if (confirm("确定提交修改？")) {
-        let data = {
-          id: employee.id,
-          roleId: roleId.value,
-          departments: departmentList,
-        };
-        if (roleId.value == 2 || employee.role.id == 2) {
-          editAdmin(data).then((res) => {
-            if (res.code == 0) {
-              root.$alert("提交成功。", "成功", { confirmButtonText: "确定" });
-              queryAllRole();
-            } else {
-              root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
-            }
-          });
-        } else {
-          editEmployee(data).then((res) => {
-            if (res.code == 0) {
-              root.$alert("提交成功。", "成功", { confirmButtonText: "确定" });
-              queryAllRole();
-            } else {
-              root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
-            }
-          });
-        }
-        isEdit.value = !isEdit.value;
+      let data = {
+        id: employee.id,
+        roleId: roleId.value,
+        departments: departmentList,
+      };
+      if (roleId.value == 2 || employee.role.id == 2) {
+        editAdmin(data).then((res) => {
+          if (res.code == 0) {
+            root.$alert("提交成功。", "成功", { confirmButtonText: "确定" });
+            queryAllRole();
+          } else {
+            root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
+          }
+        });
+      } else {
+        editEmployee(data).then((res) => {
+          if (res.code == 0) {
+            root.$alert("提交成功。", "成功", { confirmButtonText: "确定" });
+            queryAllRole();
+          } else {
+            root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
+          }
+        });
       }
+      isEdit.value = !isEdit.value;
     };
     /**
      * 删除管理员
