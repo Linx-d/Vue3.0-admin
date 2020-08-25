@@ -110,6 +110,7 @@
             autocomplete="off"
             maxlength="15"
             @input="inputDetection"
+            @keyup.enter.native="confirmNameOpen('employeeInfo')"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -134,7 +135,7 @@
         class="employeeInfoClass"
       >
         <el-form-item label="联系方式" :label-width="modifyStaffData.formLabelWidth" prop="tel">
-          <el-input v-model="employeeInfo.tel" autocomplete="off"></el-input>
+          <el-input v-model="employeeInfo.tel" autocomplete="off" @keyup.enter.native="confirmTelOpen('employeeInfo')"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -158,7 +159,7 @@
         class="employeeInfoClass"
       >
         <el-form-item label="Email" :label-width="modifyStaffData.formLabelWidth" prop="email">
-          <el-input v-model="employeeInfo.email" autocomplete="off"></el-input>
+          <el-input v-model="employeeInfo.email" autocomplete="off" @keyup.enter.native="confirmEmailOpen('employeeInfo')"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

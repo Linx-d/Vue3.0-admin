@@ -92,6 +92,7 @@
                   title="添加部门"
                   :visible.sync="dialogFormVisible"
                   class="addDialog"
+                  :append-to-body="true"
                   :close-on-click-modal="false"
                 >
                   <el-form :model="form">
