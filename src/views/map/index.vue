@@ -32,8 +32,14 @@
           <div class="case_bottom_right"></div>
           <div id="abnormal" class="alanysis_top_a echartsIndivi">
             <h1>
-              <div><span>企业成员:</span>{{ scaleStatic.person }}人</div>
-              <div><span>管理成员:</span>{{ scaleStatic.managerPerson }}人</div>
+              <div>
+                <span>企业成员:</span>
+                {{ scaleStatic.person }}人
+              </div>
+              <div>
+                <span>管理成员:</span>
+                {{ scaleStatic.managerPerson }}人
+              </div>
             </h1>
             <span class="onlineLine"></span>
             <div class="abnormal_top" @click="onlineHandle">
@@ -233,8 +239,8 @@
         <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="250" sortable></el-table-column>
-        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="300" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
+        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -266,8 +272,8 @@
         <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="250" sortable></el-table-column>
-        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="300" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
+        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -421,7 +427,7 @@ export default {
       database.temperatureContent.forEach((item) => {
         let temperature = parseFloat(item.temperature);
         let marking = deviceStep.marking;
-        if (temperature <= marking) {
+        if (temperature < marking) {
           database.temperature.data.push(item);
         }
       });
@@ -442,7 +448,7 @@ export default {
       database.temperatureContent.forEach((item) => {
         let temperature = parseFloat(item.temperature);
         let marking = deviceStep.marking;
-        if (temperature > marking) {
+        if (temperature >= marking) {
           database.temperature.data.push(item);
         }
       });
@@ -503,9 +509,14 @@ export default {
       managerPerson: 0,
       online: 0,
       unline: 0,
+      address: "",
     });
+    /**获取企业信息
+     *
+     */
     getCorpInfo().then((res) => {
       scaleStatic.person = res.data.member;
+      scaleStatic.address = res.data.address;
     });
     const full = computed(() => {
       return root.$store.state.map.full;
@@ -517,278 +528,275 @@ export default {
     /**
      * 百度地图方法
      */
+    let positionPoint = reactive({
+      lng: 0,
+      lat: 0,
+    });
     ((window) => {
-      // lng = null, lat = null, hit = false
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
-        let map = new BMap.Map("mapShow", {
-          minZoom: 4,
-          maxZoom: 18,
-          enableMapClick: false,
-        }); // 创建Map实例
-        let navigationControl = new BMap.NavigationControl({
-          // 靠左上角位置
-          anchor: BMAP_ANCHOR_TOP_LEFT,
-          offset: {
-            width: 430,
-            height: 220,
-          },
-          // LARGE类型
-          type: BMAP_NAVIGATION_CONTROL_LARGE,
-          // 启用显示定位
-          enableGeolocation: true,
-        });
-        map.addControl(navigationControl);
-        let locationPermission = sessionStorage.getItem("locationPermission");
-        if (locationPermission == "false") {
-          let geolocation = new BMap.Geolocation();
-          geolocation.getCurrentPosition(
-            function (r) {
-              if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-                let mk = new BMap.Marker(r.point);
-                map.panTo(r.point);
-                map.centerAndZoom(r.point, 10);
-                sessionStorage.setItem("locationPermission", true);
-              } else {
-                root.$message({
-                  type: "error",
-                  message: "定位失败",
-                });
-                // sessionStorage.setItem("locationPermission", true);
-              }
-            },
-            { enableHighAccuracy: true }
-          );
-        }
         // 添加地图类型控件
         // map.addControl(
         //   new BMap.MapTypeControl({
         //     mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP]
         //   })
         // );
-        window.map = map;
-        listUserLocation().then((res) => {
-          let code = res.code;
-          let data = res.data;
-          let len = data.length;
-          let zoomLevel = null;
-          if (len < 50) {
-            zoomLevel = 19;
-          } else if (len < 100) {
-            zoomLevel = 17;
-          } else if (len < 300) {
-            zoomLevel = 15;
-          } else if (len < 500) {
-            zoomLevel = 12;
-          } else {
-            zoomLevel = 10;
-          }
-          map.centerAndZoom(new BMap.Point(107.26569, 28.676057), zoomLevel); // 初始化地图,设置中心点坐标和地图级别
-          map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
-          map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
-
-          /**搜索 地址
-           * login
-           */
-          // 百度地图API功能
-          function G(id) {
-            return document.getElementById(id);
-          }
-
-          let ac = new BMap.Autocomplete({ input: "suggestId", location: map }); //建立一个自动完成的对象
-
-          ac.addEventListener("onhighlight", function (e) {
-            //鼠标放在下拉列表上的事件
-            let str = "";
-            let _value = e.fromitem.value;
-            let value = "";
-            if (e.fromitem.index > -1) {
-              value =
-                _value.province +
-                _value.city +
-                _value.district +
-                _value.street +
-                _value.business;
-            }
-            str =
-              "FromItem<br />index = " +
-              e.fromitem.index +
-              "<br />value = " +
-              value;
-
-            value = "";
-            if (e.toitem.index > -1) {
-              _value = e.toitem.value;
-              value =
-                _value.province +
-                _value.city +
-                _value.district +
-                _value.street +
-                _value.business;
-            }
-            str +=
-              "<br />ToItem<br />index = " +
-              e.toitem.index +
-              "<br />value = " +
-              value;
-            G("searchResultPanel").innerHTML = str;
-          });
-
-          let myValue;
-          ac.addEventListener("onconfirm", function (e) {
-            //鼠标点击下拉列表后的事件
-            let _value = e.item.value;
-            myValue =
-              _value.province +
-              _value.city +
-              _value.district +
-              _value.street +
-              _value.business;
-            G("searchResultPanel").innerHTML =
-              "onconfirm<br />index = " +
-              e.item.index +
-              "<br />myValue = " +
-              myValue;
-
-            setPlace();
-          });
-
-          function setPlace() {
-            map.clearOverlays(); //清除地图上所有覆盖物
-            function myFun() {
-              let pp = local.getResults().getPoi(0).point; //获取第一个智能搜索的结果
-              map.centerAndZoom(pp, 18);
-              let myIcon = new BMap.Icon(
-                address_location,
-                new BMap.Size(85, 48)
-              );
-              map.addOverlay(new BMap.Marker(pp, { icon: myIcon })); //添加标注
-            }
-            let local = new BMap.LocalSearch(map, {
-              //智能搜索
-              onSearchComplete: myFun,
-            });
-            local.search(myValue);
-          }
-          /*----end -----*/
-
-          map.setMapStyleV2({ styleJson: custom_map_config });
-          let markers = [];
-          let pointArray = [];
-          let hitArray = []; // hitArry
-          let opts = {
-            width: 250,
-            height: 80,
-            title: "个人信息",
-            enableMessage: true, //设置允许信息窗发送短息
-          };
-          // 状态统计
-          let status = {
-            personStatic: data.length,
-            eletricStatic: 0,
-            temperatureStatic: 0,
-            onlineStatic: 0,
-          };
-          scaleStatic.managerPerson = data.length;
-          database.onlineContent = data;
-          database.temperatureContent = data;
-          data.forEach((item) => {
-            let gmtTime =
-              new Date().getTime() - new Date(item.gmtCreate).getTime();
-            let deviceOline = false;
-            let step = 1000 * 60 * 5 + 1;
-            if (gmtTime < step) {
-              deviceOline = true;
-            }
-            // 地址逆解析
-            let lng = item.longitude,
-              lat = item.latitude;
-            let pt = new BMap.Point(lng, lat);
-            let geoc = new BMap.Geocoder();
-            geoc.getLocation(pt, function (rs) {
-              let addComp = rs.addressComponents;
-              item.address =
-                addComp.province +
-                addComp.city +
-                addComp.district +
-                addComp.street +
-                addComp.streetNumber;
-            });
-
-            let temperature = parseFloat(item.temperature);
-            let electric = item.electric;
-            let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
-            if (temperature > 37.3) {
-              status.temperatureStatic++;
-              myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
-            }
-            if (deviceOline) {
-              status.onlineStatic++;
-              myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
-            }
-            if (electric < 2) {
-              status.eletricStatic++;
-            }
-            // 在线统计
-            scaleStatic.online = status.onlineStatic;
-            scaleStatic.unline = status.personStatic - scaleStatic.online;
-            let point = new BMap.Point(item.longitude, item.latitude);
-            let marker = new BMap.Marker(point, { icon: myIcon });
-            // marker.setAnimation(BMAP_ANIMATION_BOUNCE);
-            // let marker = new BMap.Marker(point);
-            let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
-            addClickHandler(content, marker);
-            markers.push(marker);
-            pointArray.push(point);
-            if (item.temperature >= 37.3) {
-              let hitObj = {
-                lng: item.longitude,
-                lat: item.latitude,
-                count: item.temperature * 100,
-              };
-              hitArray.push(hitObj);
-            }
-          });
-          online(status); // 统计表 比例
-          loading.value = false;
-          function addClickHandler(content, marker) {
-            marker.addEventListener("click", function (e) {
-              openInfo(content, e);
-            });
-          }
-          function openInfo(content, e) {
-            let p = e.target;
-            let point = new BMap.Point(
-              p.getPosition().lng,
-              p.getPosition().lat
-            );
-            let infoWindow = new BMap.InfoWindow(content, opts); // 创建信息窗口对象
-            map.openInfoWindow(infoWindow, point); //开启信息窗口
-          }
-          //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
-          let markerClusterer = new BMapLib.MarkerClusterer(map, {
-            markers: markers,
-            minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
-            styles: [
-              {
-                url: pointAggre,
-                size: new BMap.Size(48, 48),
+        getCorpInfo()
+          .then((res) => {
+            let content = res.data.address;
+            let map = new BMap.Map("mapShow", {
+              minZoom: 6,
+              maxZoom: 18,
+              enableMapClick: false,
+            }); // 创建Map实例
+            window.map = map;
+            let navigationControl = new BMap.NavigationControl({
+              // 靠左上角位置
+              anchor: BMAP_ANCHOR_TOP_LEFT,
+              offset: {
+                width: 430,
+                height: 220,
               },
-            ],
-          });
-          if (locationPermission == "false") {
-            map.setViewport(pointArray);
-          }
-          /*----------热力图 login---------*/
-          var points = hitArray;
+              // LARGE类型
+              type: BMAP_NAVIGATION_CONTROL_LARGE,
+              // 启用显示定位
+              enableGeolocation: true,
+            });
+            map.addControl(navigationControl);
+            if (content == null || content.length == 0) {
+              map.centerAndZoom("中国", 7); // 初始化地图,用城市名设置地图中心点
+              root.$message({
+                type: "normal",
+                message: "请联系超级管理员设置企业地址",
+              });
+            } else {
+              map.centerAndZoom(res.data.address, 19); // 初始化地图,用城市名设置地图中心点
+            }
+          })
+          .then((response) => {
+            listUserLocation().then((res) => {
+              let code = res.code;
+              let data = res.data;
+              let len = data.length;
+              let zoomLevel = null;
+              if (len < 50) {
+                zoomLevel = 19;
+              } else if (len < 100) {
+                zoomLevel = 17;
+              } else if (len < 300) {
+                zoomLevel = 15;
+              } else if (len < 500) {
+                zoomLevel = 12;
+              } else {
+                zoomLevel = 10;
+              }
 
-          if (!isSupportCanvas()) {
-            alert(
-              "热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~"
-            );
-          }
-          //详细的参数,可以查看heatmap.js的文档 https://github.com/pa7/heatmap.js/blob/master/README.md
-          //参数说明如下:
-          /* visible 热力图是否显示,默认为true
+              // map.setCurrentCity("重庆"); // 设置地图显示的城市 此项是必须设置的
+              map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+
+              /**搜索 地址
+               * login
+               */
+              // 百度地图API功能
+              function G(id) {
+                return document.getElementById(id);
+              }
+
+              let ac = new BMap.Autocomplete({
+                input: "suggestId",
+                location: map,
+              }); //建立一个自动完成的对象
+
+              ac.addEventListener("onhighlight", function (e) {
+                //鼠标放在下拉列表上的事件
+                let str = "";
+                let _value = e.fromitem.value;
+                let value = "";
+                if (e.fromitem.index > -1) {
+                  value =
+                    _value.province +
+                    _value.city +
+                    _value.district +
+                    _value.street +
+                    _value.business;
+                }
+                str =
+                  "FromItem<br />index = " +
+                  e.fromitem.index +
+                  "<br />value = " +
+                  value;
+
+                value = "";
+                if (e.toitem.index > -1) {
+                  _value = e.toitem.value;
+                  value =
+                    _value.province +
+                    _value.city +
+                    _value.district +
+                    _value.street +
+                    _value.business;
+                }
+                str +=
+                  "<br />ToItem<br />index = " +
+                  e.toitem.index +
+                  "<br />value = " +
+                  value;
+                G("searchResultPanel").innerHTML = str;
+              });
+
+              let myValue;
+              ac.addEventListener("onconfirm", function (e) {
+                //鼠标点击下拉列表后的事件
+                let _value = e.item.value;
+                myValue =
+                  _value.province +
+                  _value.city +
+                  _value.district +
+                  _value.street +
+                  _value.business;
+                G("searchResultPanel").innerHTML =
+                  "onconfirm<br />index = " +
+                  e.item.index +
+                  "<br />myValue = " +
+                  myValue;
+
+                setPlace();
+              });
+
+              function setPlace() {
+                map.clearOverlays(); //清除地图上所有覆盖物
+                function myFun() {
+                  let pp = local.getResults().getPoi(0).point; //获取第一个智能搜索的结果
+                  map.centerAndZoom(pp, 18);
+                  let myIcon = new BMap.Icon(
+                    address_location,
+                    new BMap.Size(85, 48)
+                  );
+                  map.addOverlay(new BMap.Marker(pp, { icon: myIcon })); //添加标注
+                }
+                let local = new BMap.LocalSearch(map, {
+                  //智能搜索
+                  onSearchComplete: myFun,
+                });
+                local.search(myValue);
+              }
+              /*----end -----*/
+
+              map.setMapStyleV2({ styleJson: custom_map_config });
+              let markers = [];
+              let pointArray = [];
+              let hitArray = []; // hitArry
+              let opts = {
+                width: 250,
+                height: 80,
+                title: "个人信息",
+                enableMessage: true, //设置允许信息窗发送短息
+              };
+              // 状态统计
+              let status = {
+                personStatic: data.length,
+                eletricStatic: 0,
+                temperatureStatic: 0,
+                onlineStatic: 0,
+              };
+              scaleStatic.managerPerson = data.length;
+              database.onlineContent = data;
+              database.temperatureContent = data;
+              data.forEach((item) => {
+                let gmtTime =
+                  new Date().getTime() - new Date(item.gmtCreate).getTime();
+                let deviceOline = false;
+                let step = 1000 * 60 * 5 + 1;
+                if (gmtTime < step) {
+                  deviceOline = true;
+                }
+                // 地址逆解析
+                let lng = item.longitude,
+                  lat = item.latitude;
+                let pt = new BMap.Point(lng, lat);
+                let geoc = new BMap.Geocoder();
+                geoc.getLocation(pt, function (rs) {
+                  let addComp = rs.addressComponents;
+                  item.address =
+                    addComp.province +
+                    addComp.city +
+                    addComp.district +
+                    addComp.street +
+                    addComp.streetNumber;
+                });
+
+                let temperature = parseFloat(item.temperature);
+                let electric = item.electric;
+                let myIcon = new BMap.Icon(unLineIcon, new BMap.Size(32, 32));
+                if (temperature > 37.3) {
+                  status.temperatureStatic++;
+                  myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
+                }
+                if (deviceOline) {
+                  status.onlineStatic++;
+                  myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
+                }
+                if (electric < 2) {
+                  status.eletricStatic++;
+                }
+                // 在线统计
+                scaleStatic.online = status.onlineStatic;
+                scaleStatic.unline = status.personStatic - scaleStatic.online;
+                let point = new BMap.Point(item.longitude, item.latitude);
+                let marker = new BMap.Marker(point, { icon: myIcon });
+                // marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+                // let marker = new BMap.Marker(point);
+                let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
+                addClickHandler(content, marker);
+                markers.push(marker);
+                pointArray.push(point);
+                if (item.temperature >= 37.3) {
+                  let hitObj = {
+                    lng: item.longitude,
+                    lat: item.latitude,
+                    count: item.temperature * 100,
+                  };
+                  hitArray.push(hitObj);
+                }
+              });
+              online(status); // 统计表 比例
+              loading.value = false;
+              function addClickHandler(content, marker) {
+                marker.addEventListener("click", function (e) {
+                  openInfo(content, e);
+                });
+              }
+              function openInfo(content, e) {
+                let p = e.target;
+                let point = new BMap.Point(
+                  p.getPosition().lng,
+                  p.getPosition().lat
+                );
+                let infoWindow = new BMap.InfoWindow(content, opts); // 创建信息窗口对象
+                map.openInfoWindow(infoWindow, point); //开启信息窗口
+              }
+              //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
+              let markerClusterer = new BMapLib.MarkerClusterer(map, {
+                markers: markers,
+                minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
+                styles: [
+                  {
+                    url: pointAggre,
+                    size: new BMap.Size(48, 48),
+                  },
+                ],
+              });
+              // map.setViewport(pointArray);
+              /*----------热力图 login---------*/
+              var points = hitArray;
+
+              if (!isSupportCanvas()) {
+                alert(
+                  "热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~"
+                );
+              }
+              //详细的参数,可以查看heatmap.js的文档 https://github.com/pa7/heatmap.js/blob/master/README.md
+              //参数说明如下:
+              /* visible 热力图是否显示,默认为true
           * opacity 热力的透明度,1-100
           * radius 势力图的每个点的半径大小   
           * gradient  {JSON} 热力图的渐变区间 . gradient如下所示
@@ -801,61 +809,62 @@ export default {
               value 为颜色值. 
           */
 
-          let heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
-          map.addOverlay(heatmapOverlay);
-          heatmapOverlay.setDataSet({ data: points, max: 1000 });
-          //是否显示热力图
-          function openHeatmap() {
-            // map.clearOverlays();
-            markers.forEach((item) => {
-              item.hide();
-            });
-            heatmapOverlay.show();
-            loading.value = false;
-          }
-          window.openHeatmap = openHeatmap;
-          function closeHeatmap() {
-            //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
-            // let markerClusterer = new BMapLib.MarkerClusterer(map, {
-            //   markers: markers,
-            //   minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
-            //   styles: [
-            //     {
-            //       url: pointAggre,
-            //       size: new BMap.Size(48, 48),
-            //     },
-            //   ],
-            // });
-            heatmapOverlay.hide();
-            markers.forEach((item) => {
-              item.show();
-            });
-            loading.value = false;
-          }
-          window.closeHeatmap = closeHeatmap;
-          closeHeatmap();
-          function setGradient() {
-            /*格式如下所示:
+              let heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
+              map.addOverlay(heatmapOverlay);
+              heatmapOverlay.setDataSet({ data: points, max: 1000 });
+              //是否显示热力图
+              function openHeatmap() {
+                // map.clearOverlays();
+                markers.forEach((item) => {
+                  item.hide();
+                });
+                heatmapOverlay.show();
+                loading.value = false;
+              }
+              window.openHeatmap = openHeatmap;
+              function closeHeatmap() {
+                //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
+                // let markerClusterer = new BMapLib.MarkerClusterer(map, {
+                //   markers: markers,
+                //   minClusterSize: 2, //最小的聚合数量，小于该数量的不能成为一个聚合，默认为2
+                //   styles: [
+                //     {
+                //       url: pointAggre,
+                //       size: new BMap.Size(48, 48),
+                //     },
+                //   ],
+                // });
+                heatmapOverlay.hide();
+                markers.forEach((item) => {
+                  item.show();
+                });
+                loading.value = false;
+              }
+              window.closeHeatmap = closeHeatmap;
+              closeHeatmap();
+              function setGradient() {
+                /*格式如下所示:
 		{
 	  		0:'rgb(102, 255, 0)',
 	 	 	.5:'rgb(255, 170, 0)',
 		  	1:'rgb(255, 0, 0)'
 		}*/
-            var gradient = {};
-            var colors = document.querySelectorAll("input[type='color']");
-            colors = [].slice.call(colors, 0);
-            colors.forEach(function (ele) {
-              gradient[ele.getAttribute("data-key")] = ele.value;
+                var gradient = {};
+                var colors = document.querySelectorAll("input[type='color']");
+                colors = [].slice.call(colors, 0);
+                colors.forEach(function (ele) {
+                  gradient[ele.getAttribute("data-key")] = ele.value;
+                });
+                heatmapOverlay.setOptions({ gradient: gradient });
+              }
+              //判断浏览区是否支持canvas
+              function isSupportCanvas() {
+                var elem = document.createElement("canvas");
+                return !!(elem.getContext && elem.getContext("2d"));
+              }
+              /*----------热力图 end---------*/
             });
-            heatmapOverlay.setOptions({ gradient: gradient });
-          }
-          //判断浏览区是否支持canvas
-          function isSupportCanvas() {
-            var elem = document.createElement("canvas");
-            return !!(elem.getContext && elem.getContext("2d"));
-          }
-          /*----------热力图 end---------*/
-        });
+          });
       });
     })(window);
     /**
@@ -1193,7 +1202,7 @@ export default {
       handleCurrentChange_online,
       handleSizeChange_normal,
       handleCurrentChange_abnormal,
-      tableRowClassName
+      tableRowClassName,
     };
   },
 };
