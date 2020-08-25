@@ -11,11 +11,14 @@
         <div class="info_item_a">企业名称</div>
         <div class="info_item_b">
           <i v-show="corpInfo.name">{{ corpInfo.name }}</i>
+          <span v-if="employeeInfo.roleId!=1">
+            <i v-show="!corpInfo.name">暂无</i>
+          </span>
           <a
             hefr="javascript:;"
             class="modifyInfoBtn"
-            @click="modifycorpName"
-            v-if="employeeInfo.roleId!=3&&employeeInfo.roleId!=null"
+            @click="modifyHandle('name')"
+            v-if="employeeInfo.roleId==1"
           >
             <span v-if="corpInfo.name">修改</span>
             <span v-else>添加</span>
@@ -26,11 +29,14 @@
         <div class="info_item_center_a">企业地址</div>
         <div class="info_item_center_b">
           <i v-show="corpInfo.address">{{ corpInfo.address }}</i>
+          <span v-if="employeeInfo.roleId!=1">
+            <i v-show="!corpInfo.address">暂无</i>
+          </span>
           <a
             hefr="javascript:;"
             class="modifyInfoBtn"
-            @click="modifycorpAddress"
-            v-if="employeeInfo.roleId!=3&&employeeInfo.roleId!=null"
+            @click="modifyHandle('address')"
+            v-if="employeeInfo.roleId==1"
           >
             <span v-if="corpInfo.address">修改</span>
             <span v-else>添加</span>
@@ -41,13 +47,52 @@
         <div class="info_item_a">联系电话</div>
         <div class="info_item_b">
           <i v-show="corpInfo.tel">{{ corpInfo.tel }}</i>
+          <span v-if="employeeInfo.roleId!=1">
+            <i v-show="!corpInfo.tel">暂无</i>
+          </span>
           <a
             hefr="javascript:;"
             class="modifyInfoBtn"
-            @click="modifycorpTel"
-            v-if="employeeInfo.roleId!=3&&employeeInfo.roleId!=null"
+            @click="modifyHandle('tel')"
+            v-if="employeeInfo.roleId==1"
           >
             <span v-if="corpInfo.tel">修改</span>
+            <span v-else>添加</span>
+          </a>
+        </div>
+      </div>
+      <div class="info_item_center">
+        <div class="info_item_center_a">座机</div>
+        <div class="info_item_center_b">
+          <i v-show="corpInfo.landline">{{ corpInfo.landline }}</i>
+          <span v-if="employeeInfo.roleId!=1">
+            <i v-show="!corpInfo.landline">暂无</i>
+          </span>
+          <a
+            hefr="javascript:;"
+            class="modifyInfoBtn"
+            @click="modifyHandle('landline')"
+            v-if="employeeInfo.roleId==1"
+          >
+            <span v-if="corpInfo.landline">修改</span>
+            <span v-else>添加</span>
+          </a>
+        </div>
+      </div>
+      <div class="info_item">
+        <div class="info_item_a">电子邮箱</div>
+        <div class="info_item_b">
+          <i v-show="corpInfo.email">{{ corpInfo.email }}</i>
+          <span v-if="employeeInfo.roleId!=1">
+            <i v-show="!corpInfo.email">暂无</i>
+          </span>
+          <a
+            hefr="javascript:;"
+            class="modifyInfoBtn"
+            @click="modifyHandle('email')"
+            v-if="employeeInfo.roleId==1"
+          >
+            <span v-if="corpInfo.email">修改</span>
             <span v-else>添加</span>
           </a>
         </div>
@@ -63,7 +108,7 @@
         <div class="info_item_center_b">{{ corpInfo.departmentNum }}</div>
       </div>
       <div class="info_item">
-        <div class="info_item_a">企业员工</div>
+        <div class="info_item_a">管理人员</div>
         <div class="info_item_b">{{ corpInfo.employeeNum }}</div>
       </div>
     </div>
@@ -83,6 +128,7 @@
       title="修改企业名称"
       :visible.sync="modifyCorpData.dialogNameVisible"
       :before-close="modifyBefore"
+      :close-on-click-modal="false"
     >
       <el-form
         :model="corpInfo"
@@ -92,11 +138,15 @@
         class="corpInfoClass"
       >
         <el-form-item label="企业名称" :label-width="modifyCorpData.formLabelWidth" prop="name">
-          <el-input v-model="corpInfo.name" autocomplete="off"></el-input>
+          <el-input
+            v-model="corpInfo.name"
+            autocomplete="off"
+            @keyup.enter.native="confirmNameOpen"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="modifyNameCancle()">取 消</el-button>
+        <el-button @click="modifyCancle()">取 消</el-button>
         <el-button type="primary" @click="confirmNameOpen()">确 定</el-button>
       </div>
     </el-dialog>
@@ -106,6 +156,7 @@
       title="修改企业电话"
       :visible.sync="modifyCorpData.dialogTelVisible"
       :before-close="modifyBefore"
+      :close-on-click-modal="false"
     >
       <el-form
         :model="corpInfo"
@@ -115,11 +166,11 @@
         class="corpInfoClass"
       >
         <el-form-item label="企业电话" :label-width="modifyCorpData.formLabelWidth" prop="tel">
-          <el-input v-model="corpInfo.tel" autocomplete="off"></el-input>
+          <el-input v-model="corpInfo.tel" autocomplete="off" @keyup.enter.native="confirmTelOpen"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="modifyTelCancle()">取 消</el-button>
+        <el-button @click="modifyCancle()">取 消</el-button>
         <el-button type="primary" @click="confirmTelOpen()">确 定</el-button>
       </div>
     </el-dialog>
@@ -129,6 +180,7 @@
       title="修改企业地址"
       :visible.sync="modifyCorpData.dialogAddressVisible"
       :before-close="modifyBefore"
+      :close-on-click-modal="false"
     >
       <el-form
         :model="corpInfo"
@@ -142,8 +194,56 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="modifyAddressCancle()">取 消</el-button>
+        <el-button @click="modifyCancle()">取 消</el-button>
         <el-button type="primary" @click="confirmAddressOpen()">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 修改企业座机 弹出框 -->
+    <el-dialog
+      title="修改企业座机"
+      :visible.sync="modifyCorpData.dialogLandlineVisible"
+      :before-close="modifyBefore"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        :model="corpInfo"
+        :rules="rules"
+        ref="corpInfo"
+        label-width="100px"
+        class="corpInfoClass"
+      >
+        <el-form-item label="企业座机" :label-width="modifyCorpData.formLabelWidth" prop="landline">
+          <el-input v-model="corpInfo.landline" autocomplete="off" @keyup.enter.native="confirmLandlineOpen"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="modifyCancle()">取 消</el-button>
+        <el-button type="primary" @click="confirmLandlineOpen()">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 修改企业邮箱 弹出框 -->
+    <el-dialog
+      title="修改企业邮箱"
+      :visible.sync="modifyCorpData.dialogEmailVisible"
+      :before-close="modifyBefore"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        :model="corpInfo"
+        :rules="rules"
+        ref="corpInfo"
+        label-width="100px"
+        class="corpInfoClass"
+      >
+        <el-form-item label="企业邮箱" :label-width="modifyCorpData.formLabelWidth" prop="email">
+          <el-input v-model="corpInfo.email" autocomplete="off" @keyup.enter.native="confirmEmailOpen"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="modifyCancle()">取 消</el-button>
+        <el-button type="primary" @click="confirmEmailOpen()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -195,6 +295,8 @@ export default {
       logoUrl:
         "https://p.qlogo.cn/bizmail/x9CrcRIuFWvA8VQcstTibfPAsrpcpFulOZwapfGCNwjkJMVUibNl0kWA/0",
       tel: "",
+      email: "",
+      landline: "",
       address: "",
       gmtCreate: "2020-06-11 16:29:08",
       gmtModified: "2020-06-11T16:29:08",
@@ -213,6 +315,8 @@ export default {
       dialogNameVisible: false,
       dialogTelVisible: false,
       dialogAddressVisible: false,
+      dialogLandlineVisible: false,
+      dialogEmailVisible: false,
       formLabelWidth: "120px",
     });
     const rules = reactive({
@@ -242,6 +346,24 @@ export default {
                 message: "修改成功",
               });
               modifyCorpData[status] = false;
+              let myGeo = new BMap.Geocoder();
+              myGeo.getPoint(
+                val,
+                function (point) {
+                  if (point) {
+                    sessionStorage.setItem(
+                      "corpAddress",
+                      JSON.stringify(point)
+                    );
+                  } else {
+                    root.$message({
+                      type: "warning",
+                      message: "您选取的地址没有获取到解析结果",
+                    });
+                  }
+                },
+                "北京市"
+              );
             } else {
               root.$message({
                 type: "warning",
@@ -257,14 +379,24 @@ export default {
     const resetForm = (formName) => {
       refs[formName].resetFields();
     };
-    const modifycorpName = () => {
-      modifyCorpData.dialogNameVisible = true;
-    };
-    const modifycorpTel = () => {
-      modifyCorpData.dialogTelVisible = true;
-    };
-    const modifycorpAddress = () => {
-      modifyCorpData.dialogAddressVisible = true;
+    const modifyHandle = (data) => {
+      switch (data) {
+        case "name":
+          modifyCorpData.dialogNameVisible = true;
+          break;
+        case "tel":
+          modifyCorpData.dialogTelVisible = true;
+          break;
+        case "landline":
+          modifyCorpData.dialogLandlineVisible = true;
+          break;
+        case "address":
+          modifyCorpData.dialogAddressVisible = true;
+          break;
+        case "email":
+          modifyCorpData.dialogEmailVisible = true;
+          break;
+      }
     };
     const confirmNameOpen = () => {
       submitForm("corpInfo", "name", corpInfo.name, "dialogNameVisible");
@@ -280,23 +412,30 @@ export default {
         "dialogAddressVisible"
       );
     };
-    const modifyNameCancle = () => {
-      resetForm("corpInfo");
-      modifyCorpData.dialogNameVisible = false;
+    const confirmEmailOpen = () => {
+      submitForm("corpInfo", "email", corpInfo.email, "dialogEmailVisible");
     };
-    const modifyTelCancle = () => {
-      resetForm("corpInfo");
-      modifyCorpData.dialogTelVisible = false;
+    const confirmLandlineOpen = () => {
+      submitForm(
+        "corpInfo",
+        "landline",
+        corpInfo.landline,
+        "dialogLandlineVisible"
+      );
     };
-    const modifyAddressCancle = () => {
+    const modifyCancle = () => {
       resetForm("corpInfo");
-      modifyCorpData.dialogAddressVisible = false;
+      for (let key in modifyCorpData) {
+        if (key == "formLabelWidth") continue;
+        modifyCorpData[key] = false;
+      }
     };
     const modifyBefore = () => {
       resetForm("corpInfo");
-      modifyCorpData.dialogNameVisible = false;
-      modifyCorpData.dialogTelVisible = false;
-      modifyCorpData.dialogAdressVisible = false;
+      for (let key in modifyCorpData) {
+        if (key == "formLabelWidth") continue;
+        modifyCorpData[key] = false;
+      }
     };
     watchEffect(() => {});
     onMounted(() => {});
@@ -305,15 +444,13 @@ export default {
       rules,
       modifyCorpData,
       modifyBefore,
-      modifyNameCancle,
-      modifyTelCancle,
-      modifyAddressCancle,
-      modifycorpName,
-      modifycorpTel,
-      modifycorpAddress,
+      modifyCancle,
+      modifyHandle,
       confirmNameOpen,
       confirmTelOpen,
       confirmAddressOpen,
+      confirmLandlineOpen,
+      confirmEmailOpen,
       employeeInfo,
     };
   },
@@ -346,7 +483,6 @@ $mainWidth: 705px;
     }
   }
   .info {
-    height: 94px;
     border-bottom: 1px solid #e4e6e9;
     padding: 20px 0;
     .info_item {
