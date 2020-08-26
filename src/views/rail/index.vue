@@ -9,6 +9,14 @@
       size="50%"
     >
       <div id="modifyMap"></div>
+
+      <div id="r-result">
+        <input type="text" id="suggestId" size="20" placeholder="请输入地址" style="width:150px;" />
+      </div>
+      <div
+        id="searchResultPanel"
+        style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"
+      ></div>
       <el-form
         :model="modifyRailData"
         :rules="rules"
@@ -23,7 +31,7 @@
         <el-form-item label="围栏名称" prop="railName" class="form-item">
           <el-input v-model="modifyRailData.railName"></el-input>
         </el-form-item>
-        <el-form-item label="围栏地址" prop="railAddr" class="form-item">
+        <el-form-item label="详细地址" prop="railAddr" class="form-item">
           <el-input v-model="modifyRailData.railAddr"></el-input>
         </el-form-item>
         <el-form-item label="围栏半径" prop="radius" class="form-item">
@@ -59,7 +67,7 @@
         <el-form-item label="围栏名称" prop="railName" class="form-item">
           <el-input v-model="addRailData.railName"></el-input>
         </el-form-item>
-        <el-form-item label="围栏地址" prop="railAddr" class="form-item">
+        <el-form-item label="详细地址" prop="railAddr" class="form-item">
           <el-input v-model="addRailData.railAddr"></el-input>
         </el-form-item>
         <el-form-item label="围栏半径" prop="radius" class="form-item">
@@ -171,6 +179,7 @@ import unLineIcon from "./images/marker_unline.png";
 import dangerIcon from "./images/marker_danger.png";
 import pointAggre from "@/views/images/pointAggre.png"; // 点聚合
 import railPosition from "@/views/images/railPosition.png"; // 围栏标注
+import railPositionIcon from "@/views/images/railPositionIcon.png"; // 围栏标注
 export default {
   name: "rail",
   setup(props, { root, refs }) {
@@ -415,6 +424,9 @@ export default {
     let modifyBaiduMap = () => {
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
         // 百度地图API功能
+        function G(id) {
+          return document.getElementById(id);
+        }
         let map = new BMap.Map("modifyMap");
         let point = new BMap.Point(
           modifyRailData.longitude,
@@ -426,6 +438,83 @@ export default {
         let markers = []; // 点聚合
         map.centerAndZoom(point, 16);
         map.enableScrollWheelZoom();
+
+        /**输入提示
+         *
+         */
+        let ac = new BMap.Autocomplete({ input: "suggestId", location: map }); //建立一个自动完成的对象
+
+        ac.addEventListener("onhighlight", function (e) {
+          //鼠标放在下拉列表上的事件
+          let str = "";
+          let _value = e.fromitem.value;
+          let value = "";
+          if (e.fromitem.index > -1) {
+            value =
+              _value.province +
+              _value.city +
+              _value.district +
+              _value.street +
+              _value.business;
+          }
+          str =
+            "FromItem<br />index = " +
+            e.fromitem.index +
+            "<br />value = " +
+            value;
+
+          value = "";
+          if (e.toitem.index > -1) {
+            _value = e.toitem.value;
+            value =
+              _value.province +
+              _value.city +
+              _value.district +
+              _value.street +
+              _value.business;
+          }
+          str +=
+            "<br />ToItem<br />index = " +
+            e.toitem.index +
+            "<br />value = " +
+            value;
+          G("searchResultPanel").innerHTML = str;
+        });
+
+        let myValue;
+        ac.addEventListener("onconfirm", function (e) {
+          //鼠标点击下拉列表后的事件
+          let _value = e.item.value;
+          myValue =
+            _value.province +
+            _value.city +
+            _value.district +
+            _value.street +
+            _value.business;
+          G("searchResultPanel").innerHTML =
+            "onconfirm<br />index = " +
+            e.item.index +
+            "<br />myValue = " +
+            myValue;
+
+          setPlace();
+        });
+
+        function setPlace() {
+          function myFun() {
+            let pp = local.getResults().getPoi(0).point; //获取第一个智能搜索的结果
+            let myIcon = new BMap.Icon(railPositionIcon, new BMap.Size(85, 48));
+            let marker = new BMap.Marker(pp, { icon: myIcon });
+            overlays.push(marker);
+            map.centerAndZoom(pp, 18);
+            map.addOverlay(marker); // 添加标注
+          }
+          let local = new BMap.LocalSearch(map, {
+            //智能搜索
+            onSearchComplete: myFun,
+          });
+          local.search(myValue);
+        }
 
         /**围栏标注
          *
@@ -505,8 +594,8 @@ export default {
           ],
         });
 
-        var radius = modifyRailData.radius || 100;
-        var circle = new BMap.Circle(point, radius, {
+        let radius = modifyRailData.radius || 100;
+        let circle = new BMap.Circle(point, radius, {
           strokeColor: "blue",
           strokeWeight: 1,
           strokeOpacity: 0.01,
@@ -816,6 +905,7 @@ export default {
       addDrawer.value = false;
     };
     const loading = ref(true);
+    const addressInput = ref("");
     onMounted(() => {});
     return {
       railData, // 围栏信息
@@ -841,6 +931,7 @@ export default {
       closeModifyDrawer,
       closeAddDrawer,
       loading,
+      addressInput,
     };
   },
 };
@@ -983,5 +1074,19 @@ $customerHeight: 648px;
 }
 .railTemperatrue {
   text-align: center;
+}
+
+// 地图输入提示
+#r-result {
+  width: 200px;
+  position: absolute;
+  left: 40px;
+  top: 18px;
+  input {
+    width: 200px !important;
+    height: 25px;
+    border-radius: 3px;
+    padding: 5px 14px;
+  }
 }
 </style>
