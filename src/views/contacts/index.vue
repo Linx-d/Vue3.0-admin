@@ -104,6 +104,7 @@
                         maxlength="30"
                         placeholder="请输入部门名称"
                         @click.stop.native="() => { return }"
+                        @keyup.enter.native="dialogHide(childData)"
                       ></el-input>
                     </el-form-item>
                   </el-form>
@@ -133,6 +134,7 @@
                         ref="partmentChangeContent"
                         maxlength="30"
                         :placeholder="modifyData.name"
+                        @keyup.enter.native="dialogModifyHide()"
                         @click.stop.native="() => { return }"
                       ></el-input>
                     </el-form-item>
@@ -247,6 +249,7 @@ export default {
       userLongitude: 29.821216648608489,
       online: true,
       photo: "",
+      remarks: ""
     }); // 当前成员信息
     let tmpHistory = reactive({
       newArr_time: [],

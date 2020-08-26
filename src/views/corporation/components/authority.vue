@@ -411,7 +411,6 @@ export default {
      * 选择员工 获取详情
      */
     const choose = (id) => {
-      console.log(employee, "emp");
       departmentList.splice(0, departmentList.length);
       queryAllDepartment();
       isEdit.value = false;

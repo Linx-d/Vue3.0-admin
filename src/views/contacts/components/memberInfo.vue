@@ -98,9 +98,13 @@
             <i>{{ currentMemberInfo.tel }}</i>
           </li>
           <li>
+            <span>备注：</span>
+            <i>{{ currentMemberInfo.remarks }}</i>
+          </li>
+          <li>
             <span>住址：</span>
             <i>{{ currentMemberInfo.address }}</i>
-            <a class="info_position" href="#temperature_box">
+            <a class="info_position" href="#temperature_box" @click="newPosition">
               <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
             </a>
           </li>
@@ -485,8 +489,7 @@ export default {
           },
           toolbox: {
             show: true,
-            feature: {
-            },
+            feature: {},
           },
           xAxis: {
             type: "category",
@@ -626,6 +629,7 @@ export default {
         };
         Map("ak").then((BMap) => {
           map = new BMap.Map("mapShow"); // 创建Map实例
+          window.map = map;
           let pointArray = [];
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
           pointArray.push(point);
@@ -658,7 +662,11 @@ export default {
         });
       });
     })(window);
-
+    const newPosition = () => {
+      let lng = props.currentMemberInfo.userLongitude;
+      let lat = props.currentMemberInfo.userLatitude;
+      map.centerAndZoom(new BMap.Point(lng, lat), 19);
+    };
     onMounted(() => {
       memberInfoEcharts();
       loading.value = false;
@@ -674,20 +682,25 @@ export default {
           let pt = new BMap.Point(lng, lat);
           let geoc = new BMap.Geocoder();
           geoc.getLocation(pt, function (rs) {
-            let addComp = rs.addressComponents;
-            props.tmpHistory.tableData[index].address =
-              addComp.province +
-              addComp.city +
-              addComp.district +
-              addComp.street +
-              addComp.streetNumber;
-            if (props.tmpHistory.error_tableData[index] != undefined) {
-              props.tmpHistory.error_tableData[index].address =
-                addComp.province +
-                addComp.city +
-                addComp.district +
-                addComp.street +
-                addComp.streetNumber;
+            if (rs.addressComponents != undefined) {
+              let addComp = rs.addressComponents;
+              if (props.tmpHistory.error_tableData[index] != undefined) {
+                // 异常
+                props.tmpHistory.error_tableData[index].address =
+                  addComp.province +
+                  addComp.city +
+                  addComp.district +
+                  addComp.street +
+                  addComp.streetNumber;
+
+                // 正常  
+                props.tmpHistory.tableData[index].address =
+                  addComp.province +
+                  addComp.city +
+                  addComp.district +
+                  addComp.street +
+                  addComp.streetNumber;
+              }
             }
           });
         });
@@ -717,6 +730,7 @@ export default {
       tableRowClassName,
       toggleAbnormal,
       content,
+      newPosition,
     };
   },
 };

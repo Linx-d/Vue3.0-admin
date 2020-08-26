@@ -29,7 +29,7 @@
               <th>温度</th>
               <th>电话</th>
               <th>住址</th>
-              <th>备注</th>
+              <th>状态</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -82,7 +82,7 @@
         <div class="no_member_top">
           <svg-icon iconClass="member" class="member" v-show="memberData.total===0"></svg-icon>
           <svg-icon iconClass="no_access" class="no_access" v-show="memberData.total===null"></svg-icon>
-          <p v-show="memberData.total===0">当前部门无任何成员</p>
+          <p v-show="memberData.total===0">当前部门无成员</p>
           <p v-show="memberData.total===null">暂无权限查看</p>
         </div>
         <div class="no_member_bottom" v-if="memberData.total===0">
@@ -118,7 +118,7 @@
         <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
         <el-table-column prop="tel" label="电话" width="170" sortable></el-table-column>
         <el-table-column prop="address" label="地址" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="remark" label="备注" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="remark" label="状态" show-overflow-tooltip sortable></el-table-column>
       </el-table>
       <div slot="footer" class="dialog-footer">
         <el-button @click="toggleSelection()">取 消</el-button>
@@ -326,6 +326,8 @@ export default {
             let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
             let age = parseInt((newDate - date) / oneDay);
             currentMemberInfo[key] = age;
+          } else if (key === "temperature") {
+            currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
           } else {
             currentMemberInfo[key] = data[key];
           }
