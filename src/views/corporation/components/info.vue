@@ -141,6 +141,7 @@
           <el-input
             v-model="corpInfo.name"
             autocomplete="off"
+            maxlength="20"
             @keyup.enter.native="confirmNameOpen"
           ></el-input>
         </el-form-item>
@@ -151,9 +152,9 @@
       </div>
     </el-dialog>
 
-    <!-- 修改企业电话 弹出框 -->
+    <!-- 修改联系电话 弹出框 -->
     <el-dialog
-      title="修改企业电话"
+      title="修改联系电话"
       :visible.sync="modifyCorpData.dialogTelVisible"
       :before-close="modifyBefore"
       :close-on-click-modal="false"
@@ -165,8 +166,13 @@
         label-width="100px"
         class="corpInfoClass"
       >
-        <el-form-item label="企业电话" :label-width="modifyCorpData.formLabelWidth" prop="tel">
-          <el-input v-model="corpInfo.tel" autocomplete="off" @keyup.enter.native="confirmTelOpen"></el-input>
+        <el-form-item label="联系电话" :label-width="modifyCorpData.formLabelWidth" prop="tel">
+          <el-input
+            v-model="corpInfo.tel"
+            autocomplete="off"
+            @keyup.enter.native="confirmTelOpen()"
+            maxlength="20"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -190,7 +196,12 @@
         class="corpInfoClass"
       >
         <el-form-item label="企业地址" :label-width="modifyCorpData.formLabelWidth" prop="address">
-          <el-input v-model="corpInfo.address" autocomplete="off"></el-input>
+          <el-input
+            v-model="corpInfo.address"
+            autocomplete="off"
+            maxlength="20"
+            @keyup.enter.native="confirmAddressOpen()"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -214,7 +225,12 @@
         class="corpInfoClass"
       >
         <el-form-item label="企业座机" :label-width="modifyCorpData.formLabelWidth" prop="landline">
-          <el-input v-model="corpInfo.landline" autocomplete="off" @keyup.enter.native="confirmLandlineOpen"></el-input>
+          <el-input
+            v-model="corpInfo.landline"
+            autocomplete="off"
+            @keyup.enter.native="confirmLandlineOpen()"
+            maxlength="20"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -238,7 +254,12 @@
         class="corpInfoClass"
       >
         <el-form-item label="企业邮箱" :label-width="modifyCorpData.formLabelWidth" prop="email">
-          <el-input v-model="corpInfo.email" autocomplete="off" @keyup.enter.native="confirmEmailOpen"></el-input>
+          <el-input
+            v-model="corpInfo.email"
+            autocomplete="off"
+            @keyup.enter.native="confirmEmailOpen()"
+            maxlength="20"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -319,18 +340,53 @@ export default {
       dialogEmailVisible: false,
       formLabelWidth: "120px",
     });
+
+    const validateTel = (rule, value, callback) => {
+      let exp = /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/; // 匹配11位手机号码
+      let len = value.length;
+      if (value === "") {
+        callback(new Error("请输入联系电话"));
+      } else if (!exp.test(value)) {
+        callback(new Error("请输入正确的联系电话"));
+      } else {
+        callback();
+      }
+    };
+    const validateLandline = (rule, value, callback) => {
+      let exp = /0\d{2,3}-[1-9]\d{6,7}/; // 匹配区号3到4位，电话7到8位的固定电话号码
+      let len = value.length;
+      if (value === "") {
+        callback(new Error("请输入座机"));
+      } else if (!exp.test(value)) {
+        callback(new Error("请输入正确的座机"));
+      } else {
+        callback();
+      }
+    };
+    const validateEmail = (rule, value, callback) => {
+      let exp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/; // 匹配Email地址
+      let len = value.length;
+      if (value === "") {
+        callback(new Error("请输入Email"));
+      } else if (!exp.test(value)) {
+        callback(new Error("请输入正确的Email"));
+      } else {
+        callback();
+      }
+    };
     const rules = reactive({
       name: [
         { required: true, message: "请输入名称" },
-        { min: 2, max: 5, message: "长度在 2 到 5 个字符" },
+        { min: 2, max: 20, message: "长度在 2 到 20 个字符" },
       ],
-      tel: [
-        { required: true, message: "请输入联系电话" },
-        { min: 2, max: 25, message: "长度在 2 到 25 个字符" },
-      ],
+      tel: [{ validator: validateTel }],
+      landline: [{ validator: validateLandline }],
       address: [
         { required: true, message: "请输入地址" },
-        { min: 2, max: 25, message: "长度在 2 到 25 个字符" },
+        { min: 2, max: 20, message: "长度在 2 到 20 个字符" },
+      ],
+      email: [
+        { validator: validateEmail }
       ],
     });
     const submitForm = (formName, key, val, status) => {

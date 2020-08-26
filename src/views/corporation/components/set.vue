@@ -108,7 +108,7 @@
           <el-input
             v-model="employeeName.name"
             autocomplete="off"
-            maxlength="15"
+            maxlength="20"
             @input="inputDetection"
             @keyup.enter.native="confirmNameOpen('employeeInfo')"
           ></el-input>
@@ -135,7 +135,12 @@
         class="employeeInfoClass"
       >
         <el-form-item label="联系方式" :label-width="modifyStaffData.formLabelWidth" prop="tel">
-          <el-input v-model="employeeInfo.tel" autocomplete="off" @keyup.enter.native="confirmTelOpen('employeeInfo')"></el-input>
+          <el-input
+            v-model="employeeInfo.tel"
+            autocomplete="off"
+            @keyup.enter.native="confirmTelOpen('employeeInfo')"
+            maxlength="20"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -159,7 +164,12 @@
         class="employeeInfoClass"
       >
         <el-form-item label="Email" :label-width="modifyStaffData.formLabelWidth" prop="email">
-          <el-input v-model="employeeInfo.email" autocomplete="off" @keyup.enter.native="confirmEmailOpen('employeeInfo')"></el-input>
+          <el-input
+            v-model="employeeInfo.email"
+            autocomplete="off"
+            @keyup.enter.native="confirmEmailOpen('employeeInfo')"
+            maxlength="20"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -251,15 +261,33 @@ export default {
       dialogEmailVisible: false,
       formLabelWidth: "120px",
     });
+    const validateTel = (rule, value, callback) => {
+      let exp = /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/; // 匹配11位手机号码
+      let len = value.length;
+      if (value === "") {
+        callback(new Error("请输入联系电话"));
+      } else if (!exp.test(value)) {
+        callback(new Error("请输入正确的联系电话"));
+      } else {
+        callback();
+      }
+    };
+    const validateEmail = (rule, value, callback) => {
+      let exp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/; // 匹配Email地址
+      let len = value.length;
+      if (value === "") {
+        callback(new Error("请输入Email"));
+      } else if (!exp.test(value)) {
+        callback(new Error("请输入正确的Email"));
+      } else {
+        callback();
+      }
+    };
     const rules = reactive({
       name: [
-        {  message: "请输入名称" },
-        // { min: 2, max: 5, message: "长度在 2 到 5 个字符" }
       ],
-      tel: [
-        // { required: true, message: "请输入联系电话" },
-        // { min: 11, max: 11, message: "长度为 11 个字符" },
-      ],
+      tel: [{ validator: validateTel }],
+      email: [{ validator: validateEmail }],
     });
     const submitNameForm = (formName) => {
       refs[formName].validate((valid) => {
