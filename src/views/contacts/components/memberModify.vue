@@ -118,8 +118,19 @@ export default {
     });
 
     /**规则 */
+    const validateTel = (rule, value, callback) => {
+      let exp = /^[1]([3-9])[0-9]{9}$/; // 匹配11位手机号码
+      let len = value.length;
+      if (value === "") {
+        callback(new Error("请输入联系电话"));
+      } else if (!exp.test(value)) {
+        callback(new Error("请输入正确的联系电话"));
+      } else {
+        callback();
+      }
+    };
     const rules = reactive({
-      name: [],
+      tel: [{ validator: validateTel }],
     });
     const dateChange = (val) => {
       let year = val.getFullYear();

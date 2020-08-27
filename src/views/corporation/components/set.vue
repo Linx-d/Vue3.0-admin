@@ -262,7 +262,7 @@ export default {
       formLabelWidth: "120px",
     });
     const validateTel = (rule, value, callback) => {
-      let exp = /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/; // 匹配11位手机号码
+      let exp = /^[1]([3-9])[0-9]{9}$/; // 匹配11位手机号码
       let len = value.length;
       if (value === "") {
         callback(new Error("请输入联系电话"));
