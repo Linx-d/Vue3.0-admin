@@ -281,3 +281,26 @@ export function select(data) {
     url: "/upload/select",
   });
 }
+
+/**
+ * 修改用户信息
+ *
+ * @export
+ * @param {
+    "id": "10000",
+    "name": "封半烟",
+    "tel": "13029835476",
+    "sex": "女",
+    "age": "2002-02-02",
+    "address": "重庆市渝北区康庄美地22-3",
+    "remarks":"体温正常"
+}
+ * @returns
+ */
+export function updateUser(data) {
+  return service.request({
+    method: "post",
+    url: "/user/updateUser",
+    data
+  });
+}

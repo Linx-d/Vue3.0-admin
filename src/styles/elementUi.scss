@@ -241,3 +241,27 @@
   height: 44px;
   line-height: 44px;
 }
+
+// 修改个人信息
+.modify_form {
+  .el-form-item__label {
+    width: 50px !important;
+  }
+  .el-form-item__content {
+    margin-left: 50px !important;
+  }
+  .el-input {
+    width: 50%;
+  }
+  .el-input__inner {
+    width: 100%;
+    // border: 1px solid #c7c7c7;
+    border-radius: 2px;
+  }
+  .el-textarea__inner {
+    width: 50%;
+  }
+  .el-radio {
+    margin-right: 15px;
+  }
+}
