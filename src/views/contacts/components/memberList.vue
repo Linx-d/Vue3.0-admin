@@ -164,6 +164,14 @@ export default {
       type: Object,
       default: () => {},
     },
+    modifyMemberInfo: {
+      type: Object,
+      default: () => {},
+    },
+    initial: {
+      type: Object,
+      default: () => {},
+    },
     tmpHistory: {
       type: Object,
       default: () => {},
@@ -238,6 +246,8 @@ export default {
 
       // 获得成员个人信息
       let currentMemberInfo = props.currentMemberInfo;
+      let modifyMemberInfo = props.modifyMemberInfo;
+      let initial = props.initial;
       let step = deviceStep.step;
       for (let key in currentMemberInfo) {
         let time = new Date().getTime() - new Date(data.gmtCreate).getTime();
@@ -247,6 +257,15 @@ export default {
           currentMemberInfo.online = false;
         }
         currentMemberInfo[key] = data[key];
+      }
+      for (let key in modifyMemberInfo) {
+        if (key == "id") {
+          modifyMemberInfo[key] = data.userId;
+          initial[key] = data.userId;
+        } else {
+          modifyMemberInfo[key] = data[key];
+          initial[key] = data[key];
+        }
       }
       /**
        * 查询用户所属的所有部门
@@ -326,6 +345,9 @@ export default {
             let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
             let age = parseInt((newDate - date) / oneDay);
             currentMemberInfo[key] = age;
+            currentMemberInfo.date = data[key];
+            modifyMemberInfo.age = data[key];
+            initial.age = data[key];
           } else if (key === "temperature") {
             currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
           } else {

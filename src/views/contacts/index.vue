@@ -175,6 +175,8 @@
         :memberData="memberData"
         :contactsModule="contactsModule"
         :currentMemberInfo="currentMemberInfo"
+        :modifyMemberInfo="modifyMemberInfo"
+        :initial="initial"
         :tmpHistory="tmpHistory"
         :memberListPaging="memberListPaging"
       ></contactsList>
@@ -185,6 +187,15 @@
         :currentMemberInfo="currentMemberInfo"
         :tmpHistory="tmpHistory"
       ></contactsInfo>
+      <contactsModify
+        v-show="contactsModule.memberModify"
+        :currentDepart="currentDepart"
+        :contactsModule="contactsModule"
+        :currentMemberInfo="currentMemberInfo"
+        :initial="initial"
+        :tmpHistory="tmpHistory"
+        :modifyMemberInfo="modifyMemberInfo"
+      ></contactsModify>
     </div>
   </main>
 </template>
@@ -192,6 +203,7 @@
 <script>
 import contactsInfo from "./components/memberInfo";
 import contactsList from "./components/memberList";
+import contactsModify from "./components/memberModify";
 import {
   addDepartment,
   listAllDepartment,
@@ -222,7 +234,7 @@ import {
 } from "@vue/composition-api";
 export default {
   name: "contacts",
-  components: { contactsInfo, contactsList },
+  components: { contactsInfo, contactsModify, contactsList },
   setup(props, { root, refs, set, nextTick }) {
     /**
      * contacts模块管理
@@ -233,9 +245,11 @@ export default {
       memberModify: false, // 修改信息
       status: false,
     });
+    // 当前成员信息
     let currentMemberInfo = reactive({
       address: "山西省太原市万柏林区a",
       age: "23",
+      date: "",
       gmtCreate: null,
       name: "aaaaaa",
       radius: "25",
@@ -249,8 +263,29 @@ export default {
       userLongitude: 29.821216648608489,
       online: true,
       photo: "",
-      remarks: ""
-    }); // 当前成员信息
+      remarks: "",
+    });
+    // 表单绑定
+    const modifyMemberInfo = reactive({
+      id: "",
+      name: "",
+      tel: "",
+      sex: "",
+      age: "",
+      address: "",
+      remarks: "",
+    });
+    // 初始值
+    const initial = reactive({
+      id: "",
+      name: "",
+      tel: "",
+      sex: "",
+      age: "",
+      address: "",
+      remarks: "",
+    });
+    // 设置成员修改信息
     let tmpHistory = reactive({
       newArr_time: [],
       newArr_tmp: [],
@@ -1075,6 +1110,8 @@ export default {
       memberData,
       currentDepart,
       currentMemberInfo,
+      modifyMemberInfo,
+      initial,
       tmpHistory,
       updateDepart, // 修改部门名称
       modifyNodeData, // 传入子组件的部门修改信息

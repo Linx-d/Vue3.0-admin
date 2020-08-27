@@ -7,8 +7,8 @@
       <a class="memberLink" href="javascript:;" @click="memberInfoBack">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
-      <a class="memberLink" href="javascript:;">
-        <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>编辑
+      <a class="memberLink" href="javascript:;" @click="modifyMemberInfo">
+        编辑
       </a>
       <!--
       <a class="memberLink" href="javascript:;">编辑</a>
@@ -576,9 +576,14 @@ export default {
         };*/
       });
     };
+    // 返回
     const memberInfoBack = () => {
       switchModule(contactsModule, "memberList");
     };
+    // 编辑
+    const modifyMemberInfo = () => {
+      switchModule(contactsModule, "memberModify");
+    }
     const temperature = ref(true);
     const tableData = reactive([]);
     const toggleTable = () => {
@@ -632,6 +637,7 @@ export default {
           window.map = map;
           let pointArray = [];
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
+          map.centerAndZoom(point, 13); // 将个人作为地图中心点
           pointArray.push(point);
           let marker = new BMap.Marker(point);
           map.addOverlay(marker); //添加一个标注
@@ -650,7 +656,6 @@ export default {
           // } else {
           //   map.centerAndZoom(railPoint, 16); // 将围栏作为地图中心点
           // }
-          map.centerAndZoom(point, 13); // 将个人作为地图中心点
           let circle = new BMap.Circle(railPoint, railInfo.radius, {
             strokeColor: "blue",
             strokeWeight: 1,
@@ -682,7 +687,7 @@ export default {
           let pt = new BMap.Point(lng, lat);
           let geoc = new BMap.Geocoder();
           geoc.getLocation(pt, function (rs) {
-            if (rs.addressComponents != undefined) {
+            if (rs.addressComponents != null) {
               let addComp = rs.addressComponents;
               if (props.tmpHistory.error_tableData[index] != undefined) {
                 // 异常
@@ -717,6 +722,7 @@ export default {
       paging,
       handleCurrentChange,
       memberInfoBack,
+      modifyMemberInfo,
       bindOpen,
       unBindOpen,
       addRail,
