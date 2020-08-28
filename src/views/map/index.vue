@@ -83,38 +83,38 @@
               </span>
             </h1>
 
-            <table>
-              <tr class="tb_top">
-                <td>{{ alarmData.alarmSum }}</td>
-                <td>{{ alarmData.personSum }}</td>
-                <td>{{ alarmData.tsum }}</td>
-                <td>{{ alarmData.psum }}</td>
-              </tr>
-              <tr class="tb_middle">
-                <td class="tdBgc">累计告警</td>
-                <td class="tdBgc">累计人数</td>
-                <td class="tdBgc">温度告警</td>
-                <td class="tdBgc">位置告警</td>
-              </tr>
-              <tr class="tb_bottom">
-                <td style="color: #b2b2b2;" @click="alarmHandle('sum')">
+            <div class="totalContent">
+              <div class="tb_top">
+                <span :title="alarmData.alarmSum">{{ alarmData.alarmSum }}</span>
+                <span :title="alarmData.personSum">{{ alarmData.personSum }}</span>
+                <span :title="alarmData.tsum">{{ alarmData.tsum }}</span>
+                <span :title="alarmData.psum">{{ alarmData.psum }}</span>
+              </div>
+              <div class="tb_middle">
+                <span class="tdBgc">累计告警</span>
+                <span class="tdBgc">累计人数</span>
+                <span class="tdBgc">温度告警</span>
+                <span class="tdBgc">位置告警</span>
+              </div>
+              <div class="tb_bottom">
+                <strong style="color: #b2b2b2;" @click="alarmHandle('sum')">
                   <span>新增</span>
                   <span style="color: #bf4739;">+{{ alarmData.newSum }}</span>
-                </td>
-                <td style="color: #b2b2b2;" @click="personHandle('person')">
+                </strong>
+                <strong style="color: #b2b2b2;" @click="personHandle('person')">
                   <span>新增</span>
                   <span style="color: #cd6212;">+{{ alarmData.newPersonSum }}</span>
-                </td>
-                <td style="color: #b2b2b2;" @click="alarmHandle('temperature')">
+                </strong>
+                <strong style="color: #b2b2b2;" @click="alarmHandle('temperature')">
                   <span>新增</span>
                   <span style="color: #1089e7;">+{{ alarmData.newTSum }}</span>
-                </td>
-                <td style="color: #b2b2b2;" @click="alarmHandle('position')">
+                </strong>
+                <strong style="color: #b2b2b2;" @click="alarmHandle('position')">
                   <span>新增</span>
                   <span style="color: #35cbbf;">+{{ alarmData.newPSum }}</span>
-                </td>
-              </tr>
-            </table>
+                </strong>
+              </div>
+            </div>
           </a>
         </div>
         <div :class="['alanysis_bottom_R echartsIndivi']">
@@ -600,7 +600,6 @@ export default {
         0,
         database.alarm.pageSize
       );
-      console.log(database.alarm.data, "alarm.data");
       database.alarm.loading = false;
     };
     const handleSizeChange = (val) => {
@@ -1871,7 +1870,6 @@ $echartsBorder: 1px solid #146ede;
 .tdBgc {
   background-color: #273e84;
   border-radius: 5px;
-  min-width: 72px;
   color: #fff;
 }
 
@@ -1890,7 +1888,7 @@ $echartsBorder: 1px solid #146ede;
   height: 90%;
   padding-top: 8%;
   box-sizing: border-box;
-  table {
+  .totalContent {
     color: #000;
     padding: 0;
     font-size: 1.2vw;
@@ -1898,28 +1896,34 @@ $echartsBorder: 1px solid #146ede;
     width: 100%;
     text-align: center;
     padding-bottom: 0;
-    line-height: 59px;
-    td {
+    line-height: 40px;
+    span {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      max-width: 30px;
+      width: 4vw;
     }
     .tb_top {
-      td:nth-child(1) {
+      span {
+        display: inline-block;
+      }
+      span:nth-child(1) {
         color: #bf4739;
       }
-      td:nth-child(2) {
+      span:nth-child(2) {
         color: #cd6212;
       }
-      td:nth-child(3) {
+      span:nth-child(3) {
         color: #1089e7;
       }
-      td:nth-child(4) {
+      span:nth-child(4) {
         color: #35cbbf;
       }
     }
     .tb_middle {
+      span {
+        display: inline-block;
+      }
       height: 20%;
       font-weight: 700;
       color: #2d2d2d;
@@ -1929,6 +1933,15 @@ $echartsBorder: 1px solid #146ede;
       font-weight: 700;
       height: 35px;
       font-size: 1vw;
+      strong {
+        color: rgb(178, 178, 178);
+        display: inline-block;
+        width: 4vw;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 4vw;
+      }
     }
   }
 }
