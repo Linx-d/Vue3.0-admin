@@ -33,11 +33,11 @@
           <div id="abnormal" class="alanysis_top_a echartsIndivi">
             <h1>
               <div>
-                <span>企业成员:</span>
+                <span>企业用户总量:</span>
                 {{ scaleStatic.person }}人
               </div>
               <div>
-                <span>管理成员:</span>
+                <span>您管理的用户:</span>
                 {{ scaleStatic.managerPerson }}人
               </div>
             </h1>
@@ -545,7 +545,7 @@ export default {
       let len = database.person.data.length;
       database.person.data.splice(0, len);
       if (val == "person") {
-        database.person.title = "新增人数";
+        database.person.title = "新增成员";
         database.person.data = database.personContent;
       }
       database.person.total = database.person.data.length;
@@ -645,7 +645,10 @@ export default {
     // 异常状态表格
     const tableRowClassName = ({ row, rowIndex }) => {
       let temperature = parseFloat(row.temperature);
+      let type = row.alarmType;
       if (temperature >= 37.3) {
+        return "warning-row";
+      }else if(type==1||type==2||type==3) {
         return "warning-row";
       }
       return "";
@@ -1896,11 +1899,11 @@ $echartsBorder: 1px solid #146ede;
     width: 100%;
     text-align: center;
     padding-bottom: 0;
-    line-height: 40px;
+    line-height: 56px;
     span {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      // overflow: hidden;
+      // white-space: nowrap;
+      // text-overflow: ellipsis;
       width: 4vw;
     }
     .tb_top {
@@ -1937,10 +1940,10 @@ $echartsBorder: 1px solid #146ede;
         color: rgb(178, 178, 178);
         display: inline-block;
         width: 4vw;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        width: 4vw;
+        // overflow: hidden;
+        // white-space: nowrap;
+        // text-overflow: ellipsis;
+        // width: 4vw;
       }
     }
   }
