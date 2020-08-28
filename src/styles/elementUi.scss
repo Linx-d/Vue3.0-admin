@@ -210,7 +210,9 @@
   }
 }
 .online_dialog,
-.temperature_dialog {
+.temperature_dialog,
+.alarm_dialog,
+.person_dialog {
   .el-dialog__body {
     padding: 20px 20px 50px 20px;
     .el-pagination {

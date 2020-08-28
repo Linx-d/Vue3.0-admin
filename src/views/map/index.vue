@@ -42,12 +42,12 @@
               </div>
             </h1>
             <span class="onlineLine"></span>
-            <div class="abnormal_top" @click="onlineHandle">
+            <div class="abnormal_top" @click="lineHandle('on')">
               <span>在线</span>
               <br />
               <span>{{ scaleStatic.online }}人</span>
             </div>
-            <div class="abnormal_bottom" @click="unlineHandle">
+            <div class="abnormal_bottom" @click="lineHandle('un')">
               <span>离线</span>
               <br />
               <span>{{ scaleStatic.unline }}人</span>
@@ -97,19 +97,19 @@
                 <td class="tdBgc">位置告警</td>
               </tr>
               <tr class="tb_bottom">
-                <td style="color: #b2b2b2;">
+                <td style="color: #b2b2b2;" @click="alarmHandle('sum')">
                   <span>新增</span>
                   <span style="color: #bf4739;">+{{ alarmData.newSum }}</span>
                 </td>
-                <td style="color: #b2b2b2;">
+                <td style="color: #b2b2b2;" @click="personHandle('person')">
                   <span>新增</span>
                   <span style="color: #cd6212;">+{{ alarmData.newPersonSum }}</span>
                 </td>
-                <td style="color: #b2b2b2;">
+                <td style="color: #b2b2b2;" @click="alarmHandle('temperature')">
                   <span>新增</span>
                   <span style="color: #1089e7;">+{{ alarmData.newTSum }}</span>
                 </td>
-                <td style="color: #b2b2b2;">
+                <td style="color: #b2b2b2;" @click="alarmHandle('position')">
                   <span>新增</span>
                   <span style="color: #35cbbf;">+{{ alarmData.newPSum }}</span>
                 </td>
@@ -244,8 +244,8 @@
       </el-table>
       <div class="block">
         <el-pagination
-          @size-change="handleSizeChange_online"
-          @current-change="handleCurrentChange_online"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
           :current-page="database.online.pageNum"
           :page-sizes="database.online.pageSizes"
           :page-size="database.online.pageSize"
@@ -254,6 +254,7 @@
         ></el-pagination>
       </div>
     </el-dialog>
+
     <!-- 用户温度情况 -->
     <el-dialog
       :title="database.temperature.title"
@@ -277,13 +278,82 @@
       </el-table>
       <div class="block">
         <el-pagination
-          @size-change="handleSizeChange_normal"
-          @current-change="handleCurrentChange_abnormal"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
           :current-page="database.temperature.pageNum"
           :page-sizes="database.temperature.pageSizes"
           :page-size="database.temperature.pageSize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="database.temperature.total"
+        ></el-pagination>
+      </div>
+    </el-dialog>
+
+    <!-- 告警统计 -->
+    <el-dialog
+      :title="database.alarm.title"
+      :visible.sync="database.alarm.visible"
+      :close-on-click-modal="false"
+      class="alarm_dialog"
+    >
+      <el-table
+        :data="database.alarm.show"
+        style="width: 100%"
+        max-height="500"
+        height="500"
+        v-loading="database.alarm.loading"
+        :row-class-name="tableRowClassName"
+      >
+        <el-table-column prop="userName" label="姓名" width="100" title="userName" sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
+        <el-table-column prop="type" label="告警类型" width="120" sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="120" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="260" sortable></el-table-column>
+        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="200" sortable></el-table-column>
+      </el-table>
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="database.alarm.pageNum"
+          :page-sizes="database.alarm.pageSizes"
+          :page-size="database.alarm.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="database.alarm.total"
+        ></el-pagination>
+      </div>
+    </el-dialog>
+
+    <!-- 新增人数统计 -->
+    <el-dialog
+      :title="database.person.title"
+      :visible.sync="database.person.visible"
+      :close-on-click-modal="false"
+      class="person_dialog"
+    >
+      <el-table
+        :data="database.person.show"
+        style="width: 100%"
+        max-height="500"
+        height="500"
+        v-loading="database.person.loading"
+        :row-class-name="tableRowClassName"
+      >
+        <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
+        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
+      </el-table>
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="database.person.pageNum"
+          :page-sizes="database.person.pageSizes"
+          :page-size="database.person.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="database.person.total"
         ></el-pagination>
       </div>
     </el-dialog>
@@ -306,6 +376,8 @@ import {
   add,
   fuzzySearch,
   listDeviceAlarmInfoByUserId,
+  listAddAlarmData,
+  listAddAlarmUser,
 } from "@/api/mapApi";
 import { listRail, selectRailList, listUserInfoByRail } from "@/api/railApi";
 import { getCorpInfo } from "@/api/corporationApi";
@@ -347,6 +419,9 @@ export default {
         deviceStep.step = nightInterval * 60 * 1000 * 2;
       }
     });
+    /**温度、在线统计
+     *
+     */
     const database = reactive({
       online: {
         title: "",
@@ -370,24 +445,60 @@ export default {
         pageNum: 1,
         pageSize: 15,
       },
+      alarm: {
+        title: "",
+        visible: false,
+        loading: true,
+        data: [],
+        show: [],
+        total: 0,
+        pageSizes: [15, 20, 30, 40],
+        pageNum: 1,
+        pageSize: 15,
+      },
+      person: {
+        title: "",
+        visible: false,
+        loading: true,
+        data: [],
+        show: [],
+        total: 0,
+        pageSizes: [15, 20, 30, 40],
+        pageNum: 1,
+        pageSize: 15,
+      },
       onlineContent: [],
       temperatureContent: [],
+      personContent: [],
+      alarmContent: [],
     });
-    const onlineHandle = () => {
+    const lineHandle = (val) => {
       database.online.visible = true;
       database.online.pageNum = 1;
       database.online.pageSize = 15;
       let len = database.online.data.length;
       database.online.data.splice(0, len);
-      database.online.title = "在线用户";
-      database.onlineContent.forEach((item) => {
-        let temperature = parseFloat(item.temperature),
-          gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
-        let step = deviceStep.step;
-        if (gmt < step) {
-          database.online.data.push(item);
-        }
-      });
+      if (val == "on") {
+        database.online.title = "在线用户";
+        database.onlineContent.forEach((item) => {
+          let temperature = parseFloat(item.temperature),
+            gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
+          let step = deviceStep.step;
+          if (gmt < step) {
+            database.online.data.push(item);
+          }
+        });
+      } else {
+        database.online.title = "离线用户";
+        database.onlineContent.forEach((item) => {
+          let temperature = parseFloat(item.temperature),
+            gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
+          let step = deviceStep.step;
+          if (gmt >= step) {
+            database.online.data.push(item);
+          }
+        });
+      }
       database.online.total = database.online.data.length;
       database.online.show = database.online.data.slice(
         0,
@@ -395,42 +506,31 @@ export default {
       );
       database.online.loading = false;
     };
-    const unlineHandle = () => {
-      database.online.visible = true;
-      database.online.pageNum = 1;
-      database.online.pageSize = 15;
-      let len = database.online.data.length;
-      database.online.data.splice(0, len);
-      database.online.title = "离线用户";
-      database.onlineContent.forEach((item) => {
-        let temperature = parseFloat(item.temperature),
-          gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
-        let step = deviceStep.step;
-        if (gmt >= step) {
-          database.online.data.push(item);
-        }
-      });
-      database.online.total = database.online.data.length;
-      database.online.show = database.online.data.slice(
-        0,
-        database.online.pageSize
-      );
-      database.online.loading = false;
-    };
-    const normalHandle = () => {
+    const temperatureHandle = (val) => {
       database.temperature.visible = true;
       database.temperature.pageNum = 1;
       database.temperature.pageSize = 15;
       let len = database.temperature.data.length;
       database.temperature.data.splice(0, len);
-      database.temperature.title = "体温正常用户";
-      database.temperatureContent.forEach((item) => {
-        let temperature = parseFloat(item.temperature);
-        let marking = deviceStep.marking;
-        if (temperature < marking) {
-          database.temperature.data.push(item);
-        }
-      });
+      if (val == "normal") {
+        database.temperature.title = "体温正常用户";
+        database.temperatureContent.forEach((item) => {
+          let temperature = parseFloat(item.temperature);
+          let marking = deviceStep.marking;
+          if (temperature < marking) {
+            database.temperature.data.push(item);
+          }
+        });
+      } else {
+        database.temperature.title = "体温异常用户";
+        database.temperatureContent.forEach((item) => {
+          let temperature = parseFloat(item.temperature);
+          let marking = deviceStep.marking;
+          if (temperature >= marking) {
+            database.temperature.data.push(item);
+          }
+        });
+      }
       database.temperature.total = database.temperature.data.length;
       database.temperature.show = database.temperature.data.slice(
         0,
@@ -438,54 +538,110 @@ export default {
       );
       database.temperature.loading = false;
     };
-    const abnormalHandle = () => {
-      database.temperature.visible = true;
-      database.temperature.pageNum = 1;
-      database.temperature.pageSize = 15;
-      let len = database.temperature.data.length;
-      database.temperature.data.splice(0, len);
-      database.temperature.title = "体温异常用户";
-      database.temperatureContent.forEach((item) => {
-        let temperature = parseFloat(item.temperature);
-        let marking = deviceStep.marking;
-        if (temperature >= marking) {
-          database.temperature.data.push(item);
-        }
-      });
-      database.temperature.total = database.temperature.data.length;
-      database.temperature.show = database.temperature.data.slice(
+    const personHandle = (val) => {
+      database.person.visible = true;
+      database.person.pageNum = 1;
+      database.person.pageSize = 15;
+      let len = database.person.data.length;
+      database.person.data.splice(0, len);
+      if (val == "person") {
+        database.person.title = "新增人数";
+        database.person.data = database.personContent;
+      }
+      database.person.total = database.person.data.length;
+      database.person.show = database.person.data.slice(
         0,
-        database.temperature.pageSize
+        database.person.pageSize
       );
-      database.temperature.loading = false;
+      database.person.loading = false;
     };
-    const handleSizeChange_online = (val) => {
-      database.online.pageSize = val;
-      let start = database.online.pageSize * (database.online.pageNum - 1);
-      let end = database.online.pageSize * database.online.pageNum;
-      database.online.show = database.online.data.slice(start, end);
+    const alarmHandle = (val) => {
+      database.alarm.visible = true;
+      database.alarm.pageNum = 1;
+      database.alarm.pageSize = 15;
+      let len = database.alarm.data.length;
+      database.alarm.data.splice(0, len);
+      if (val == "sum") {
+        database.alarm.title = "新增告警";
+        database.alarmContent.forEach((item) => {
+          let alarmType = item.alarmType;
+          if (alarmType == 1) {
+            item.type = "温度";
+            database.alarm.data.push(item);
+          } else if (alarmType == 2) {
+            item.type = "位置";
+            database.alarm.data.push(item);
+          } else if (alarmType == 3) {
+            item.type = "位置和位置";
+            database.alarm.data.push(item);
+          }
+        });
+      } else if (val == "temperature") {
+        database.alarm.title = "新增温度告警";
+        database.alarmContent.forEach((item) => {
+          let alarmType = item.alarmType;
+          if (alarmType == 1 || alarmType == 3) {
+            item.type = "温度";
+            database.alarm.data.push(item);
+          }
+        });
+      } else if (val == "position") {
+        database.alarm.title = "新增位置告警";
+        database.alarmContent.forEach((item) => {
+          let alarmType = item.alarmType;
+          if (alarmType == 2 || alarmType == 3) {
+            item.type = "位置";
+            database.alarm.data.push(item);
+          }
+        });
+      }
+      database.alarm.total = database.alarm.data.length;
+      database.alarm.show = database.alarm.data.slice(
+        0,
+        database.alarm.pageSize
+      );
+      console.log(database.alarm.data, "alarm.data");
+      database.alarm.loading = false;
     };
-    const handleCurrentChange_online = (val) => {
-      console.log(`当前页: ${val}`);
-      database.online.pageNum = val;
-      let start = database.online.pageSize * (database.online.pageNum - 1);
-      let end = database.online.pageSize * database.online.pageNum;
-      database.online.show = database.online.data.slice(start, end);
+    const handleSizeChange = (val) => {
+      let choose = "",
+        online = database.online.visible,
+        temperature = database.temperature.visible,
+        alarm = database.alarm.visible,
+        person = database.person.visible;
+      if (online) {
+        choose = "online";
+      } else if (temperature) {
+        choose = "temperature";
+      } else if (alarm) {
+        choose = "alarm";
+      } else if (person) {
+        choose = "person";
+      }
+      database[choose].pageSize = val;
+      let start = database[choose].pageSize * (database[choose].pageNum - 1);
+      let end = database[choose].pageSize * database[choose].pageNum;
+      database[choose].show = database[choose].data.slice(start, end);
     };
-    const handleSizeChange_normal = (val) => {
-      database.temperature.pageSize = val;
-      let start =
-        database.temperature.pageSize * (database.temperature.pageNum - 1);
-      let end = database.temperature.pageSize * database.temperature.pageNum;
-      database.temperature.show = database.temperature.data.slice(start, end);
-    };
-    const handleCurrentChange_abnormal = (val) => {
-      console.log(`当前页: ${val}`);
-      database.temperature.pageNum = val;
-      let start =
-        database.temperature.pageSize * (database.temperature.pageNum - 1);
-      let end = database.temperature.pageSize * database.temperature.pageNum;
-      database.temperature.show = database.temperature.data.slice(start, end);
+    const handleCurrentChange = (val) => {
+      let choose = "",
+        online = database.online.visible,
+        temperature = database.temperature.visible,
+        alarm = database.alarm.visible,
+        person = database.person.visible;
+      if (online) {
+        choose = "online";
+      } else if (temperature) {
+        choose = "temperature";
+      } else if (alarm) {
+        choose = "alarm";
+      } else if (person) {
+        choose = "person";
+      }
+      database[choose].pageNum = val;
+      let start = database[choose].pageSize * (database[choose].pageNum - 1);
+      let end = database[choose].pageSize * database[choose].pageNum;
+      database[choose].show = database[choose].data.slice(start, end);
     };
     // 异常状态表格
     const tableRowClassName = ({ row, rowIndex }) => {
@@ -495,6 +651,7 @@ export default {
       }
       return "";
     };
+
     /**
      * 图表框
      */
@@ -569,7 +726,7 @@ export default {
         // );
         let map = new BMap.Map("mapShow", {
           minZoom: 6,
-          maxZoom: 18,
+          maxZoom: 20,
           enableMapClick: false,
         }); // 创建Map实例
         window.map = map;
@@ -586,10 +743,7 @@ export default {
           enableGeolocation: true,
         });
         map.addControl(navigationControl);
-        map.centerAndZoom(
-          new BMap.Point(data.lng, data.lat),
-          19
-        ); // 初始化地图,用城市名设置地图中心点
+        map.centerAndZoom(new BMap.Point(data.lng, data.lat), 19); // 初始化地图,用城市名设置地图中心点
         listUserLocation().then((res) => {
           let code = res.code;
           let data = res.data;
@@ -898,9 +1052,9 @@ export default {
       // 处理点击事件并且跳转到相应的开始
       onlineChart.on("click", function (params) {
         if (params.name == "体温正常人数") {
-          normalHandle();
+          temperatureHandle("normal");
         } else {
-          abnormalHandle();
+          temperatureHandle("abnormal");
         }
       });
       let option = onlineOption;
@@ -1187,6 +1341,64 @@ export default {
         onlineStatic: 0,
       });
       // baiduMap(); // 百度地图
+      listAddAlarmUser().then((res) => {
+        let data = res.data,
+          code = res.code,
+          msg = res.msg;
+        if (code == 0) {
+          database.personContent = data;
+          // 地址逆解析
+          database.personContent.forEach((item) => {
+            let lng = item.longitude,
+              lat = item.latitude;
+            let pt = new BMap.Point(lng, lat);
+            let geoc = new BMap.Geocoder();
+            geoc.getLocation(pt, function (rs) {
+              let addComp = rs.addressComponents;
+              item.address =
+                addComp.province +
+                addComp.city +
+                addComp.district +
+                addComp.street +
+                addComp.streetNumber;
+            });
+          });
+        } else {
+          root.$message({
+            type: "error",
+            message: msg,
+          });
+        }
+      });
+      listAddAlarmData().then((res) => {
+        let data = res.data,
+          code = res.code,
+          msg = res.msg;
+        if (code == 0) {
+          database.alarmContent = data;
+          // 地址逆解析
+          database.alarmContent.forEach((item) => {
+            let lng = item.longitude,
+              lat = item.latitude;
+            let pt = new BMap.Point(lng, lat);
+            let geoc = new BMap.Geocoder();
+            geoc.getLocation(pt, function (rs) {
+              let addComp = rs.addressComponents;
+              item.address =
+                addComp.province +
+                addComp.city +
+                addComp.district +
+                addComp.street +
+                addComp.streetNumber;
+            });
+          });
+        } else {
+          root.$message({
+            type: "error",
+            message: msg,
+          });
+        }
+      });
     });
     return {
       full,
@@ -1214,13 +1426,12 @@ export default {
       member_close,
       item_active,
       database,
-      onlineHandle,
-      unlineHandle,
-      handleSizeChange_online,
-      handleCurrentChange_online,
-      handleSizeChange_normal,
-      handleCurrentChange_abnormal,
+      lineHandle,
+      handleSizeChange,
+      handleCurrentChange,
       tableRowClassName,
+      alarmHandle,
+      personHandle,
     };
   },
 };
@@ -1382,9 +1593,8 @@ $echartsBorder: 1px solid #146ede;
         color: #0f9ae2;
         font-size: 19px;
         font-weight: 400;
-        text-align: left;
+        text-align: center;
         margin-top: 10px;
-        padding-left: 76px;
         div {
           margin-bottom: 5px;
           span {

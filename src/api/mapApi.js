@@ -186,3 +186,31 @@ export function listDeviceAlarmInfoByUserId(data) {
     data,
   });
 }
+
+/**
+ * 查询当日新增告警用户
+ *
+ * @export
+ * @param null
+* @returns data
+*/
+export function listAddAlarmUser() {
+  return service.request({
+    method: "get",
+    url: "/user/listAddAlarmUser",
+  });
+}
+
+/**
+ * 查询当日新增告警数据
+ *
+ * @export
+ * @param null
+* @returns data
+*/
+export function listAddAlarmData() {
+  return service.request({
+    method: "get",
+    url: "/deviceData/listAddAlarmData",
+  });
+}
