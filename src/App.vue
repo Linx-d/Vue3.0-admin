@@ -1,7 +1,7 @@
 <template>
   <div id="app" v-if="!loading">
     <Header v-if="full"></Header>
-    <router-view/>
+    <router-view />
     <Footer v-if="full"></Footer>
   </div>
 </template>
@@ -9,6 +9,7 @@
 import Header from "./views/Layout/Header";
 import Footer from "./views/Layout/Footer";
 import { computed, ref, watchEffect } from "@vue/composition-api";
+import { getCorpInfo } from "@/api/corporationApi"; // 获取企业地址
 export default {
   name: "App",
   components: { Header, Footer },
@@ -17,10 +18,11 @@ export default {
       return root.$store.state.map.full;
     });
     const loading = ref(true);
-    watchEffect(()=>{
+    watchEffect(() => {
       let hasToken = sessionStorage.getItem("auth_token");
-      loading.value = hasToken == null || hasToken == undefined || hasToken == "";
-    })
+      loading.value =
+        hasToken == null || hasToken == undefined || hasToken == "";
+    });
     return { full, loading };
   },
 };

@@ -7,7 +7,7 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <script
       type="text/javascript"
-      src="//api.map.baidu.com/api?v=3.0&ak=EG4ercSC4ZmBIhIcBvyoj65q12m2fy00"
+      src="https://api.map.baidu.com/api?v=3.0&ak=EG4ercSC4ZmBIhIcBvyoj65q12m2fy00"
     ></script>
     <!--加载鼠标绘制工具-->
     <script
@@ -18,28 +18,32 @@
       rel="stylesheet"
       href="//api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css"
     />
+    <!--加载检索信息窗口-->
     <script
       type="text/javascript"
-      src="//api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js"
+      src="//api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="//api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js"
     ></script>
     <script
       type="text/javascript"
-      src="//api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"
-    ></script>
-    <!-- 路书 -->
-    <script
-      type="text/javascript"
-      src="//api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js"
+      src="https://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"
     ></script>
     <!-- 热力图 -->
     <script
       type="text/javascript"
-      src="//api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"
+      src="https://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"
     ></script>
     <!-- 地图拖出该区域后会重新弹回 -->
     <script
       type="text/javascript"
-      src="//api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"
+      src="https://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"
     ></script>
     <!-- 企业微信sdk -->
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
@@ -85,12 +89,12 @@
         return userAgent;
       }
       let mb = myBrowser();
-      console.log(mb, "mb");
       if ("IE" == mb) {
         alert(
           "疫情防控中心部分功能暂不支持IE浏览器，请使用Chrome、Safari、Firfox、Samsung Internet、Opera、Edge等浏览器进行访问!"
         );
       }
+      console.log("版本号：V0.1.5");
     </script>
   </body>
 </html>

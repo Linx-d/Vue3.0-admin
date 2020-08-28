@@ -30,7 +30,7 @@ const system = {
       {
           name: '隔离用户',
           type: 'bar',
-          data: [20, 49, 70, 232, 256, 767, 1356, 1622, 326, 200, 64, 33],
+          data: [],
           markPoint: {
               data: [
                   {type: 'max', name: '最大值'},
@@ -46,7 +46,7 @@ const system = {
       {
           name: '解除隔离',
           type: 'bar',
-          data: [26, 59, 90, 264, 287, 707, 1756, 1822, 487, 188, 60, 23],
+          data: [],
           markPoint: {
               data: [
                   {name: '年最高', value: 1822, xAxis: 7, yAxis: 183},

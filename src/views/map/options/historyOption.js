@@ -34,12 +34,12 @@ const history = {
       stack: "start",
       data: [120, 132, 101, 134, 90, 230, 210],
     },
-    {
-      name: "总人数",
-      type: "line",
-      stack: "middle",
-      data: [220, 282, 201, 234, 290, 430, 410],
-    },
+    // {
+    //   name: "总人数",
+    //   type: "line",
+    //   stack: "middle",
+    //   data: [220, 282, 201, 234, 290, 430, 410],
+    // },
     {
       name: "位置告警",
       type: "line",
