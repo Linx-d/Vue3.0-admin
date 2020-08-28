@@ -295,6 +295,27 @@ export default {
           error_tmp = [],
           new_errorTableData = [];
         array.forEach((item) => {
+          if (item.alarmType == 2 || item.alarmType == 3) {
+            item.userName = currentMemberInfo.name;
+            item.tel = currentMemberInfo.tel;
+            // let lng = item.longitude,
+            //   lat = item.latitude;
+            // let pt = new BMap.Point(lng, lat);
+            // let geoc = new BMap.Geocoder();
+            // geoc.getLocation(pt, function (rs) {
+            //   if (rs.addressComponents != null) {
+            //     let addComp = rs.addressComponents;
+            //     item.address =
+            //       addComp.province +
+            //       addComp.city +
+            //       addComp.district +
+            //       addComp.street +
+            //       addComp.streetNumber;
+            //     tmpHistory.data.push(item);
+            //   }
+            // });
+            tmpHistory.data.push(item);
+          }
           // temperature
           newArr_time.push(item.gmtCreate);
           let temperature = Number(item.temperature).toFixed(1);

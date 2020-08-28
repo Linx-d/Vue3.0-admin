@@ -301,6 +301,7 @@ export default {
       tnumber: null,
       pnumber: 109,
       tableData: [],
+      data: []
     });
     // 当前成员温度随时间变化的历史数据
     /**

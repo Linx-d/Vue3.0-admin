@@ -7,9 +7,7 @@
       <a class="memberLink" href="javascript:;" @click="memberInfoBack">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
-      <a class="memberLink" href="javascript:;" @click="modifyMemberInfo">
-        编辑
-      </a>
+      <a class="memberLink" href="javascript:;" @click="modifyMemberInfo">编辑</a>
       <!--
       <a class="memberLink" href="javascript:;">编辑</a>
       <a class="memberLink" href="javascript:;">移除</a>
@@ -149,7 +147,7 @@
               :content="content.position.txt"
               placement="left"
             >
-              <a href="javascript:;">
+              <a href="javascript:;" @click="positionHandle('position')">
                 <span>位置告警：</span>
                 <i>
                   {{ currentMemberInfo.pnumber }}&nbsp;
@@ -184,7 +182,7 @@
         </el-tooltip>
         <el-pagination
           background
-          @current-change="handleCurrentChange"
+          @current-change="handleCurrentChange_tmp"
           layout="prev, pager, next"
           :total="paging.total"
           :page-size="paging.pageSize"
@@ -194,6 +192,8 @@
       <div class="info_module mapBox" v-loading="loading">
         <div id="mapShow"></div>
       </div>
+
+      <!-- 围栏列表 -->
       <el-dialog
         title="围栏列表"
         :visible.sync="dialogRailVisible.status"
@@ -217,6 +217,40 @@
             </template>
           </el-table-column>
         </el-table>
+      </el-dialog>
+
+      <!-- 位置异常统计 -->
+      <el-dialog
+        :title="database.position.title"
+        :visible.sync="database.position.visible"
+        :close-on-click-modal="false"
+        class="position_dialog"
+      >
+        <el-table
+          :data="database.position.show"
+          style="width: 100%"
+          max-height="500"
+          height="500"
+          v-loading="database.position.loading"
+          :row-class-name="tableRowClassName"
+        >
+          <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
+          <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
+          <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
+          <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
+          <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
+        </el-table>
+        <div class="block">
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="database.position.pageNum"
+            :page-sizes="database.position.pageSizes"
+            :page-size="database.position.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="database.position.total"
+          ></el-pagination>
+        </div>
       </el-dialog>
     </div>
   </div>
@@ -265,7 +299,69 @@ export default {
       data: [],
       total: 0,
     });
+
+    /** 位置异常统计
+     *
+     */
+    const database = reactive({
+      position: {
+        title: "",
+        visible: false,
+        loading: true,
+        data: [],
+        show: [],
+        total: 0,
+        pageSizes: [15, 20, 30, 40],
+        pageNum: 1,
+        pageSize: 15,
+      },
+      positionContent: [],
+    });
+    const handleSizeChange = (val) => {
+      let choose = "",
+        position = database.position.visible;
+      if (position) {
+        choose = "position";
+      }
+      database[choose].pageSize = val;
+      let start = database[choose].pageSize * (database[choose].pageNum - 1);
+      let end = database[choose].pageSize * database[choose].pageNum;
+      database[choose].show = database[choose].data.slice(start, end);
+    };
     const handleCurrentChange = (val) => {
+      let choose = "",
+        position = database.position.visible;
+      if (position) {
+        choose = "position";
+      }
+      database[choose].pageNum = val;
+      let start = database[choose].pageSize * (database[choose].pageNum - 1);
+      let end = database[choose].pageSize * database[choose].pageNum;
+      database[choose].show = database[choose].data.slice(start, end);
+    };
+    const positionHandle = (val) => {
+      return;
+      database.position.visible = true;
+      database.position.pageNum = 1;
+      database.position.pageSize = 15;
+      let len = database.position.data.length;
+      database.position.data.splice(0, len);
+      if (val == "position") {
+        database.position.title = "位置异常统计";
+        database.positionContent.forEach((item) => {
+          //
+        });
+        database.position.data = database.positionContent;
+      }
+      database.position.total = database.position.data.length;
+      database.position.show = database.position.data.slice(
+        0,
+        database.position.pageSize
+      );
+      database.position.loading = false;
+    };
+
+    const handleCurrentChange_tmp = (val) => {
       paging.pageNum = val;
       if (abnormal.value) {
         paging.data.splice(0, paging.data.length);
@@ -583,7 +679,7 @@ export default {
     // 编辑
     const modifyMemberInfo = () => {
       switchModule(contactsModule, "memberModify");
-    }
+    };
     const temperature = ref(true);
     const tableData = reactive([]);
     const toggleTable = () => {
@@ -677,38 +773,52 @@ export default {
       loading.value = false;
     });
     watchEffect(() => {
-      // 逆解析地址
-      let len = props.tmpHistory.newArr_position.length;
-      if (len != 0) {
-        props.tmpHistory.newArr_position.forEach((item, index) => {
-          // 地址逆解析
-          let lng = item.lng,
-            lat = item.lat;
-          let pt = new BMap.Point(lng, lat);
-          let geoc = new BMap.Geocoder();
-          geoc.getLocation(pt, function (rs) {
-            if (rs.addressComponents != null) {
-              let addComp = rs.addressComponents;
-              if (props.tmpHistory.error_tableData[index] != undefined) {
-                // 异常
-                props.tmpHistory.error_tableData[index].address =
-                  addComp.province +
-                  addComp.city +
-                  addComp.district +
-                  addComp.street +
-                  addComp.streetNumber;
+      if (props.contactsModule.memberInfo) {
+        // if (!temperature) {
+          // 温度异常逆解析地址
+          let tmp_len = props.tmpHistory.newArr_time.length;
+          if (tmp_len != 0) {
+            props.tmpHistory.newArr_time.forEach((item, index) => {
+              // 地址逆解析
+              let lng = item.lng,
+                lat = item.lat;
+              let pt = new BMap.Point(lng, lat);
+              let geoc = new BMap.Geocoder();
+              geoc.getLocation(pt, function (rs) {
+                if (rs.addressComponents != null) {
+                  let addComp = rs.addressComponents;
+                  if (props.tmpHistory.error_tableData[index] != undefined) {
+                    // 异常
+                    props.tmpHistory.error_tableData[index].address =
+                      addComp.province +
+                      addComp.city +
+                      addComp.district +
+                      addComp.street +
+                      addComp.streetNumber;
 
-                // 正常  
-                props.tmpHistory.tableData[index].address =
-                  addComp.province +
-                  addComp.city +
-                  addComp.district +
-                  addComp.street +
-                  addComp.streetNumber;
-              }
-            }
-          });
-        });
+                    // 正常
+                    props.tmpHistory.tableData[index].address =
+                      addComp.province +
+                      addComp.city +
+                      addComp.district +
+                      addComp.street +
+                      addComp.streetNumber;
+                  }
+                }
+              });
+            });
+          }
+        // }
+
+        // 位置异常逆解析地址 database.position.visible temperature
+        if (database.position.visible) {
+          let position_len = props.tmpHistory.data.length;
+          if (position_len != 0) {
+            props.tmpHistory.data.forEach((item) => {
+              database.positionContent.push(item);
+            });
+          }
+        }
       }
 
       // 切换个人信息温度表格
@@ -720,7 +830,11 @@ export default {
     return {
       loading,
       paging,
+      database,
       handleCurrentChange,
+      handleCurrentChange_tmp,
+      handleSizeChange,
+      positionHandle,
       memberInfoBack,
       modifyMemberInfo,
       bindOpen,
@@ -878,6 +992,7 @@ $contactsHeight: 592px;
     #info_table {
       height: 500px;
       padding: 35px 25px 25px 25px;
+      border-top: 1px dashed #e4e6e9;
       @include webkit("box-sizing", border-box);
     }
     .table_svg {
