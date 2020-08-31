@@ -175,6 +175,9 @@ export default {
                   let age = parseInt((newDate - date) / oneDay);
                   memberData[key] = age;
                 }
+                if(key =="remarks") {
+                  memberData[key] = "暂无数据";
+                }
               }
               switchModule(props.contactsModule, "memberInfo");
             } else {
@@ -202,15 +205,9 @@ export default {
         key1 = ""; // 判断是否修改了信息
       data.id = data.userId;
       for (key in modifyData) {
-        if (key == "remarks") {
-          if (data[key] == "暂无数据") {
-            data[key] = null;
-          }
-        }
         if (data[key] != modifyData[key]) {
           if (key == "age") {
             if (data.date == modifyData[key]) {
-              console.log(data.date, modifyData[key]);
               handle.judge = true;
               // continue;
             } else {

@@ -376,7 +376,7 @@ export default {
           }
         }
         for (let key in currentMemberInfo) {
-          if (key === "railName" || key == "online") {
+          if (key === "railName" || key == "online" || key == "remarks") {
             continue;
           }
           let verify =

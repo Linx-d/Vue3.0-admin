@@ -20,9 +20,10 @@
           <el-image
             style="height: 70px; width: 70px;"
             :src="currentMemberInfo.photo"
-            :fit="fit"
+            fit="cover"
             class="info_svg"
           ></el-image>
+          <!-- <img :src="currentMemberInfo.photo" style="height: 70px; width: 70px;" class="info_svg"> -->
         </div>
         <div class="info_head_r">
           <p>
@@ -97,7 +98,8 @@
           </li>
           <li>
             <span>备注：</span>
-            <i>{{ currentMemberInfo.remarks }}</i>
+            <i v-if="currentMemberInfo.remarks!=null">{{ currentMemberInfo.remarks }}</i>
+            <i v-else>暂无数据</i>
           </li>
           <li>
             <span>住址：</span>
@@ -775,39 +777,41 @@ export default {
     watchEffect(() => {
       if (props.contactsModule.memberInfo) {
         // if (!temperature) {
-          // 温度异常逆解析地址
-          let tmp_len = props.tmpHistory.newArr_time.length;
-          if (tmp_len != 0) {
-            props.tmpHistory.newArr_time.forEach((item, index) => {
-              // 地址逆解析
-              let lng = item.lng,
-                lat = item.lat;
-              let pt = new BMap.Point(lng, lat);
-              let geoc = new BMap.Geocoder();
-              geoc.getLocation(pt, function (rs) {
-                if (rs.addressComponents != null) {
-                  let addComp = rs.addressComponents;
-                  if (props.tmpHistory.error_tableData[index] != undefined) {
-                    // 异常
-                    props.tmpHistory.error_tableData[index].address =
-                      addComp.province +
-                      addComp.city +
-                      addComp.district +
-                      addComp.street +
-                      addComp.streetNumber;
-
-                    // 正常
-                    props.tmpHistory.tableData[index].address =
-                      addComp.province +
-                      addComp.city +
-                      addComp.district +
-                      addComp.street +
-                      addComp.streetNumber;
-                  }
+        // 温度异常逆解析地址
+        let tmp_len = props.tmpHistory.newArr_position.length;
+        if (tmp_len != 0) {
+          props.tmpHistory.newArr_position.forEach((item, index) => {
+            // 地址逆解析
+            let lng = item.lng,
+              lat = item.lat;
+            let pt = new BMap.Point(lng, lat);
+            let geoc = new BMap.Geocoder();
+            geoc.getLocation(pt, function (rs) {
+              if (rs.addressComponents != null) {
+                let addComp = rs.addressComponents;
+                if (props.tmpHistory.error_tableData[index] != undefined) {
+                  // 异常
+                  props.tmpHistory.error_tableData[index].address =
+                    addComp.province +
+                    addComp.city +
+                    addComp.district +
+                    addComp.street +
+                    addComp.streetNumber;
                 }
-              });
+
+                if (props.tmpHistory.tableData[index] != undefined) {
+                  // 正常
+                  props.tmpHistory.tableData[index].address =
+                    addComp.province +
+                    addComp.city +
+                    addComp.district +
+                    addComp.street +
+                    addComp.streetNumber;
+                }
+              }
             });
-          }
+          });
+        }
         // }
 
         // 位置异常逆解析地址 database.position.visible temperature
