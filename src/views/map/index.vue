@@ -1125,17 +1125,26 @@ export default {
           let tsum = [];
           let gmtCreate = [];
           data.forEach((item, index) => {
-              gmtCreate.push(item.gmtCreate);
+            gmtCreate.push(item.gmtCreate);
             if (index == 0) {
               alarmSum.push(item.alarmSum);
               personSum.push(item.personSum);
               psum.push(item.psum);
               tsum.push(item.tsum);
             } else {
-              alarmSum.push(parseFloat(item.alarmSum)-parseFloat(data[index-1].alarmSum));
-              personSum.push(parseFloat(item.personSum)-parseFloat(data[index-1].personSum));
-              psum.push(parseFloat(item.psum)-parseFloat(data[index-1].psum));
-              tsum.push(parseFloat(item.tsum)-parseFloat(data[index-1].tsum));
+              alarmSum.push(
+                parseFloat(item.alarmSum) - parseFloat(data[index - 1].alarmSum)
+              );
+              personSum.push(
+                parseFloat(item.personSum) -
+                  parseFloat(data[index - 1].personSum)
+              );
+              psum.push(
+                parseFloat(item.psum) - parseFloat(data[index - 1].psum)
+              );
+              tsum.push(
+                parseFloat(item.tsum) - parseFloat(data[index - 1].tsum)
+              );
             }
           });
 
@@ -1945,7 +1954,8 @@ $echartsBorder: 1px solid #146ede;
       font-weight: 700;
       height: 55px;
       font-size: 0.9vw;
-      line-height: 55px;
+      height: 35px;
+      line-height: 35px;
       strong {
         min-width: 55px;
         span {
