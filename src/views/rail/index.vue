@@ -663,6 +663,7 @@ export default {
           }
           overlays.length = 0;
         };
+        document.getElementsByClassName("BMapLib_box")[1].title = "绘制围栏";
       });
     };
 
@@ -725,7 +726,6 @@ export default {
         //添加鼠标绘制工具监听事件，用于获取绘制结果
         drawingManager.addEventListener("overlaycomplete", overlaycomplete);
         const clearAll = () => {
-          console.log("1");
           for (let i = 0; i < overlays.length; i++) {
             map.removeOverlay(overlays[i]);
           }
