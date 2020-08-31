@@ -1906,14 +1906,15 @@ $echartsBorder: 1px solid #146ede;
     width: 100%;
     text-align: center;
     padding-bottom: 0;
-    line-height: 56px;
     span {
       // overflow: hidden;
       // white-space: nowrap;
       // text-overflow: ellipsis;
       width: 4vw;
+      min-width: 55px;
     }
     .tb_top {
+      line-height: 56px;
       span {
         display: inline-block;
       }
@@ -1931,6 +1932,7 @@ $echartsBorder: 1px solid #146ede;
       }
     }
     .tb_middle {
+      line-height: 56px;
       span {
         display: inline-block;
       }
@@ -1941,9 +1943,14 @@ $echartsBorder: 1px solid #146ede;
     }
     .tb_bottom {
       font-weight: 700;
-      height: 35px;
-      font-size: 1vw;
+      height: 55px;
+      font-size: 0.9vw;
+      line-height: 55px;
       strong {
+        min-width: 55px;
+        span {
+          display: block;
+        }
         color: rgb(178, 178, 178);
         display: inline-block;
         width: 4vw;

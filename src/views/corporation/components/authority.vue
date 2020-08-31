@@ -640,6 +640,7 @@ export default {
  */
 $border: 1px rgb(230, 230, 230) solid;
 $corporationHeight: 655px;
+$corporationMaxHeight: 750px;
 .managerHead {
   width: 215px;
   height: 65px;
@@ -673,9 +674,11 @@ $corporationHeight: 655px;
 .detail {
   min-height: $corporationHeight;
   width: 77%;
-  // height: 100%;
+  max-height: $corporationMaxHeight;
   border-right: $border;
   padding: 25px;
+  overflow: scroll;
+  overflow-x: hidden;
 }
 .el-container {
   // height: $corporationHeight;
