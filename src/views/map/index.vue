@@ -98,19 +98,19 @@
               </div>
               <div class="tb_bottom">
                 <strong style="color: #b2b2b2;" @click="alarmHandle('sum')">
-                  <span>新增</span>
+                  <span>今日新增</span>
                   <span style="color: #bf4739;">+{{ alarmData.newSum }}</span>
                 </strong>
                 <strong style="color: #b2b2b2;" @click="personHandle('person')">
-                  <span>新增</span>
+                  <span>今日新增</span>
                   <span style="color: #cd6212;">+{{ alarmData.newPersonSum }}</span>
                 </strong>
                 <strong style="color: #b2b2b2;" @click="alarmHandle('temperature')">
-                  <span>新增</span>
+                  <span>今日新增</span>
                   <span style="color: #1089e7;">+{{ alarmData.newTSum }}</span>
                 </strong>
                 <strong style="color: #b2b2b2;" @click="alarmHandle('position')">
-                  <span>新增</span>
+                  <span>今日新增</span>
                   <span style="color: #35cbbf;">+{{ alarmData.newPSum }}</span>
                 </strong>
               </div>
@@ -324,7 +324,7 @@
       </div>
     </el-dialog>
 
-    <!-- 新增人数统计 -->
+    <!-- 今日新增人数统计 -->
     <el-dialog
       :title="database.person.title"
       :visible.sync="database.person.visible"
@@ -545,7 +545,7 @@ export default {
       let len = database.person.data.length;
       database.person.data.splice(0, len);
       if (val == "person") {
-        database.person.title = "新增成员";
+        database.person.title = "今日新增成员";
         database.person.data = database.personContent;
       }
       database.person.total = database.person.data.length;
@@ -562,7 +562,7 @@ export default {
       let len = database.alarm.data.length;
       database.alarm.data.splice(0, len);
       if (val == "sum") {
-        database.alarm.title = "新增告警";
+        database.alarm.title = "今日新增告警";
         database.alarmContent.forEach((item) => {
           let alarmType = item.alarmType;
           if (alarmType == 1) {
@@ -577,7 +577,7 @@ export default {
           }
         });
       } else if (val == "temperature") {
-        database.alarm.title = "新增温度告警";
+        database.alarm.title = "今日新增温度告警";
         database.alarmContent.forEach((item) => {
           let alarmType = item.alarmType;
           if (alarmType == 1 || alarmType == 3) {
@@ -586,7 +586,7 @@ export default {
           }
         });
       } else if (val == "position") {
-        database.alarm.title = "新增位置告警";
+        database.alarm.title = "今日新增位置告警";
         database.alarmContent.forEach((item) => {
           let alarmType = item.alarmType;
           if (alarmType == 2 || alarmType == 3) {
@@ -648,7 +648,7 @@ export default {
       let type = row.alarmType;
       if (temperature >= 37.3) {
         return "warning-row";
-      }else if(type==1||type==2||type==3) {
+      } else if (type == 1 || type == 2 || type == 3) {
         return "warning-row";
       }
       return "";
@@ -1124,12 +1124,19 @@ export default {
           let psum = [];
           let tsum = [];
           let gmtCreate = [];
-          data.forEach((item) => {
-            gmtCreate.push(item.gmtCreate);
-            alarmSum.push(item.alarmSum);
-            personSum.push(item.personSum);
-            psum.push(item.psum);
-            tsum.push(item.tsum);
+          data.forEach((item, index) => {
+              gmtCreate.push(item.gmtCreate);
+            if (index == 0) {
+              alarmSum.push(item.alarmSum);
+              personSum.push(item.personSum);
+              psum.push(item.psum);
+              tsum.push(item.tsum);
+            } else {
+              alarmSum.push(parseFloat(item.alarmSum)-parseFloat(data[index-1].alarmSum));
+              personSum.push(parseFloat(item.personSum)-parseFloat(data[index-1].personSum));
+              psum.push(parseFloat(item.psum)-parseFloat(data[index-1].psum));
+              tsum.push(parseFloat(item.tsum)-parseFloat(data[index-1].tsum));
+            }
           });
 
           adaptionEchartsV2(historyChart);

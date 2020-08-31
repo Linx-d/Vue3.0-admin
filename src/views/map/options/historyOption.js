@@ -1,6 +1,6 @@
 const history = {
   title: {
-    text: "告警历史统计",
+    text: "新增告警统计",
   },
   tooltip: {
     trigger: "axis",
