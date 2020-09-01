@@ -731,6 +731,7 @@ export default {
           }
           overlays.length = 0;
         };
+        document.getElementsByClassName("BMapLib_box")[1].title = "绘制围栏";
       });
     };
 

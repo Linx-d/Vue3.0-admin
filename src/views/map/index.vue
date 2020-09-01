@@ -25,7 +25,24 @@
         <h1>疫情防控中心</h1>
       </div>
       <div class="alanysis_top">
-        <div class="alanysis-a">
+        <div
+          class="case_open_left-a"
+          @click="echarts_toggle.online=false"
+          v-if="echarts_toggle.online"
+        >
+          <svg-icon iconClass="open_echarts"></svg-icon>
+        </div>
+        <div
+          class="case_open_left-b"
+          @click="echarts_toggle.temperature=false"
+          v-if="echarts_toggle.temperature"
+        >
+          <svg-icon iconClass="open_echarts"></svg-icon>
+        </div>
+        <div :class="['alanysis-a', {'echarts_hide': echarts_toggle.online}]">
+          <div class="case_close_right" @click="echarts_toggle.online=true">
+            <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
+          </div>
           <div class="case_top_right"></div>
           <div class="case_top_left"></div>
           <div class="case_bottom_left"></div>
@@ -54,7 +71,10 @@
             </div>
           </div>
         </div>
-        <div class="alanysis-b">
+        <div :class="['alanysis-b', {'echarts_hide': echarts_toggle.temperature}]">
+          <div class="case_close_right" @click="echarts_toggle.temperature=true">
+            <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
+          </div>
           <div class="case_top_right"></div>
           <div class="case_top_left"></div>
           <div class="case_bottom_left"></div>
@@ -63,7 +83,26 @@
         </div>
       </div>
       <div class="alanysis_bottom">
-        <div class="alanysis_bottom_L echartsIndivi">
+        <div
+          class="case_open_left-l"
+          @click="echarts_toggle.alarm=false"
+          v-if="echarts_toggle.alarm"
+        >
+          <svg-icon iconClass="open_echarts"></svg-icon>
+        </div>
+        <div
+          class="case_open_left-r"
+          @click="echarts_toggle.history=false"
+          v-if="echarts_toggle.history"
+        >
+          <svg-icon iconClass="open_echarts"></svg-icon>
+        </div>
+        <div
+          :class="['alanysis_bottom_L', 'echartsIndivi', {'echarts_hide': echarts_toggle.alarm}]"
+        >
+          <div class="case_close_right" @click="echarts_toggle.alarm=true">
+            <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
+          </div>
           <div class="case_top_right"></div>
           <div class="case_top_left"></div>
           <div class="case_bottom_left"></div>
@@ -117,7 +156,14 @@
             </div>
           </a>
         </div>
-        <div :class="['alanysis_bottom_R echartsIndivi']">
+
+        <div
+          :class="['alanysis_bottom_R', 'echartsIndivi', {'echarts_hide': echarts_toggle.history}]"
+        >
+          <div class="case_close_right" @click="echarts_toggle.history=true">
+            <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
+          </div>
+
           <div class="case_top_right"></div>
           <div class="case_top_left"></div>
           <div class="case_bottom_left"></div>
@@ -125,12 +171,24 @@
           <div id="history"></div>
         </div>
       </div>
-      <div class="alanysis_right">
-        <div class="case_top_right"></div>
-        <div class="case_top_left"></div>
-        <div class="case_bottom_left"></div>
-        <div class="case_bottom_right"></div>
-        <div id="system" class="alanysis_right_content echartsIndivi"></div>
+      <div class="alanysis_topRight">
+        <div
+          class="case_open_left-t"
+          @click="echarts_toggle.system=false"
+          v-if="echarts_toggle.system"
+        >
+          <svg-icon iconClass="open_echarts"></svg-icon>
+        </div>
+        <div :class="['alanysis_right', {'echarts_hide': echarts_toggle.system}]">
+          <div class="case_close_right" @click="echarts_toggle.system=true">
+            <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
+          </div>
+          <div class="case_top_right"></div>
+          <div class="case_top_left"></div>
+          <div class="case_bottom_left"></div>
+          <div class="case_bottom_right"></div>
+          <div id="system" class="alanysis_right_content echartsIndivi"></div>
+        </div>
       </div>
 
       <!-- input search -->
@@ -400,6 +458,17 @@ import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
   setup(props, { root, refs }) {
+    /**显示隐藏图表
+     * 值是false 时为显示, true 为隐藏
+     */
+    const echarts_toggle = reactive({
+      online: false, // 在线
+      alarm: false, // 警告
+      history: false, // 历史
+      system: false, // 疫情
+      temperature: false, // 温度
+      mask: false, // 覆盖层
+    });
     /**
      * 设备频率
      */
@@ -1419,6 +1488,7 @@ export default {
       });
     });
     return {
+      echarts_toggle,
       full,
       alarmData,
       alanysisStatus,
@@ -1471,7 +1541,7 @@ $alanysisMinWidth_Bottom: 1915px;
 $alanysisMinHeight_Bottom: 227px;
 
 // echarts CSS
-$echartsMargin: 15px;
+$echartsMargin: 1%;
 $echartsBorder: 1px solid #146ede;
 
 #map {
@@ -1539,20 +1609,24 @@ $echartsBorder: 1px solid #146ede;
   padding-top: 80px;
   min-width: $layout-min-width;
   @include webkit("box-sizing", border-box);
+  .echarts_hide {
+    z-index: -1;
+  }
   .alanysis_top {
-    height: 52%;
-    width: 20%;
-    position: relative;
-    top: 15px;
-    left: 15px;
     .alanysis-a {
-      position: relative;
-      height: 38%;
+      position: absolute;
+      height: 18%;
+      width: 20%;
+      opacity: 1;
+      left: $echartsMargin;
     }
     .alanysis-b {
-      position: relative;
-      top: 20px;
-      height: 56%;
+      position: absolute;
+      top: 31%;
+      left: $echartsMargin;
+      height: 27%;
+      width: 20%;
+      opacity: 1;
     }
     .alanysis_top_a {
       width: 100%;
@@ -1623,27 +1697,24 @@ $echartsBorder: 1px solid #146ede;
     }
   }
   .alanysis_bottom {
-    height: 41%;
-    width: 100%;
-    position: relative;
-    bottom: -36px;
     .alanysis_bottom_L {
       width: 20%;
-      // min-width: 330px;
-      height: 100%;
-      // margin: 15px;
-      float: $echartsMargin;
+      position: absolute;
+      height: 38%;
       left: $echartsMargin;
-      bottom: 0;
+      bottom: 10px;
       background: #0b1532;
       border: $echartsBorder;
     }
     .alanysis_bottom_R {
+      .case_close_right {
+        right: 1%;
+      }
       width: 76.9%;
-      height: 100%;
+      height: 38%;
       float: right;
       right: $echartsMargin;
-      bottom: 0;
+      bottom: 10px;
       @include webkit("box-sizing", border-box);
       background: #0b1532;
       #history {
@@ -1654,8 +1725,10 @@ $echartsBorder: 1px solid #146ede;
       }
     }
   }
+  .alanysis_topRight {
+  }
   .alanysis_right {
-    height: 47%;
+    height: 46%;
     width: 20%;
     position: absolute;
     right: $echartsMargin;
@@ -1867,6 +1940,52 @@ $echartsBorder: 1px solid #146ede;
   position: absolute;
   right: -9px;
   bottom: -7px;
+}
+.case_close_right {
+  position: absolute;
+  right: 4%;
+  top: 5%;
+  z-index: 1;
+  cursor: pointer;
+  .closeIcon {
+    width: 0.9em;
+    height: 0.9em;
+  }
+}
+.case_open_left-a {
+  position: absolute;
+  left: 2%;
+  top: 10%;
+  z-index: 2;
+  cursor: pointer;
+}
+.case_open_left-b {
+  position: absolute;
+  left: 2%;
+  top: 33%;
+  z-index: 2;
+  cursor: pointer;
+}
+.case_open_left-l {
+  position: absolute;
+  left: 2%;
+  bottom: 39%;
+  z-index: 2;
+  cursor: pointer;
+}
+.case_open_left-r {
+  position: absolute;
+  right: 1%;
+  bottom: 38%;
+  z-index: 2;
+  cursor: pointer;
+}
+.case_open_left-t {
+  position: absolute;
+  right: 1%;
+  top: 15%;
+  z-index: 2;
+  cursor: pointer;
 }
 .case_header {
   height: 116px;

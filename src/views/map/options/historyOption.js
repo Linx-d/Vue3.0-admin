@@ -16,7 +16,7 @@ const history = {
   },
   toolbox: {
     feature: {
-      saveAsImage: {},
+      // saveAsImage: {},
     },
   },
   xAxis: {
