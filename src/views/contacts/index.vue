@@ -643,6 +643,8 @@ export default {
       treeData.status = true;
       memberData.data.splice(0, memberData.data.length); // 删除之前的成员信息
       memberListPaging.id = id;
+      memberListPaging.pageSize = 15;
+      memberListPaging.pageNum = 1;
       selectChildMember(memberListPaging);
       switchModule(contactsModule, "memberList");
     };
