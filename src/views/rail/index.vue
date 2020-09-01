@@ -239,22 +239,10 @@ export default {
           modifyBaiduMap();
         });
     };
-    // 自定义校验规则, 围栏名称不能重复
-    const validateRailName = (rule, value, callback) => {
-      queryRailByName(value).then((res) => {
-        let code = res.code;
-        if (code != 0) {
-          callback(new Error("已经有这个围栏，请重新设置"));
-        } else {
-          callback(); // required 成功的回调
-        }
-      });
-    };
     const rules = reactive({
       railName: [
         { required: true, message: "请输入围栏名称", trigger: "blur" },
         { min: 3, max: 7, message: "长度在 3 到 7 个字符" },
-        { validator: validateRailName, trigger: "blur" },
       ],
       railAddr: [
         { required: true, message: "请设置围栏地址" },
