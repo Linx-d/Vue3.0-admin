@@ -248,6 +248,8 @@ export default {
     // 当前成员信息
     let currentMemberInfo = reactive({
       address: "山西省太原市万柏林区a",
+      addressLongitude: 0,
+      addressLatitude: 0,
       age: "23",
       date: "",
       gmtCreate: null,

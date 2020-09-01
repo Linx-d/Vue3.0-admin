@@ -257,6 +257,27 @@ export default {
           currentMemberInfo.online = false;
         }
         currentMemberInfo[key] = data[key];
+        if (key == "address") {
+          let address = currentMemberInfo.address;
+          // 创建地址解析器实例
+          var myGeo = new BMap.Geocoder();
+          // 将地址解析结果显示在地图上,并调整地图视野
+          myGeo.getPoint(
+            address,
+            function (point) {
+              if (point) {
+                currentMemberInfo.addressLongitude = point.lng;
+                currentMemberInfo.addressLatitude = point.lat;
+              } else {
+                root.$message({
+                  type: "error",
+                  message: "您选择地址没有解析到结果!",
+                });
+              }
+            },
+            "北京市"
+          );
+        }
       }
       for (let key in modifyMemberInfo) {
         if (key == "id") {

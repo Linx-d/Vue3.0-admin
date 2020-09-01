@@ -70,6 +70,15 @@
               </span>
             </div>
           </div>
+
+          <el-tooltip class="item" effect="light" content="当前位置" placement="bottom">
+            <p>
+              <span>{{ currentMemberInfo.location }}</span>
+              <a class="info_position" href="#temperature_box" @click="newPosition">
+                <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
+              </a>
+            </p>
+          </el-tooltip>
         </div>
         <el-tooltip class="item" effect="light" content="最新温度" placement="top">
           <div
@@ -104,8 +113,8 @@
           <li>
             <span>住址：</span>
             <i>{{ currentMemberInfo.address }}</i>
-            <a class="info_position" href="#temperature_box" @click="newPosition">
-              <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
+            <a class="info_position" href="#temperature_box" @click="new_address">
+              <svg-icon iconClass="address_info" class="quick_position"></svg-icon>
             </a>
           </li>
           <li>
@@ -268,6 +277,8 @@ import {
 } from "@/api/contactsApi";
 import { listRail } from "@/api/railApi";
 import personTravel from "@/views/images/personTravel.png";
+import address_location from "@/views/images/address_location.png";
+import address_position from "@/views/images/address_position.png";
 export default {
   name: "memberList",
   props: {
@@ -737,7 +748,8 @@ export default {
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
           map.centerAndZoom(point, 13); // 将个人作为地图中心点
           pointArray.push(point);
-          let marker = new BMap.Marker(point);
+          let mIcon = new BMap.Icon(address_location, new BMap.Size(85, 48));
+          let marker = new BMap.Marker(point, { icon: mIcon });
           map.addOverlay(marker); //添加一个标注
           map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
           map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
@@ -769,6 +781,14 @@ export default {
       let lng = props.currentMemberInfo.userLongitude;
       let lat = props.currentMemberInfo.userLatitude;
       map.centerAndZoom(new BMap.Point(lng, lat), 19);
+    };
+    const new_address = () => {
+      let lng = props.currentMemberInfo.addressLongitude,
+        lat = props.currentMemberInfo.addressLatitude;
+      let point = new BMap.Point(lng, lat);
+      let myIcon = new BMap.Icon(address_position, new BMap.Size(48, 48)); //address_location, address_position
+      map.addOverlay(new BMap.Marker(point, { icon: myIcon }));
+      map.centerAndZoom(point, 19);
     };
     onMounted(() => {
       memberInfoEcharts();
@@ -855,6 +875,7 @@ export default {
       toggleAbnormal,
       content,
       newPosition,
+      new_address,
     };
   },
 };
@@ -943,17 +964,6 @@ $contactsHeight: 592px;
     padding: 35px 25px 25px 25px;
     border-top: 1px dashed #e4e6e9;
     @include webkit("box-sizing", border-box);
-    .info_position {
-      position: relative;
-      .quick_position {
-        width: 1.9em;
-        height: 1.9em;
-        position: absolute;
-        top: -3px;
-        left: 3px;
-        cursor: pointer;
-      }
-    }
     .departManagersBoxAll {
       overflow: auto;
       line-height: 32px;
@@ -965,6 +975,18 @@ $contactsHeight: 592px;
           margin-right: 15px;
         }
       }
+    }
+  }
+
+  .info_position {
+    position: relative;
+    .quick_position {
+      width: 1.9em;
+      height: 1.9em;
+      position: absolute;
+      top: -3px;
+      left: 3px;
+      cursor: pointer;
     }
   }
   #info_personal {
