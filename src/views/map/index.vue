@@ -161,7 +161,20 @@
           <div class="case_close_right" @click="echarts_toggle.history=true">
             <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
           </div>
-
+          <div class="btnBox">
+            <button
+              :class="['sumBtn', 'echartsTogglebtn', {echartsBtn_active: historyData.sum.active}]"
+              @click="echartsToggle('sum')"
+            >告警总数</button>
+            <button
+              :class="['temperatureBtn', 'echartsTogglebtn', {echartsBtn_active: historyData.temperature.active}]"
+              @click="echartsToggle('temperature')"
+            >温度告警</button>
+            <button
+              :class="['positionBtn', 'echartsTogglebtn', {echartsBtn_active: historyData.position.active}]"
+              @click="echartsToggle('position')"
+            >位置告警</button>
+          </div>
           <div class="case_top_right"></div>
           <div class="case_top_left"></div>
           <div class="case_bottom_left"></div>
@@ -802,7 +815,7 @@ export default {
             res.data.address,
             function (addressPoint) {
               if (addressPoint) {
-                baiduMap(addressPoint);
+                baiduMap(addressPoint, res);
               } else {
                 alert("您选择地址没有解析到结果!");
               }
@@ -815,11 +828,11 @@ export default {
             message: "请联系超级管理员设置企业地址",
           });
           let point = new BMap.Point(116.404, 39.915);
-          baiduMap(data);
+          baiduMap(data, res);
         }
       });
     })(window);
-    function baiduMap(data) {
+    function baiduMap(data, response) {
       Map("EG4ercSC4ZmBIhIcBvyoj65q12m2fy00").then((BMap) => {
         // 添加地图类型控件
         // map.addControl(
@@ -832,6 +845,7 @@ export default {
           maxZoom: 20,
           // enableMapClick: false, // 关闭底图可点默认事件
         }); // 创建Map实例
+        let locationPoint = new BMap.Point(data.lng, data.lat);
         window.map = map;
         let navigationControl = new BMap.NavigationControl({
           // 靠左上角位置
@@ -846,7 +860,21 @@ export default {
           enableGeolocation: true,
         });
         map.addControl(navigationControl);
-        map.centerAndZoom(new BMap.Point(data.lng, data.lat), 19); // 初始化地图,用城市名设置地图中心点
+        map.centerAndZoom(locationPoint, 19); // 初始化地图,用城市名设置地图中心点
+        let myIcon = new BMap.Icon(address_location, new BMap.Size(85, 48));
+        var marker = new BMap.Marker(locationPoint, { icon: myIcon }); // 创建标注
+        map.addOverlay(marker); // 将标注添加到地图中
+        var opts = {
+          width: 10, // 信息窗口宽度
+          height: 5, // 信息窗口高度
+          enableMessage: true, //设置允许信息窗发送短息
+          message: "",
+        };
+        var infoWindow = new BMap.InfoWindow(response.data.address, opts); // 创建信息窗口对象
+        marker.addEventListener("click", function () {
+          map.openInfoWindow(infoWindow, locationPoint); //开启信息窗口
+        });
+
         listUserLocation().then((res) => {
           let code = res.code;
           let data = res.data;
@@ -945,7 +973,16 @@ export default {
                 address_location,
                 new BMap.Size(85, 48)
               );
-              map.addOverlay(new BMap.Marker(pp, { icon: myIcon })); //添加标注
+              let marker = new BMap.Marker(pp, { icon: myIcon });
+              map.addOverlay(marker); //添加标注
+              let opts = {
+                width: 10,
+                height: 5,
+              };
+              let infoWindow = new BMap.InfoWindow(local.ma.keyword, opts);
+              marker.addEventListener("click", function () {
+                map.openInfoWindow(infoWindow, pp);
+              });
             }
             let local = new BMap.LocalSearch(map, {
               //智能搜索
@@ -1207,6 +1244,36 @@ export default {
      * 告警历史 history
      */
     let historyChart = null;
+    const historyData = reactive({
+      sum: {
+        name: "告警总数",
+        data: [],
+        active: true,
+      },
+      temperature: {
+        name: "温度告警",
+        data: [],
+        active: false,
+      },
+      position: {
+        name: "位置告警",
+        data: [],
+        active: false,
+      },
+      legend: [],
+    });
+    const echartsToggle = (res) => {
+      for(let key in historyData) {
+        historyData[key].active = false;
+      }
+      historyData[res].active = true;
+      let option = historyOption;
+      option.series[0].data = historyData[res].data;
+      option.series[0].name = historyData[res].name;
+      option.legend.data = historyData.legend = [historyData[res].name];
+      historyChart.setOption(option);
+    };
+    
     const history = () => {
       listAlarmView()
         .then((res) => {
@@ -1253,10 +1320,12 @@ export default {
           // 使用刚指定的配置项和数据显示图表。
           let option = historyOption;
           option.xAxis.data = gmtCreate;
-          option.series[0].data = alarmSum;
-          // option.series[1].data = personSum;
-          option.series[1].data = psum;
-          option.series[2].data = tsum;
+          historyData.sum.data = alarmSum;
+          historyData.position.data = psum;
+          historyData.temperature.data = tsum;
+          option.series[0].data = historyData.sum.data;
+          option.series[0].name = historyData.sum.name;
+          historyData.legend = [historyData.sum.name];
           historyChart.setOption(option);
         });
     };
@@ -1460,6 +1529,7 @@ export default {
         onlineStatic: 0,
       });
       // baiduMap(); // 百度地图
+      // 获取告警人数统计
       listAddAlarmUser().then((res) => {
         let data = res.data,
           code = res.code,
@@ -1489,6 +1559,7 @@ export default {
           });
         }
       });
+      // 获取告警数据统计
       listAddAlarmData().then((res) => {
         let data = res.data,
           code = res.code,
@@ -1552,6 +1623,8 @@ export default {
       tableRowClassName,
       alarmHandle,
       personHandle,
+      echartsToggle,
+      historyData,
     };
   },
 };
@@ -1774,6 +1847,25 @@ $transitionTime: 0.3s;
         width: 100%;
         border: $echartsBorder;
         float: right;
+      }
+      .btnBox {
+        top: 3px;
+        position: absolute;
+        left: 145px;
+        z-index: 1;
+        .echartsTogglebtn {
+          color: #000;
+          padding: 5px 15px;
+          margin-right: 5px;
+          cursor: pointer;
+          background: #f4f5f7;
+          border: 1px solid #f4f5f7;
+        }
+        .echartsBtn_active {
+          color: #cd4f52;
+          border: 1px solid #d8acad;
+          background-color: #f4f5f7;
+        }
       }
     }
   }
