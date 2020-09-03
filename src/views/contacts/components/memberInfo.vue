@@ -71,7 +71,7 @@
             </div>
           </div>
 
-          <el-tooltip class="item" effect="light" content="当前位置" placement="bottom">
+          <el-tooltip class="item" effect="light" content="最新位置" placement="bottom">
             <p>
               <span>{{ currentMemberInfo.location }}</span>
               <a class="info_position" href="#temperature_box" @click="newPosition">
@@ -180,9 +180,9 @@
             :row-class-name="tableRowClassName"
             height="430"
           >
-            <el-table-column prop="time" label="日期" width="250" sortable></el-table-column>
-            <el-table-column prop="temperature" label="温度" width="130" sortable></el-table-column>
-            <el-table-column prop="address" label="地址" width="340" sortable></el-table-column>
+            <el-table-column prop="time" label="日期" width="250" show-overflow-tooltip  sortable></el-table-column>
+            <el-table-column prop="temperature" label="温度" width="130" show-overflow-tooltip  sortable></el-table-column>
+            <el-table-column prop="address" label="地址" width="340" show-overflow-tooltip  sortable></el-table-column>
           </el-table>
         </div>
         <el-tooltip class="item" effect="light" :content="content.table.txt" placement="right">
@@ -213,12 +213,12 @@
         :close-on-click-modal="false"
       >
         <el-table :data="railList.data" style="width: 100%" max-height="400">
-          <el-table-column fixed prop="gmtCreate" label="日期" width="220" sortable></el-table-column>
-          <el-table-column prop="railName" label="围栏名称" width="120" sortable></el-table-column>
-          <el-table-column prop="personSum" label="人数" width="120" sortable></el-table-column>
-          <el-table-column prop="radius" label="半径" width="120" sortable></el-table-column>
-          <el-table-column prop="railAddr" label="地址" width="300" sortable></el-table-column>
-          <el-table-column fixed="right" label="操作" width="120">
+          <el-table-column fixed prop="gmtCreate" label="日期" width="220" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="railName" label="围栏名称" width="120" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="personSum" label="人数" width="120" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="radius" label="半径" width="120" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="railAddr" label="地址" width="300" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column fixed="right" label="操作" show-overflow-tooltip  width="120">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="selectRow(scope.$index, railList.data)"
@@ -245,11 +245,11 @@
           v-loading="database.position.loading"
           :row-class-name="tableRowClassName"
         >
-          <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
-          <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
-          <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
-          <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
-          <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
+          <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" show-overflow-tooltip  sortable></el-table-column>
         </el-table>
         <div class="block">
           <el-pagination

@@ -18,9 +18,9 @@
                 <p v-html="scope.row.name"></p>
               </template>
             </el-table-column>
-            <el-table-column property="tel" label="电话" width="200" sortable></el-table-column>
-            <el-table-column property="gmtCreate" label="创建时间" sortable></el-table-column>
-            <el-table-column fixed="right" label="操作" width="100">
+            <el-table-column property="tel" label="电话" width="200" show-overflow-tooltip  sortable></el-table-column>
+            <el-table-column property="gmtCreate" label="创建时间" show-overflow-tooltip  sortable></el-table-column>
+            <el-table-column fixed="right" label="操作" show-overflow-tooltip width="100">
               <template slot-scope="scope">
                 <el-button
                   @click.native.prevent="chooseEmployee(scope.row.id)"

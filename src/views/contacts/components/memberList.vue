@@ -14,6 +14,8 @@
       <div class="has_member" v-show="changeModule.status">
         <div class="cnt_tool">
           <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
+          <!-- <a class="memberLink" href="javascript:;" @click="screenAbnormal(currentDepart.id, 'abnormal')">筛选异常成员</a>
+          <a class="memberLink" href="javascript:;" @click="screenAbnormal(currentDepart.id, 'normal')">筛选正常成员</a> -->
         </div>
         <table class="memberTable mm_tabel">
           <thead>
@@ -111,12 +113,12 @@
         @scroll="tableScroll"
         class="addScroll"
       >
-        <el-table-column type="selection" width="45"></el-table-column>
-        <el-table-column label="姓名" width="100" sortable>
+        <el-table-column type="selection" width="45" show-overflow-tooltip ></el-table-column>
+        <el-table-column label="姓名" width="100" show-overflow-tooltip  sortable>
           <template slot-scope="scope">{{ scope.row.name }}</template>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
-        <el-table-column prop="tel" label="电话" width="170" sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip  sortable></el-table-column>
+        <el-table-column prop="tel" label="电话" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="地址" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="remark" label="状态" show-overflow-tooltip sortable></el-table-column>
       </el-table>
@@ -430,7 +432,7 @@ export default {
       pageNum: 1,
       pageSize: 15,
       value: false,
-      data: [],
+      data: [], // 普通查询
     });
     const addMemberBtn = () => {
       let role = loginEmployeeInfo.role;
@@ -444,6 +446,46 @@ export default {
         noDepart(ungrouped.pageNum, ungrouped.pageSize);
       }
     };
+    const screen = reactive({
+      visible: false,
+      pageNum: 1,
+      pageSize: 15,
+      pagesizes: [15, 20, 30, 40],
+      total: 0,
+      show: [],
+      data: [],
+    }); // 筛选
+    const screenAbnormal = (departId, txt) => {
+      let parmas = new URLSearchParams();
+      parmas.append("id", departId);
+      listUserByDepartment(parmas).then((res) => {
+        let code = res.code,
+          msg = res.msg,
+          data = res.data.list,
+          start = screen.pageSize * (screen.pageNum - 1),
+          end = screen.pageSize * screen.pageNum;
+        if (code == 0) {
+          screen.visible = true;
+          if (txt == "abnormal") {
+            screen.data = data.filter((item) => {
+              return parseFloat(item.temperature) >= 37.3;
+            });
+          }else {
+            screen.data = data.filter((item) => {
+              return parseFloat(item.temperature) < 37.3;
+            });
+          }
+          screen.show = screen.data.slice(start, end);
+          console.log(screen);
+        } else {
+          root.$message({
+            type: "error",
+            message: msg,
+          });
+        }
+      });
+    };
+    const screenNormal = (id) => {};
     const noDepart = (pageNum, pageSize) => {
       addNodepart_loading.value = true;
       listUserByNoDepartment(pageNum, pageSize).then((res) => {
@@ -715,6 +757,7 @@ export default {
       changeModule,
       checkChild,
       addMemberBtn, // Fn 添加部门成员
+      screenAbnormal,
       delMember, // Fn 移除部门成员
       handleCurrentChange,
       handleSizeChange,

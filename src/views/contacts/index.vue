@@ -633,6 +633,8 @@ export default {
      * departData 点击事件
      */
     const handleNodeClick = (data) => {
+      memberListPaging.pageSize = 15;
+      memberListPaging.pageNum = 1;
       // 选中节点高亮显示
       searchResult_list.status = true;
       // 当前部门信息
@@ -643,8 +645,6 @@ export default {
       treeData.status = true;
       memberData.data.splice(0, memberData.data.length); // 删除之前的成员信息
       memberListPaging.id = id;
-      memberListPaging.pageSize = 15;
-      memberListPaging.pageNum = 1;
       selectChildMember(memberListPaging);
       switchModule(contactsModule, "memberList");
     };
