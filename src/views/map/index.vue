@@ -108,9 +108,7 @@
           <div class="case_bottom_left"></div>
           <div class="case_bottom_right"></div>
           <a href="javascript:;" id="grandTotal">
-            <h1
-              style="color: #fff; font-weight: 500; font-size: 18px; margin-left: 15px; margin-top: 20px;margin-bottom: 20px;"
-            >
+            <h1>
               警告统计
               <span
                 style="color: #cfcfcf; font-size: 12px; text-align: center; display: inline-block;"
@@ -294,11 +292,17 @@
         v-loading="database.online.loading"
         :row-class-name="tableRowClassName"
       >
-        <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
-        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column
+          prop="gmtCreate"
+          label="最新上传数据时间"
+          width="250"
+          show-overflow-tooltip
+          sortable
+        ></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -328,11 +332,17 @@
         v-loading="database.temperature.loading"
         :row-class-name="tableRowClassName"
       >
-        <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
-        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column
+          prop="gmtCreate"
+          label="最新上传数据时间"
+          width="250"
+          show-overflow-tooltip
+          sortable
+        ></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -362,12 +372,25 @@
         v-loading="database.alarm.loading"
         :row-class-name="tableRowClassName"
       >
-        <el-table-column prop="userName" label="姓名" width="100" title="userName" sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
-        <el-table-column prop="type" label="告警类型" width="120" sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="120" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="260" sortable></el-table-column>
-        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="200" sortable></el-table-column>
+        <el-table-column
+          prop="userName"
+          label="姓名"
+          width="100"
+          title="userName"
+          show-overflow-tooltip
+          sortable
+        ></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="type" label="告警类型" width="120" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="120" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="260" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column
+          prop="gmtCreate"
+          label="最新上传数据时间"
+          width="200"
+          show-overflow-tooltip
+          sortable
+        ></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -397,11 +420,17 @@
         v-loading="database.person.loading"
         :row-class-name="tableRowClassName"
       >
-        <el-table-column prop="userName" label="姓名" width="100" sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="150" sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="300" sortable></el-table-column>
-        <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column
+          prop="gmtCreate"
+          label="最新上传数据时间"
+          width="250"
+          show-overflow-tooltip
+          sortable
+        ></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -453,7 +482,10 @@ import dangerIcon from "@/views/images/marker_danger.png";
 import address_location from "@/views/images/address_location.png"; // 搜索地址标注
 import pointAggre from "@/views/images/pointAggre.png"; // 点聚合
 import case_top_right from "@/views/images/case_top_right.png";
-import custom_map_config from "./custom_map_config/custom_map_config2.json";
+import custom_map_config from "./custom_map_config/custom_map_config.json";
+// import "./custom_echarts_config/macarons.js"; // macarons echarts
+// import "./custom_echarts_config/vintage.js"; // vintage echarts
+// import "./custom_echarts_config/walden.js"; // walden echarts
 import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
@@ -798,7 +830,7 @@ export default {
         let map = new BMap.Map("mapShow", {
           minZoom: 6,
           maxZoom: 20,
-          enableMapClick: false,
+          // enableMapClick: false, // 关闭底图可点默认事件
         }); // 创建Map实例
         window.map = map;
         let navigationControl = new BMap.NavigationControl({
@@ -923,7 +955,7 @@ export default {
           }
           /*----end -----*/
 
-          map.setMapStyleV2({ styleJson: custom_map_config });
+          map.setMapStyleV2({ styleJson: custom_map_config }); // 个性化地图
           let markers = [];
           let pointArray = [];
           let hitArray = []; // hitArry
@@ -947,7 +979,7 @@ export default {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
             let deviceOline = false;
-            let step = 1000 * 60 * 5 + 1;
+            let step = deviceStep.step;
             if (gmtTime < step) {
               deviceOline = true;
             }
@@ -1544,15 +1576,18 @@ $alanysisMinHeight_Bottom: 227px;
 $echartsMargin: 1%;
 $echartsBorder: 1px solid #146ede;
 
+// 透明色
+$transparency: rgba(11, 21, 50);
 #map {
   height: 100vh;
   min-height: 757px;
   min-width: $layout-min-width;
   width: 100%;
   position: relative;
-  background-color: #fff;
+  background: $transparency;
+  overflow: hidden;
   #mapShow {
-    background-color: rgb(11, 21, 50) !important;
+    background-color: $transparency !important;
   }
   .map_main {
     position: absolute;
@@ -1561,6 +1596,7 @@ $echartsBorder: 1px solid #146ede;
     width: 100%;
     height: 100%;
     @include webkit("transition", all 0.5s);
+    background: $transparency;
   }
 }
 .tool {
@@ -1602,6 +1638,7 @@ $echartsBorder: 1px solid #146ede;
   top: 16px;
 }
 
+$transitionTime: 0.3s;
 // 数据分析 alanysis 模块
 .alanysis {
   height: 100%;
@@ -1610,6 +1647,9 @@ $echartsBorder: 1px solid #146ede;
   min-width: $layout-min-width;
   @include webkit("box-sizing", border-box);
   .echarts_hide {
+    // z-index: -1;
+    // width: 0 !important;
+    // opacity: 0 !important;
     z-index: -1;
   }
   .alanysis_top {
@@ -1619,6 +1659,8 @@ $echartsBorder: 1px solid #146ede;
       width: 20%;
       opacity: 1;
       left: $echartsMargin;
+      transition: $transitionTime;
+      background: $transparency;
     }
     .alanysis-b {
       position: absolute;
@@ -1627,6 +1669,7 @@ $echartsBorder: 1px solid #146ede;
       height: 27%;
       width: 20%;
       opacity: 1;
+      transition: $transitionTime;
     }
     .alanysis_top_a {
       width: 100%;
@@ -1634,12 +1677,20 @@ $echartsBorder: 1px solid #146ede;
       left: 0;
       top: 0;
       border: $echartsBorder;
+      // overflow: hidden;
     }
     #abnormal {
       top: 0;
-      background: #0b1532;
+      // background: #0b1532;
       font-size: 20px;
       text-align: center;
+      h1,
+      .abnormal_top,
+      .abnormal_bottom {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .abnormal_top {
         float: left;
         width: 50%;
@@ -1703,8 +1754,9 @@ $echartsBorder: 1px solid #146ede;
       height: 38%;
       left: $echartsMargin;
       bottom: 10px;
-      background: #0b1532;
       border: $echartsBorder;
+      transition: $transitionTime;
+      background: $transparency;
     }
     .alanysis_bottom_R {
       .case_close_right {
@@ -1716,7 +1768,7 @@ $echartsBorder: 1px solid #146ede;
       right: $echartsMargin;
       bottom: 10px;
       @include webkit("box-sizing", border-box);
-      background: #0b1532;
+      transition: $transitionTime;
       #history {
         height: 100%;
         width: 100%;
@@ -1725,16 +1777,14 @@ $echartsBorder: 1px solid #146ede;
       }
     }
   }
-  .alanysis_topRight {
-  }
   .alanysis_right {
-    height: 46%;
+    height: 48%;
     width: 20%;
     position: absolute;
     right: $echartsMargin;
-    top: 95px;
     border: $echartsBorder;
-    background-color: #0b1532;
+    // background-color: #0b1532;
+    transition: $transitionTime;
     .alanysis_right_content {
       position: absolute;
       right: 0;
@@ -1756,7 +1806,6 @@ $echartsBorder: 1px solid #146ede;
     opacity: 1;
     // display: none;
     .frame_operation_dep {
-      background: #fff;
       height: 29px;
       color: #9e9e9e;
       width: 8px;
@@ -1902,7 +1951,7 @@ $echartsBorder: 1px solid #146ede;
 }
 
 .echartsIndivi {
-  background: #fff;
+  // background: rgba(255,255,255,0.85);
   position: absolute;
   @include webkit("box-sizing", boder-box);
 }
@@ -1916,6 +1965,9 @@ $echartsBorder: 1px solid #146ede;
   position: absolute;
   left: -8px;
   top: -8px;
+  // left: -2px;
+  // top: -2px;
+  z-index: 1;
 }
 .case_top_right {
   width: 15px;
@@ -1924,6 +1976,9 @@ $echartsBorder: 1px solid #146ede;
   position: absolute;
   top: -7px;
   right: -8px;
+  // top: -2px;
+  // right: -2px;
+  z-index: 1;
 }
 .case_bottom_left {
   width: 15px;
@@ -1932,6 +1987,9 @@ $echartsBorder: 1px solid #146ede;
   position: absolute;
   left: -7px;
   bottom: -7px;
+  // bottom: -2px;
+  // left: -2px;
+  z-index: 1;
 }
 .case_bottom_right {
   width: 15px;
@@ -1940,6 +1998,9 @@ $echartsBorder: 1px solid #146ede;
   position: absolute;
   right: -9px;
   bottom: -7px;
+  // bottom: -2px;
+  // right: -2px;
+  z-index: 1;
 }
 .case_close_right {
   position: absolute;
@@ -1969,21 +2030,21 @@ $echartsBorder: 1px solid #146ede;
 .case_open_left-l {
   position: absolute;
   left: 2%;
-  bottom: 39%;
+  bottom: 35%;
   z-index: 2;
   cursor: pointer;
 }
 .case_open_left-r {
   position: absolute;
-  right: 1%;
-  bottom: 38%;
+  right: 2%;
+  bottom: 35%;
   z-index: 2;
   cursor: pointer;
 }
 .case_open_left-t {
   position: absolute;
-  right: 1%;
-  top: 15%;
+  right: 2%;
+  top: 13%;
   z-index: 2;
   cursor: pointer;
 }
@@ -2006,7 +2067,7 @@ $echartsBorder: 1px solid #146ede;
 
 /*---------------------table login-----------------------*/
 .tdBgc {
-  background-color: #273e84;
+  background-color: #c05050;
   border-radius: 5px;
   color: #fff;
 }
@@ -2015,17 +2076,22 @@ $echartsBorder: 1px solid #146ede;
 }
 
 #grandTotal {
-  display: block;
-  width: 94%;
   margin-top: 10px;
   border: 1px solid #0b1532;
   margin: 9.2px auto;
   @include webkit("box-shadow", rgba(0, 0, 0, 0.1) 0 0 8px);
   min-height: 168.5px;
   min-width: 303px;
-  height: 90%;
   padding-top: 8%;
   box-sizing: border-box;
+  h1 {
+    color: #008acd;
+    font-weight: 700;
+    font-size: 18px;
+    margin-left: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
   .totalContent {
     color: #000;
     padding: 0;

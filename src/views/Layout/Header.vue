@@ -8,7 +8,7 @@
         <!-- <a href="javascript:;">文档</a>
         <span class="frame_operation_separator">|</span>
         <span>联系客服</span>
-        <span class="frame_operation_separator">|</span> -->
+        <span class="frame_operation_separator">|</span>-->
         <a href="javascript:;" @click="logOut">退出</a>
       </aside>
     </div>
@@ -37,7 +37,7 @@ import {
   ref,
   onMounted,
   computed,
-  watchEffect
+  watchEffect,
 } from "@vue/composition-api";
 export default {
   name: "frame",
@@ -48,29 +48,29 @@ export default {
         name: "地图",
         targetId: "map",
         target: "/map",
-        current: false
+        current: false,
       },
       {
         index: 1,
         name: "部门",
         targetId: "contacts",
         target: "/contacts",
-        current: false
+        current: false,
       },
       {
         index: 2,
         name: "围栏",
         targetId: "rail",
         target: "/rail",
-        current: false
+        current: false,
       },
       {
         index: 3,
         name: "企业",
         targetId: "corporation",
         target: "/corporation",
-        current: false
-      }
+        current: false,
+      },
     ]);
     const step = ref(90);
     const clickStr = ref("translateX(" + step.value + "px)");
@@ -85,7 +85,7 @@ export default {
         }
         step.value = 90;
         let url = window.location.href;
-        navList.forEach(value => {
+        navList.forEach((value) => {
           let target = value.target;
           if (url.indexOf(target) !== -1) {
             step.value += 270 * value.index;
@@ -94,9 +94,9 @@ export default {
         });
         return "transform:" + clickStr.value;
       },
-      set: val => {
+      set: (val) => {
         urlStr.value = val;
-      }
+      },
     });
 
     /**
@@ -109,7 +109,7 @@ export default {
      * 声明函数
      */
     const navTrigger = (data, index) => {
-      navList.forEach(value => {
+      navList.forEach((value) => {
         value.current = false;
       });
       step.value = 90;
@@ -123,16 +123,19 @@ export default {
      * 退出登录
      */
     const logOut = () => {
+
       sessionStorage.clear();
+      // 清除历史堆栈
+      let Backlen = history.length;
+      history.go(-Backlen); // Return at the beginning
+      window.location.replace("https://iot.chinautech.com/");
       // window.location.href="http://www.chinautech.com/";
-      window.location.href="https://iot.chinautech.com/";
-    }
+    };
     /**监听路由 */
     watchEffect(() => {
       let path = root.$route.path;
       if (path != "/") {
-        navList.forEach((item, index) => {
-        });
+        navList.forEach((item, index) => {});
       }
     });
     return {
@@ -140,9 +143,9 @@ export default {
       step,
       stepStyle,
       navTrigger,
-      logOut
+      logOut,
     };
-  }
+  },
 };
 </script>
 
@@ -155,7 +158,7 @@ export default {
   .frame_head_top {
     height: 32px;
     width: 90%;
-    max-width:1080px;
+    max-width: 1080px;
     color: #fff;
     margin: 0 auto;
     background: #335883;
