@@ -3,14 +3,14 @@
     "elementType": "geometry",
     "stylers": {
         "visibility": "on",
-        "color": "#0d1b2aff"
+        "color": "#121d3fff"
     }
 }, {
     "featureType": "water",
     "elementType": "labels.text.fill",
     "stylers": {
         "visibility": "on",
-        "color": "#000000ff"
+        "color": "#36213eff"
     }
 }, {
     "featureType": "building",
@@ -23,7 +23,8 @@
     "featureType": "building",
     "elementType": "geometry.stroke",
     "stylers": {
-        "visibility": "on"
+        "visibility": "on",
+        "color": "#1c0316ff"
     }
 }, {
     "featureType": "water",
@@ -55,7 +56,7 @@
     "elementType": "labels.text.fill",
     "stylers": {
         "visibility": "on",
-        "color": "#ffffffff"
+        "color": "#b8f3ffff"
     }
 }, {
     "featureType": "city",
@@ -68,7 +69,8 @@
     "featureType": "continent",
     "elementType": "labels.text.fill",
     "stylers": {
-        "visibility": "on"
+        "visibility": "on",
+        "color": "#b8f3ffff"
     }
 }, {
     "featureType": "poilabel",
@@ -126,7 +128,7 @@
     "elementType": "geometry.fill",
     "stylers": {
         "visibility": "on",
-        "color": "#415a77ff"
+        "color": "#415368ff"
     }
 }, {
     "featureType": "road",
@@ -146,14 +148,14 @@
     "elementType": "geometry",
     "stylers": {
         "visibility": "on",
-        "color": "#1b263bff"
+        "color": "#554971ff"
     }
 }, {
     "featureType": "scenicspots",
     "elementType": "geometry",
     "stylers": {
         "visibility": "on",
-        "color": "#1b263bff"
+        "color": "#36213eff"
     }
 }, {
     "featureType": "scenicspots",
@@ -322,7 +324,7 @@
     "featureType": "scenicspotslabel",
     "elementType": "labels",
     "stylers": {
-        "visibility": "on"
+        "visibility": "off"
     }
 }, {
     "featureType": "manmade",
@@ -549,21 +551,21 @@
     "elementType": "geometry.fill",
     "stylers": {
         "visibility": "on",
-        "color": "#415a77ff"
+        "color": "#415368ff"
     }
 }, {
     "featureType": "fourlevelway",
     "elementType": "geometry.fill",
     "stylers": {
         "visibility": "on",
-        "color": "#415a77ff"
+        "color": "#415368ff"
     }
 }, {
     "featureType": "local",
     "elementType": "geometry.fill",
     "stylers": {
         "visibility": "on",
-        "color": "#415a77ff"
+        "color": "#415368ff"
     }
 }, {
     "featureType": "provincialway",
@@ -1136,7 +1138,7 @@
     "featureType": "poilabel",
     "elementType": "labels.text.fill",
     "stylers": {
-        "color": "#b8f3ffc4"
+        "color": "#ffffffff"
     }
 }, {
     "featureType": "districtlabel",
@@ -1155,11 +1157,5 @@
     "elementType": "labels.text",
     "stylers": {
         "fontsize": 26
-    }
-}, {
-    "featureType": "building",
-    "elementType": "geometry.topfill",
-    "stylers": {
-        "color": "#0d1b2aff"
     }
 }]

@@ -4,6 +4,12 @@ const history = {
   },
   tooltip: {
     trigger: "axis",
+    axisPointer: {
+      type: 'cross',
+      label: {
+          backgroundColor: '#6a7985'
+      }
+  }
   },
   legend: {
     data: ["告警总数", "总人数", "位置告警", "温度告警"]

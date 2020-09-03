@@ -9,8 +9,7 @@
     "featureType": "water",
     "elementType": "labels.text.fill",
     "stylers": {
-        "visibility": "on",
-        "color": "#000000ff"
+        "visibility": "on"
     }
 }, {
     "featureType": "building",
@@ -55,7 +54,7 @@
     "elementType": "labels.text.fill",
     "stylers": {
         "visibility": "on",
-        "color": "#ffffffff"
+        "color": "#b8f3ffff"
     }
 }, {
     "featureType": "city",
@@ -68,7 +67,8 @@
     "featureType": "continent",
     "elementType": "labels.text.fill",
     "stylers": {
-        "visibility": "on"
+        "visibility": "on",
+        "color": "#b8f3ffff"
     }
 }, {
     "featureType": "poilabel",
@@ -1136,7 +1136,7 @@
     "featureType": "poilabel",
     "elementType": "labels.text.fill",
     "stylers": {
-        "color": "#b8f3ffc4"
+        "color": "#ffffffff"
     }
 }, {
     "featureType": "districtlabel",
