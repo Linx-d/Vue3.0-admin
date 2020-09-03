@@ -651,7 +651,11 @@ export default {
           }
           overlays.length = 0;
         };
-        document.getElementsByClassName("BMapLib_box")[1].title = "绘制围栏";
+        console.log(document.getElementsByClassName("BMapLib_circle"),'modify title');
+        
+        document.getElementsByClassName("BMapLib_circle").forEach(item => {
+          item.title = "绘制围栏";
+        });
       });
     };
 
@@ -719,7 +723,9 @@ export default {
           }
           overlays.length = 0;
         };
-        document.getElementsByClassName("BMapLib_box")[1].title = "绘制围栏";
+        document.getElementsByClassName("BMapLib_circle").forEach(item => {
+          item.title = "绘制围栏";
+        });
       });
     };
 
