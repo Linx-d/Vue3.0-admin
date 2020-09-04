@@ -182,10 +182,10 @@
       ></contactsList>
       <contactsInfo
         v-show="contactsModule.memberInfo"
-        :currentDepart="currentDepart"
         :contactsModule="contactsModule"
         :currentMemberInfo="currentMemberInfo"
         :tmpHistory="tmpHistory"
+        :showMemberInfo_drawer="showMemberInfo_drawer"
       ></contactsInfo>
       <contactsModify
         v-show="contactsModule.memberModify"
@@ -236,6 +236,15 @@ export default {
   name: "contacts",
   components: { contactsInfo, contactsModify, contactsList },
   setup(props, { root, refs, set, nextTick }) {
+    /**判断组件在地图、个人信息等中使用
+     * 
+     */
+    const showMemberInfo_drawer = reactive({
+      status: {
+        map: false,
+        info: true
+      },
+    });
     /**
      * contacts模块管理
      */
@@ -1125,6 +1134,7 @@ export default {
       hideDepartLeave, // 鼠标离开 控制左侧导航栏隐藏的菜单栏函数
       memberListPaging,
       loading,
+      showMemberInfo_drawer
     };
   },
 };

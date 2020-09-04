@@ -3,8 +3,8 @@
     <div class="info_title">
       <span>成员详情</span>
     </div>
-    <div class="cnt_tool">
-      <a class="memberLink" href="javascript:;" @click="memberInfoBack">
+    <div class="cnt_tool" v-if="showMemberInfo_drawer.status.info">
+      <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
       <a class="memberLink" href="javascript:;" @click="modifyMemberInfo">编辑</a>
@@ -12,6 +12,11 @@
       <a class="memberLink" href="javascript:;">编辑</a>
       <a class="memberLink" href="javascript:;">移除</a>
       -->
+    </div>
+    <div class="cnt_tool" v-if="showMemberInfo_drawer.status.map">
+      <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
+        <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>关闭
+      </a>
     </div>
     <div class="info_main">
       <div class="info_head">
@@ -125,7 +130,7 @@
           </li>
           <li class="departManagersBoxAll">
             <span>部门：</span>
-            <div class="departManagers">
+            <div class="departManagers" v-if="currentMemberInfo.listDepart!=null&&currentMemberInfo.listDepart.length!=0">
               <div
                 v-for="depart in currentMemberInfo.listDepart"
                 :key="depart.id"
@@ -137,6 +142,8 @@
                 </div>
               </div>
             </div>
+
+            <span v-else>暂无</span>
           </li>
           <li>
             <el-tooltip class="item" effect="light" :content="content.tmp.txt" placement="left">
@@ -180,9 +187,15 @@
             :row-class-name="tableRowClassName"
             height="430"
           >
-            <el-table-column prop="time" label="日期" width="250" show-overflow-tooltip  sortable></el-table-column>
-            <el-table-column prop="temperature" label="温度" width="130" show-overflow-tooltip  sortable></el-table-column>
-            <el-table-column prop="address" label="地址" width="340" show-overflow-tooltip  sortable></el-table-column>
+            <el-table-column
+              prop="temperature"
+              label="温度"
+              width="130"
+              show-overflow-tooltip
+              sortable
+            ></el-table-column>
+            <el-table-column prop="address" label="地址" width="340" show-overflow-tooltip sortable></el-table-column>
+            <el-table-column prop="time" label="上传数据时间" width="250" show-overflow-tooltip sortable></el-table-column>
           </el-table>
         </div>
         <el-tooltip class="item" effect="light" :content="content.table.txt" placement="right">
@@ -201,7 +214,7 @@
         ></el-pagination>
       </div>
       <div class="info_module mapBox" v-loading="loading">
-        <div id="mapShow"></div>
+        <div id="memberMapShow"></div>
       </div>
 
       <!-- 围栏列表 -->
@@ -213,12 +226,19 @@
         :close-on-click-modal="false"
       >
         <el-table :data="railList.data" style="width: 100%" max-height="400">
-          <el-table-column fixed prop="gmtCreate" label="日期" width="220" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="railName" label="围栏名称" width="120" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="personSum" label="人数" width="120" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="radius" label="半径" width="120" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="railAddr" label="地址" width="300" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column fixed="right" label="操作" show-overflow-tooltip  width="120">
+          <el-table-column
+            fixed
+            prop="gmtCreate"
+            label="日期"
+            width="220"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column prop="railName" label="围栏名称" width="120" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="personSum" label="人数" width="120" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="radius" label="半径" width="120" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="railAddr" label="地址" width="300" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column fixed="right" label="操作" show-overflow-tooltip width="120">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="selectRow(scope.$index, railList.data)"
@@ -245,11 +265,17 @@
           v-loading="database.position.loading"
           :row-class-name="tableRowClassName"
         >
-          <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip  sortable></el-table-column>
-          <el-table-column prop="gmtCreate" label="最新上传数据时间" width="250" show-overflow-tooltip  sortable></el-table-column>
+          <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column
+            prop="gmtCreate"
+            label="最新上传数据时间"
+            width="250"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
         </el-table>
         <div class="block">
           <el-pagination
@@ -282,11 +308,6 @@ import address_position from "@/views/images/address_position.png";
 export default {
   name: "memberList",
   props: {
-    currentDepart: {
-      // 不用在setup中重新声明一次变量
-      type: Object,
-      default: () => {}, // default值 需要使用箭头函数回调
-    },
     currentMemberInfo: {
       type: Object,
       default: () => {},
@@ -296,6 +317,10 @@ export default {
       default: () => [],
     },
     tmpHistory: {
+      type: Object,
+      default: () => {},
+    },
+    showMemberInfo_drawer: {
       type: Object,
       default: () => {},
     },
@@ -686,8 +711,14 @@ export default {
       });
     };
     // 返回
-    const memberInfoBack = () => {
-      switchModule(contactsModule, "memberList");
+    const memberInfoBack = (data) => {
+      let map = data.status.map;
+      let info = data.status.info;
+      if (info) {
+        switchModule(contactsModule, "memberList");
+      } else if (map) {
+        data.visible = false;
+      }
     };
     // 编辑
     const modifyMemberInfo = () => {
@@ -742,7 +773,7 @@ export default {
           radius: props.currentMemberInfo.radius,
         };
         Map("ak").then((BMap) => {
-          map = new BMap.Map("mapShow"); // 创建Map实例
+          map = new BMap.Map("memberMapShow"); // 创建Map实例
           window.map = map;
           let pointArray = [];
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
@@ -1032,7 +1063,7 @@ $contactsHeight: 592px;
     padding-top: 0;
     border-top: none;
   }
-  #mapShow {
+  #memberMapShow {
     height: 500px;
   }
 }
