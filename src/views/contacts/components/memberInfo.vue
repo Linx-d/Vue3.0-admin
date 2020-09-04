@@ -130,7 +130,10 @@
           </li>
           <li class="departManagersBoxAll">
             <span>部门：</span>
-            <div class="departManagers" v-if="currentMemberInfo.listDepart!=null&&currentMemberInfo.listDepart.length!=0">
+            <div
+              class="departManagers"
+              v-if="currentMemberInfo.listDepart!=null&&currentMemberInfo.listDepart.length!=0"
+            >
               <div
                 v-for="depart in currentMemberInfo.listDepart"
                 :key="depart.id"
@@ -224,21 +227,22 @@
         class="railTable"
         id="memberRailList"
         :close-on-click-modal="false"
+        :modal="false"
       >
         <el-table :data="railList.data" style="width: 100%" max-height="400">
           <el-table-column
             fixed
-            prop="gmtCreate"
-            label="日期"
-            width="220"
+            prop="railName"
+            label="围栏名称"
+            width="120"
             show-overflow-tooltip
             sortable
           ></el-table-column>
-          <el-table-column prop="railName" label="围栏名称" width="120" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="personSum" label="人数" width="120" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="radius" label="半径" width="120" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="railAddr" label="地址" width="300" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column fixed="right" label="操作" show-overflow-tooltip width="120">
+          <el-table-column prop="personSum" label="人数" width="80" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="radius" label="半径" width="80" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="railAddr" label="地址" width="150" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="gmtCreate" label="创建时间" width="230" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column fixed="right" label="操作" show-overflow-tooltip width="80">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="selectRow(scope.$index, railList.data)"

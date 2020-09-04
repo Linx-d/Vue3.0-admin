@@ -306,10 +306,10 @@
         :row-class-name="tableRowClassName"
         @row-click="showMemberInfo"
       >
-        <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column fixed prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
@@ -347,10 +347,10 @@
         :row-class-name="tableRowClassName"
         @row-click="showMemberInfo"
       >
-        <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
@@ -391,19 +391,19 @@
         <el-table-column
           prop="userName"
           label="姓名"
-          width="100"
+          width="80"
           title="userName"
           show-overflow-tooltip
           sortable
         ></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="type" label="告警类型" width="120" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="120" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="260" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="200"
+          width="210"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -437,10 +437,10 @@
         :row-class-name="tableRowClassName"
         @row-click="showMemberInfo"
       >
-        <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"

@@ -124,8 +124,12 @@
   }
 }
 
-#memberRailList .el-dialog {
-  width: 55%;
+// #memberRailList .el-dialog {
+//   width: 55%;
+// }
+.el-dialog {
+  width: 800px;
+  min-width: 730px;
 }
 
 /**部门 左侧菜单*/
