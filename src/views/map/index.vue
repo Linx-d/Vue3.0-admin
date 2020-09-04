@@ -30,14 +30,14 @@
           @click="echarts_toggle.online=false"
           v-if="echarts_toggle.online"
         >
-          <svg-icon iconClass="open_echarts"></svg-icon>
+          <svg-icon iconClass="open_echarts1" className="echartsSvg"></svg-icon>
         </div>
         <div
           class="case_open_left-b"
           @click="echarts_toggle.temperature=false"
           v-if="echarts_toggle.temperature"
         >
-          <svg-icon iconClass="open_echarts"></svg-icon>
+          <svg-icon iconClass="open_echarts2" className="echartsSvg"></svg-icon>
         </div>
         <div :class="['alanysis-a', {'echarts_hide': echarts_toggle.online}]">
           <div class="case_close_right" @click="echarts_toggle.online=true">
@@ -88,14 +88,14 @@
           @click="echarts_toggle.alarm=false"
           v-if="echarts_toggle.alarm"
         >
-          <svg-icon iconClass="open_echarts"></svg-icon>
+          <svg-icon iconClass="open_echarts3" className="echartsSvg"></svg-icon>
         </div>
         <div
           class="case_open_left-r"
           @click="echarts_toggle.history=false"
           v-if="echarts_toggle.history"
         >
-          <svg-icon iconClass="open_echarts"></svg-icon>
+          <svg-icon iconClass="open_echarts4" className="echartsSvg"></svg-icon>
         </div>
         <div
           :class="['alanysis_bottom_L', 'echartsIndivi', {'echarts_hide': echarts_toggle.alarm}]"
@@ -188,7 +188,7 @@
           @click="echarts_toggle.system=false"
           v-if="echarts_toggle.system"
         >
-          <svg-icon iconClass="open_echarts"></svg-icon>
+          <svg-icon iconClass="open_echarts5" className="echartsSvg"></svg-icon>
         </div>
         <div :class="['alanysis_right', {'echarts_hide': echarts_toggle.system}]">
           <div class="case_close_right" @click="echarts_toggle.system=true">
@@ -2494,4 +2494,8 @@ $transitionTime: 0.3s;
   }
 }
 /*---------------------table end-----------------------*/
+.echartsSvg {
+  width: 1.3em;
+  height: 1.3em;
+}
 </style>
