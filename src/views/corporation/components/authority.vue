@@ -18,8 +18,8 @@
                 <p v-html="scope.row.name"></p>
               </template>
             </el-table-column>
-            <el-table-column property="tel" label="电话" width="200" show-overflow-tooltip  sortable></el-table-column>
-            <el-table-column property="gmtCreate" label="创建时间" show-overflow-tooltip  sortable></el-table-column>
+            <el-table-column property="tel" label="电话" width="200" show-overflow-tooltip sortable></el-table-column>
+            <el-table-column property="gmtCreate" label="创建时间" show-overflow-tooltip sortable></el-table-column>
             <el-table-column fixed="right" label="操作" show-overflow-tooltip width="100">
               <template slot-scope="scope">
                 <el-button
@@ -557,6 +557,7 @@ export default {
      * 删除管理员
      */
     const delManager = () => {
+      const h = root.$createElement;
       let authorityId = loginEmployeeInfo.role.id;
       let employeeRoleId = employee.role.id;
       if (authorityId === 3 || authorityId === employeeRoleId) {
@@ -565,35 +566,69 @@ export default {
           message: "没有访问权限",
         });
       } else {
-        if (confirm("确定删除该管理员？")) {
-          let data = {
-            id: employee.id,
-          };
-          if (roleId.value == 2 || employee.role.id == 2) {
-            editAdmin(data).then((res) => {
-              if (res.code == 0) {
-                root.$alert("删除成功。", "成功", {
-                  confirmButtonText: "确定",
-                });
-                queryAllRole();
+        root
+          .$msgbox({
+            title: "消息",
+            message: h("p", null, [
+              h("span", null, "确定删除该管理员"),
+              h("i", { style: "color: teal" }, ""),
+            ]),
+            showCancelButton: true,
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "执行中...";
+                setTimeout(() => {
+                  done();
+                  let data = {
+                    id: employee.id,
+                  };
+                  if (roleId.value == 2 || employee.role.id == 2) {
+                    editAdmin(data).then((res) => {
+                      if (res.code == 0) {
+                        root.$alert("删除成功。", "成功", {
+                          confirmButtonText: "确定",
+                        });
+                        queryAllRole();
+                      } else {
+                        root.$alert(res.msg, "失败", {
+                          confirmButtonText: "确定",
+                        });
+                      }
+                      isEdit.value = !isEdit.value;
+                    });
+                  } else {
+                    editEmployee(data).then((res) => {
+                      if (res.code == 0) {
+                        root.$alert("删除成功。", "成功", {
+                          confirmButtonText: "确定",
+                        });
+                        queryAllRole();
+                      } else {
+                        root.$alert(res.msg, "失败", {
+                          confirmButtonText: "确定",
+                        });
+                      }
+                      isEdit.value = !isEdit.value;
+                    });
+                  }
+                  setTimeout(() => {
+                    instance.confirmButtonLoading = false;
+                  }, 300);
+                }, 1000);
               } else {
-                root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
+                done();
               }
-            });
-          } else {
-            editEmployee(data).then((res) => {
-              if (res.code == 0) {
-                root.$alert("删除成功。", "成功", {
-                  confirmButtonText: "确定",
-                });
-                queryAllRole();
-              } else {
-                root.$alert(res.msg, "失败", { confirmButtonText: "确定" });
-              }
-            });
-          }
-          isEdit.value = !isEdit.value;
-        }
+            },
+          })
+          .then((action) => {
+            // root.$message({
+            //   type: "info",
+            //   message: "action: " + action,
+            // });
+          });
       }
     };
     // -------------------------企业微信--------------------------------
