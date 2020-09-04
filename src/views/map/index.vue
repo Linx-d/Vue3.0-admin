@@ -304,6 +304,7 @@
         height="500"
         v-loading="database.online.loading"
         :row-class-name="tableRowClassName"
+        @row-click="showMemberInfo"
       >
         <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
@@ -344,6 +345,7 @@
         height="500"
         v-loading="database.temperature.loading"
         :row-class-name="tableRowClassName"
+        @row-click="showMemberInfo"
       >
         <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
@@ -384,6 +386,7 @@
         height="500"
         v-loading="database.alarm.loading"
         :row-class-name="tableRowClassName"
+        @row-click="showMemberInfo"
       >
         <el-table-column
           prop="userName"
@@ -432,6 +435,7 @@
         height="500"
         v-loading="database.person.loading"
         :row-class-name="tableRowClassName"
+        @row-click="showMemberInfo"
       >
         <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
@@ -457,6 +461,23 @@
         ></el-pagination>
       </div>
     </el-dialog>
+    <el-drawer
+      title="成员详情"
+      :show-close="true"
+      :visible.sync="showMemberInfo_drawer.visible"
+      :before-close="closeDrawer"
+      :with-header="false"
+      :destroy-on-close="true"
+      :wrapperClosable="false"
+      size="50%"
+    >
+      <contactsInfo
+        :contactsModule="contactsModule"
+        :currentMemberInfo="currentMemberInfo"
+        :tmpHistory="tmpHistory"
+        :showMemberInfo_drawer="showMemberInfo_drawer"
+      ></contactsInfo>
+    </el-drawer>
   </main>
 </template>
 
@@ -469,6 +490,7 @@ import {
   watchEffect,
   ref,
 } from "@vue/composition-api";
+import contactsInfo from "@/views/contacts/components/memberInfo"; // 导入个人信息组件
 import {
   listAlarmView,
   getAlarmView,
@@ -481,7 +503,11 @@ import {
 } from "@/api/mapApi";
 import { listRail, selectRailList, listUserInfoByRail } from "@/api/railApi";
 import { getCorpInfo } from "@/api/corporationApi";
-import { select } from "@/api/contactsApi";
+import {
+  select,
+  listDepartmentByUser,
+  listUserLocationById,
+} from "@/api/contactsApi";
 import individuaction from "./custom_map_config/custom_map_config.json"; // 个性化地图 所用样式文件
 import { adaptionEchartsV2 } from "@/utils/common"; // 图表自适应
 import alarmOption from "./options/alarmOption.js"; // 告警模块
@@ -502,6 +528,7 @@ import custom_map_config from "./custom_map_config/custom_map_config.json";
 import "./custom_echarts_config/dark.js"; // dark echarts
 export default {
   name: "mapModule",
+  components: { contactsInfo },
   setup(props, { root, refs }) {
     /**显示隐藏图表
      * 值是false 时为显示, true 为隐藏
@@ -768,6 +795,186 @@ export default {
       return "";
     };
 
+    /*----------------------------获取个人信息 start---------------------------------------*/
+    /**数据
+     * {
+        contactsModule,
+        currentMemberInfo, 1
+        tmpHistory 1
+        }
+     */
+    /**
+     * contacts模块管理
+     */
+    let contactsModule = reactive({
+      memberList: true, // 成员列表
+      memberInfo: false, // 成员信息
+      memberModify: false, // 修改信息
+      status: false,
+    });
+    // 当前成员信息
+    let currentMemberInfo = reactive({
+      address: "山西省太原市万柏林区a",
+      addressLongitude: 0,
+      addressLatitude: 0,
+      age: "23",
+      date: "",
+      gmtCreate: null,
+      name: "aaaaaa",
+      radius: "25",
+      railLatitude: "29.825502",
+      railLongitude: "106.530144",
+      sex: "男",
+      tel: "13647684961",
+      temperature: "0.0",
+      userId: "5",
+      userLatitude: 106.53721028909878,
+      userLongitude: 29.821216648608489,
+      online: true,
+      photo: "",
+      remarks: "",
+    });
+    // 设置成员修改信息
+    let tmpHistory = reactive({
+      newArr_time: [],
+      newArr_tmp: [],
+      error_time: [],
+      error_tmp: [],
+      newArr_position: [],
+      online: false,
+      temperature: "33.78",
+      electric: "2",
+      location: "重庆市北碚区云汉大道",
+      railName: "万寿福居公租房",
+      lastUpdate: "2020-05-14 15:48:02",
+      tnumber: null,
+      pnumber: 109,
+      tableData: [],
+      data: [],
+    });
+
+    // 控制抽屉显示隐藏
+    const showMemberInfo_drawer = reactive({
+      status: {
+        map: true,
+        info: false,
+      },
+      visible: false,
+      loading: true,
+      size: 1000,
+    });
+    //
+    const closeDrawer = (done) => {
+      showMemberInfo_drawer.visible = false;
+      contactsModule.memberInfo = false;
+    };
+    /** 表格添加单击事件
+     *  { userId: 0 }
+     */
+    const showMemberInfo = (row) => {
+      let userId = row.userId;
+      contactsModule.memberInfo = true;
+      showMemberInfo_drawer.visible = true;
+      currentMemberInfo.name = row.name;
+      /**
+       * 查询用户所属的所有部门
+       */
+      let selectId = {
+        id: userId,
+      };
+      listDepartmentByUser(selectId).then((res) => {
+        let listData = res.data;
+        currentMemberInfo.listDepart = [];
+        listData.forEach((item) => {
+          currentMemberInfo.listDepart.push(item.name);
+        });
+      });
+
+      /**根据用户id获取历史数据信息 */
+      let currentObj = {
+        userId: userId,
+      };
+      listUserLocationById(currentObj).then((res) => {
+        let array = res.data.list ? res.data.list : res.data; // 服务器与local切换
+        let newArr_time = [],
+          newArr_tmp = [],
+          newArr_position = [],
+          new_tableData = [],
+          error_time = [],
+          error_tmp = [],
+          new_errorTableData = [];
+        array.forEach((item) => {
+          // temperature
+          newArr_time.push(item.gmtCreate);
+          let temperature = Number(item.temperature).toFixed(1);
+          newArr_tmp.push(temperature); //Number().toFiexd(1)
+          let errorObj = {};
+          if (temperature >= 37.3) {
+            error_time.push(item.gmtCreate);
+            error_tmp.push(temperature);
+            errorObj = {
+              name: currentMemberInfo.name,
+              time: item.gmtCreate,
+              temperature: temperature,
+            };
+            new_errorTableData.push(errorObj);
+          }
+          // position
+          let positionObj = {
+            lng: item.longitude,
+            lat: item.latitude,
+          };
+          newArr_position.push(positionObj);
+
+          // tableData
+          let tableObj = {
+            name: currentMemberInfo.name,
+            time: item.gmtCreate,
+            temperature: temperature,
+          };
+          new_tableData.push(tableObj);
+        });
+        tmpHistory.newArr_time = newArr_time;
+        tmpHistory.newArr_tmp = newArr_tmp;
+        tmpHistory.error_time = error_time;
+        tmpHistory.error_tmp = error_tmp;
+        tmpHistory.newArr_position = newArr_position;
+        tmpHistory.tableData = new_tableData.reverse();
+        tmpHistory.error_tableData = new_errorTableData.reverse();
+      });
+
+      /**根据用户id获取设备最新数据和告警信息 */
+      let currentArray = [userId];
+      listDeviceAlarmInfoByUserId(currentArray).then((res) => {
+        let data = res.data[0] ? res.data[0] : [];
+        tmpHistory.railName = data.railName;
+        for (let key in data) {
+          if (key == "age") {
+            let newDate = new Date().getTime();
+            let date = new Date(data[key]).getTime();
+            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+            let age = parseInt((newDate - date) / oneDay);
+            currentMemberInfo[key] = age;
+          } else {
+            currentMemberInfo[key] = data[key];
+          }
+        }
+        for (let key in currentMemberInfo) {
+          if (key === "railName") {
+            continue;
+          }
+          let verify =
+            currentMemberInfo[key] === null ||
+            currentMemberInfo[key] === undefined ||
+            currentMemberInfo[key] === ""; // 验证值是否为空
+          if (verify) {
+            currentMemberInfo[key] = "暂无数据";
+          }
+        }
+      });
+    };
+    /*----------------------------获取个人信息 end---------------------------------------*/
+
     /**
      * 图表框
      */
@@ -815,7 +1022,7 @@ export default {
             res.data.address,
             function (addressPoint) {
               if (addressPoint) {
-                baiduMap(addressPoint, res);
+                baiduMap(addressPoint, res.data.address);
               } else {
                 alert("您选择地址没有解析到结果!");
               }
@@ -827,8 +1034,20 @@ export default {
             type: "normal",
             message: "请联系超级管理员设置企业地址",
           });
+
           let point = new BMap.Point(116.404, 39.915);
-          baiduMap(data, res);
+          let geoc = new BMap.Gecoder();
+          geoc.getLocation(point, (rs) => {
+            let addComp = rs.addressComponents;
+            baiduMap(
+              point,
+              addComp.province +
+                addComp.city +
+                addComp.district +
+                addComp.street +
+                addComp.streetNumber
+            );
+          });
         }
       });
     })(window);
@@ -847,8 +1066,8 @@ export default {
         }); // 创建Map实例
         let locationPoint = new BMap.Point(data.lng, data.lat);
         window.map = map;
+        // 靠左上角位置
         let navigationControl = new BMap.NavigationControl({
-          // 靠左上角位置
           anchor: BMAP_ANCHOR_TOP_LEFT,
           offset: {
             width: 430,
@@ -859,18 +1078,28 @@ export default {
           // 启用显示定位
           enableGeolocation: true,
         });
-        map.addControl(navigationControl);
+        //右上角，仅包含平移和缩放按钮
+        let top_right_navigation = new BMap.NavigationControl({
+          anchor: BMAP_ANCHOR_TOP_LEFT,
+          offset: {
+            width: 430,
+            height: 220,
+          },
+          type: BMAP_NAVIGATION_CONTROL_SMALL,
+        });
+        map.addControl(top_right_navigation);
         map.centerAndZoom(locationPoint, 19); // 初始化地图,用城市名设置地图中心点
         let myIcon = new BMap.Icon(address_location, new BMap.Size(85, 48));
-        var marker = new BMap.Marker(locationPoint, { icon: myIcon }); // 创建标注
+        let marker = new BMap.Marker(locationPoint, { icon: myIcon }); // 创建标注
         map.addOverlay(marker); // 将标注添加到地图中
-        var opts = {
+        let opts = {
           width: 10, // 信息窗口宽度
           height: 5, // 信息窗口高度
           enableMessage: true, //设置允许信息窗发送短息
           message: "",
         };
-        var infoWindow = new BMap.InfoWindow(response.data.address, opts); // 创建信息窗口对象
+        let infoWindow = new BMap.InfoWindow(response, opts); // 创建信息窗口对象
+        map.openInfoWindow(infoWindow, locationPoint); //开启信息窗口
         marker.addEventListener("click", function () {
           map.openInfoWindow(infoWindow, locationPoint); //开启信息窗口
         });
@@ -1054,10 +1283,23 @@ export default {
             scaleStatic.unline = status.personStatic - scaleStatic.online;
             let point = new BMap.Point(item.longitude, item.latitude);
             let marker = new BMap.Marker(point, { icon: myIcon });
+            marker.userId = item.userId;
+            // 文字标签
+            // let label = new BMap.Label(item.userName + "-" + item.temperature, {
+            //   offset: new BMap.Size(20, -10),
+            // });
+            // marker.setLabel(label);
+            // marker.enableMassClear();
+
             // marker.setAnimation(BMAP_ANIMATION_BOUNCE);
             // let marker = new BMap.Marker(point);
-            let content = `姓名: ${item.userName} \n温度: ${item.temperature}`;
-            addClickHandler(content, marker);
+
+            marker.addEventListener("click", function (e) {
+              let userIdObj = {
+                userId: e.target.userId,
+              };
+              showMemberInfo(userIdObj);
+            });
             markers.push(marker);
             pointArray.push(point);
             if (item.temperature >= 37.3) {
@@ -1071,11 +1313,6 @@ export default {
           });
           online(status); // 统计表 比例
           loading.value = false;
-          function addClickHandler(content, marker) {
-            marker.addEventListener("click", function (e) {
-              openInfo(content, e);
-            });
-          }
           function openInfo(content, e) {
             let p = e.target;
             let point = new BMap.Point(
@@ -1263,7 +1500,7 @@ export default {
       legend: [],
     });
     const echartsToggle = (res) => {
-      for(let key in historyData) {
+      for (let key in historyData) {
         historyData[key].active = false;
       }
       historyData[res].active = true;
@@ -1271,9 +1508,10 @@ export default {
       option.series[0].data = historyData[res].data;
       option.series[0].name = historyData[res].name;
       option.legend.data = historyData.legend = [historyData[res].name];
+      option.title.text = historyData[res].name;
       historyChart.setOption(option);
     };
-    
+
     const history = () => {
       listAlarmView()
         .then((res) => {
@@ -1625,6 +1863,12 @@ export default {
       personHandle,
       echartsToggle,
       historyData,
+      showMemberInfo,
+      showMemberInfo_drawer,
+      closeDrawer,
+      contactsModule,
+      currentMemberInfo,
+      tmpHistory,
     };
   },
 };

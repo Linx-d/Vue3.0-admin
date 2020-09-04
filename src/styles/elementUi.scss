@@ -72,7 +72,7 @@
 }
 
 .v-modal {
-  z-index: 1000 !important;
+  // z-index: 1000 !important;
 }
 
 // tree 节点
@@ -267,4 +267,15 @@
   .el-radio {
     margin-right: 15px;
   }
+}
+
+.el-table__row {
+  cursor: pointer;
+}
+.el-drawer__body {
+  overflow: scroll;
+  overflow-x: hidden;
+}
+:focus {
+  outline: none;
 }

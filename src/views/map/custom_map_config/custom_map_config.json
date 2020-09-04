@@ -80,7 +80,7 @@
     "featureType": "poilabel",
     "elementType": "labels.icon",
     "stylers": {
-        "visibility": "off"
+        "visibility": "on"
     }
 }, {
     "featureType": "scenicspotslabel",
