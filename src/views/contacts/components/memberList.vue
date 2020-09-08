@@ -14,6 +14,7 @@
       <div class="has_member" v-show="changeModule.status">
         <div class="cnt_tool">
           <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
+          <a class="memberLink" href="javascript:;" @click="delMemberBtn">移除成员</a>
           <a
             class="memberLink"
             href="javascript:;"
@@ -51,7 +52,7 @@
               <el-button
                 size="mini"
                 type="danger"
-                @click="delMember(scope.row.userId,scope.$index)"
+                @click="delMember(scope.row.userId,scope.row)"
               >移除</el-button>
             </template>
           </el-table-column>
@@ -231,7 +232,7 @@ export default {
         refs.multipleTable_remove.clearSelection();
       }
     };
-    const handleSelectionChange_remove = (val) => {
+    const handleSelectionChange_remove = (val, index) => {
       multipleSelection_remove = val;
     };
 
@@ -440,6 +441,7 @@ export default {
       value: false,
       data: [], // 普通查询
     });
+    // 添加成员
     const addMemberBtn = () => {
       let role = loginEmployeeInfo.role;
       if (role.id == 3 || role == null) {
@@ -452,6 +454,23 @@ export default {
         noDepart(ungrouped.pageNum, ungrouped.pageSize);
       }
     };
+    // 批量移除成员
+    const delMemberBtn = () => {
+      let len = multipleSelection_remove.length;
+      if (len == 0) {
+        root.$message({
+          type: "warning",
+          message: "请选择要移除部门的成员",
+        });
+      } else {
+        let data = [];
+        multipleSelection_remove.forEach((item) => {
+          data.push(item.userId);
+        });
+        delMemberOpen(data, multipleSelection_remove[0]);
+      }
+    };
+
     const screen = reactive({
       visible: true,
       pageNum: 1,
@@ -561,8 +580,8 @@ export default {
     /**
      * 移除成员
      */
-    const delMember = (id, index) => {
-      delMemberOpen(id, index);
+    const delMember = (id, row) => {
+      delMemberOpen([id], row);
     };
 
     /**当前页变动时候触发的事件 */
@@ -631,14 +650,19 @@ export default {
      */
 
     // 移除成员确认框
-    const delMemberOpen = (id, index) => {
-      let item = props.memberData.data[index];
+    const delMemberOpen = (data, row) => {
       const h = root.$createElement;
+      let str = "";
+      if (data.length == 1) {
+        str = `移除"${row.name}"`;
+      } else {
+        str = "移除这些成员。";
+      }
       root
         .$msgbox({
           title: "移除成员",
           message: h("p", null, [
-            h("span", null, `移除"${item.name}"`),
+            h("span", null, str),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
           showCancelButton: true,
@@ -662,12 +686,11 @@ export default {
         .then((action) => {
           let parmas = {
             depId: props.currentDepart.id,
-            userIds: [id],
+            userIds: data,
           };
           removeMember(parmas).then((res) => {
             let code = res.code;
             if (code === 0) {
-              //props.memberData.data.splice(index, 1);
               root.$message({
                 type: "success",
                 message: "移除成功",
@@ -775,6 +798,7 @@ export default {
       changeModule,
       checkChild,
       addMemberBtn, // Fn 添加部门成员
+      delMemberBtn,
       screen,
       screenAbnormal,
       delMember, // Fn 移除部门成员
