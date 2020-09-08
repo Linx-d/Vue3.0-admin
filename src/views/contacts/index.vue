@@ -1017,6 +1017,11 @@ export default {
             let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
             let age = parseInt((newDate - date) / oneDay);
             data[i].age = age;
+            if(data[i].temperature>37.3) {
+              data[i].status="温度异常";
+            }else {
+              data[i].status="";
+            }
             memberData.data.push(data[i]);
           }
           //[ ... memberData.data] = data;

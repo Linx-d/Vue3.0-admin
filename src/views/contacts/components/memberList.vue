@@ -14,57 +14,45 @@
       <div class="has_member" v-show="changeModule.status">
         <div class="cnt_tool">
           <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
-          <!-- <a class="memberLink" href="javascript:;" @click="screenAbnormal(currentDepart.id, 'abnormal')">筛选异常成员</a>
-          <a class="memberLink" href="javascript:;" @click="screenAbnormal(currentDepart.id, 'normal')">筛选正常成员</a> -->
+          <a
+            class="memberLink"
+            href="javascript:;"
+            @click="screenAbnormal(currentDepart.id, 'abnormal')"
+          >筛选异常成员</a>
+          <a
+            class="memberLink"
+            href="javascript:;"
+            @click="screenAbnormal(currentDepart.id, 'normal')"
+          >筛选正常成员</a>
         </div>
-        <table class="memberTable mm_tabel">
-          <thead>
-            <tr>
-              <!--
-              <th>
-                <input type="checkbox" name="memberChooseAll" class="memberAllSlect" />
-              </th>
-              -->
-              <th>姓名</th>
-              <th>性别</th>
-              <th>年龄</th>
-              <th>温度</th>
-              <th>电话</th>
-              <th>住址</th>
-              <th>状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(member, index) in memberData.data"
-              :key="member.id"
-              @click.stop="compileTool(member)"
-              :class="{danger: member.temperature>=37.3}"
-            >
-              <!--
-              <td @click.stop="checkChild">
-                <input type="checkbox" name="memberChoose" class="memberSelect" />
-              </td>
-              -->
-              <td :title="member.name">{{ member.name }}</td>
-              <td :title="member.sex">{{ member.sex }}</td>
-              <td :title="member.age">{{ member.age }}</td>
-              <td :title="member.temperature">{{ member.temperature }}</td>
-              <td :title="member.tel">{{ member.tel }}</td>
-              <td :title="member.address">{{ member.address }}</td>
-              <td>
-                <span title="温度异常">
-                  <svg-icon iconClass="warning1" v-if="member.temperature>=37.3"></svg-icon>
-                </span>
-              </td>
-              <td class="tdTool">
-                <a href="javascript:;" @click.stop="compileTool(member)">查看</a>
-                <a href="javascript:;" @click.stop="delMember(member.userId, index)">移除</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+        <el-table
+          ref="multipleTable_remove"
+          :data="memberData.data"
+          :row-class-name="tableRowClassName"
+          tooltip-effect="dark"
+          style="width: 100%"
+          @selection-change="handleSelectionChange_remove"
+          :row-style="{'font-size': '13px','height': '37px', 'font-family': 'Microsoft YaHei'}"
+          :header-row-style="{'font-size': '13px', 'padding': 0, 'font-family': 'Microsoft YaHei'}"
+          :cell-style="{'padding': 0, 'font-family': 'Microsoft YaHei'}"
+        >
+          <el-table-column type="selection" width="45"></el-table-column>
+          <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="80"></el-table-column>
+          <el-table-column prop="sex" label="性别" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="age" label="年龄" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="tel" label="电话" sortable show-overflow-tooltip width="110"></el-table-column>
+          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="170"></el-table-column>
+          <el-table-column prop="status" label="状态" sortable show-overflow-tooltip width="75"></el-table-column>
+          <el-table-column label="操作" show-overflow-tooltip width="150">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
+              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.$index)">移除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
         <div class="cnt_tool">
           <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
         </div>
@@ -113,11 +101,11 @@
         @scroll="tableScroll"
         class="addScroll"
       >
-        <el-table-column type="selection" width="45" show-overflow-tooltip ></el-table-column>
-        <el-table-column label="姓名" width="100" show-overflow-tooltip  sortable>
+        <el-table-column type="selection" width="45" show-overflow-tooltip></el-table-column>
+        <el-table-column label="姓名" width="100" show-overflow-tooltip sortable>
           <template slot-scope="scope">{{ scope.row.name }}</template>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip  sortable></el-table-column>
+        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="电话" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="地址" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="remark" label="状态" show-overflow-tooltip sortable></el-table-column>
@@ -208,14 +196,11 @@ export default {
     let changeModule = reactive({
       status: true,
     });
-    // let condition = !props.memberData.authority;
-    // console.log(condition, 'condition');
-    // if (condition) {
-    //   changeModule.status = false;
-    // }
     const dialogTableVisible = reactive({
       status: false,
     });
+
+    // 批量添加未分組成員
     let multipleSelection = reactive([]);
     const toggleSelection = (rows) => {
       dialogTableVisible.status = false;
@@ -230,6 +215,22 @@ export default {
     const handleSelectionChange = (val) => {
       multipleSelection = val;
     };
+
+    // 批量移除成員
+    let multipleSelection_remove = reactive([]);
+    const toggleSelection_remove = (rows) => {
+      if (rows) {
+        rows.forEach((row) => {
+          refs.multipleTable_remove.toggleRowSelection(row);
+        });
+      } else {
+        refs.multipleTable_remove.clearSelection();
+      }
+    };
+    const handleSelectionChange_remove = (val) => {
+      multipleSelection_remove = val;
+    };
+
     watchEffect(() => {
       if (props.memberData.total === 0) {
         changeModule.status = false;
@@ -239,6 +240,7 @@ export default {
         changeModule.status = true;
       }
     });
+
     /**
      *  tr click事件
      */
@@ -447,7 +449,7 @@ export default {
       }
     };
     const screen = reactive({
-      visible: false,
+      visible: true,
       pageNum: 1,
       pageSize: 15,
       pagesizes: [15, 20, 30, 40],
@@ -465,12 +467,12 @@ export default {
           start = screen.pageSize * (screen.pageNum - 1),
           end = screen.pageSize * screen.pageNum;
         if (code == 0) {
-          screen.visible = true;
+          screen.visible = false;
           if (txt == "abnormal") {
             screen.data = data.filter((item) => {
               return parseFloat(item.temperature) >= 37.3;
             });
-          }else {
+          } else {
             screen.data = data.filter((item) => {
               return parseFloat(item.temperature) < 37.3;
             });
@@ -757,6 +759,7 @@ export default {
       changeModule,
       checkChild,
       addMemberBtn, // Fn 添加部门成员
+      screen,
       screenAbnormal,
       delMember, // Fn 移除部门成员
       handleCurrentChange,
@@ -764,6 +767,7 @@ export default {
       ungrouped,
       toggleSelection,
       handleSelectionChange,
+      handleSelectionChange_remove, 
       tableRowClassName,
       dialogTableVisible,
       addMemberList,

@@ -181,6 +181,13 @@
     color: #f0f9eb;
   }
 }
+/**批量移除成員表格樣式
+ *
+ */
+.has_member .el-table .el-table__header-wrapper .has-gutter th {
+  height: 34px !important;
+  padding: 0;
+}
 
 /**
   * map search
