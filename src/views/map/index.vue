@@ -30,14 +30,14 @@
           @click="echarts_toggle.online=false"
           v-if="echarts_toggle.online"
         >
-          <svg-icon iconClass="open_echarts1" className="echartsSvg"></svg-icon>
+          <svg-icon iconClass="open_echarts1" class="echartsSvg"></svg-icon>
         </div>
         <div
           class="case_open_left-b"
           @click="echarts_toggle.temperature=false"
           v-if="echarts_toggle.temperature"
         >
-          <svg-icon iconClass="open_echarts2" className="echartsSvg"></svg-icon>
+          <svg-icon iconClass="open_echarts2" class="echartsSvg"></svg-icon>
         </div>
         <div :class="['alanysis-a', {'echarts_hide': echarts_toggle.online}]">
           <div class="case_close_right" @click="echarts_toggle.online=true">
@@ -88,14 +88,14 @@
           @click="echarts_toggle.alarm=false"
           v-if="echarts_toggle.alarm"
         >
-          <svg-icon iconClass="open_echarts3" className="echartsSvg"></svg-icon>
+          <svg-icon iconClass="open_echarts3" class="echartsSvg"></svg-icon>
         </div>
         <div
           class="case_open_left-r"
           @click="echarts_toggle.history=false"
           v-if="echarts_toggle.history"
         >
-          <svg-icon iconClass="open_echarts4" className="echartsSvg"></svg-icon>
+          <svg-icon iconClass="open_echarts4" class="echartsSvg"></svg-icon>
         </div>
         <div
           :class="['alanysis_bottom_L', 'echartsIndivi', {'echarts_hide': echarts_toggle.alarm}]"
@@ -188,7 +188,7 @@
           @click="echarts_toggle.system=false"
           v-if="echarts_toggle.system"
         >
-          <svg-icon iconClass="open_echarts5" className="echartsSvg"></svg-icon>
+          <svg-icon iconClass="open_echarts5" class="echartsSvg"></svg-icon>
         </div>
         <div :class="['alanysis_right', {'echarts_hide': echarts_toggle.system}]">
           <div class="case_close_right" @click="echarts_toggle.system=true">
@@ -283,6 +283,7 @@
               <li @click.stop="cutFull" :class="{'item_active': item_active.cutFull}">全屏</li>
               <li @click.stop="searchMeber">搜索用户</li>
               <li @click.stop="searchCity">搜索地址</li>
+              <li @click.stop="location">定位</li>
             </ul>
           </div>
         </div>
@@ -1011,6 +1012,7 @@ export default {
     let positionPoint = reactive({
       lng: 0,
       lat: 0,
+      level: 19
     });
     ((window) => {
       getCorpInfo().then((res) => {
@@ -1022,6 +1024,8 @@ export default {
             res.data.address,
             function (addressPoint) {
               if (addressPoint) {
+                positionPoint.lng = addressPoint.lng;
+                positionPoint.lat = addressPoint.lat;
                 baiduMap(addressPoint, res.data.address);
               } else {
                 alert("您选择地址没有解析到结果!");
@@ -1036,6 +1040,8 @@ export default {
           });
 
           let point = new BMap.Point(116.404, 39.915);
+          positionPoint.lng = point.lng;
+          positionPoint.lat = point.lat;
           let geoc = new BMap.Gecoder();
           geoc.getLocation(point, (rs) => {
             let addComp = rs.addressComponents;
@@ -1088,7 +1094,7 @@ export default {
           type: BMAP_NAVIGATION_CONTROL_SMALL,
         });
         map.addControl(top_right_navigation);
-        map.centerAndZoom(locationPoint, 19); // 初始化地图,用城市名设置地图中心点
+        map.centerAndZoom(locationPoint, positionPoint.level); // 初始化地图,用城市名设置地图中心点
         let myIcon = new BMap.Icon(address_location, new BMap.Size(85, 48));
         let marker = new BMap.Marker(locationPoint, { icon: myIcon }); // 创建标注
         map.addOverlay(marker); // 将标注添加到地图中
@@ -1684,6 +1690,11 @@ export default {
       search_toggle.city = !search_toggle.city;
       refs.address_search.focus();
     };
+    // 定位
+    const location = () => {
+      let point = new BMap.Point(positionPoint.lng, positionPoint.lat);
+      map.centerAndZoom(point, positionPoint.level);
+    };
 
     /**搜索
      *
@@ -1842,6 +1853,7 @@ export default {
       cutFull,
       searchMeber,
       searchCity,
+      location,
       search_toggle,
       member,
       address,
