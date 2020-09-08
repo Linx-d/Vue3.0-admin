@@ -38,13 +38,13 @@
             </span>
           </p>
           <div class="info_status">
-            <span v-if="currentMemberInfo.online">
+            <span v-if="!currentMemberInfo.online">
               <svg-icon iconClass="online1" class="online my_icon online_icon"></svg-icon>在线
             </span>
-            <span v-if="!currentMemberInfo.online">
+            <span v-if="currentMemberInfo.online">
               <svg-icon iconClass="unline" class="unline online_icon"></svg-icon>离线
             </span>
-            <div v-if="currentMemberInfo.online">
+            <div v-if="!currentMemberInfo.online" class="electricBox">
               <span>
                 <svg-icon
                   iconClass="electric0"
@@ -78,10 +78,10 @@
 
           <el-tooltip class="item" effect="light" content="最新位置" placement="bottom">
             <p>
-              <span>{{ currentMemberInfo.location }}</span>
               <a class="info_position" href="#temperature_box" @click="newPosition">
                 <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
               </a>
+              <span>{{ currentMemberInfo.location }}</span>
             </p>
           </el-tooltip>
         </div>
@@ -968,6 +968,7 @@ $contactsHeight: 592px;
         }
       }
       .info_status {
+        margin-bottom: 10px;
         .online_icon {
           vertical-align: middle;
           margin-right: 5px;
@@ -979,7 +980,17 @@ $contactsHeight: 592px;
         span:last-child {
           color: #787878;
         }
-        margin-bottom: 10px;
+        .electricBox {
+          display: inline-block;
+        }
+      }
+      .info_position {
+        display: inline-block;
+        width: 1.9em;
+        height: 1.9em;
+        vertical-align: middle;
+        margin-left: -9px;
+        margin-right: 1px;
       }
     }
     .info_head_main {

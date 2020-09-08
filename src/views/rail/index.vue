@@ -6,6 +6,7 @@
       :before-close="modifyHandleClose"
       :with-header="false"
       class="modifyRailModule"
+      :wrapperClosable="false"
       size="50%"
     >
       <div id="modifyMap"></div>
@@ -56,6 +57,7 @@
       :before-close="addHandleClose"
       :with-header="false"
       class="addRailModule"
+      :wrapperClosable="false"
       size="50%"
     >
       <div id="addMap"></div>
