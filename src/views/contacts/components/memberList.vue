@@ -48,7 +48,11 @@
           <el-table-column label="操作" show-overflow-tooltip width="150">
             <template slot-scope="scope">
               <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
-              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.$index)">移除</el-button>
+              <el-button
+                size="mini"
+                type="danger"
+                @click="delMember(scope.row.userId,scope.$index)"
+              >移除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -604,6 +608,18 @@ export default {
         for (i; i < len; i++) {
           // temperatrue
           data[i].temperature = Number(data[i].temperature).toFixed(1);
+
+          // age
+          let newDate = new Date().getTime();
+          let date = new Date(data[i].age).getTime();
+          let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+          let age = parseInt((newDate - date) / oneDay);
+          data[i].age = age;
+          if (data[i].temperature > 37.3) {
+            data[i].status = "温度异常";
+          } else {
+            data[i].status = "";
+          }
           props.memberData.data.push(data[i]);
         }
         //[ ... memberData.data] = data;
@@ -767,7 +783,7 @@ export default {
       ungrouped,
       toggleSelection,
       handleSelectionChange,
-      handleSelectionChange_remove, 
+      handleSelectionChange_remove,
       tableRowClassName,
       dialogTableVisible,
       addMemberList,
