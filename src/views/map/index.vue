@@ -1314,20 +1314,17 @@ export default {
             let marker = new BMap.Marker(point, { icon: myIcon });
             marker.userId = item.userId;
             // 文字标签
-            // let label = new BMap.Label(item.userName + "-" + item.temperature, {
-            //   offset: new BMap.Size(20, -10),
-            // });
-            // marker.setLabel(label);
-            // marker.enableMassClear();
-
-            // marker.setAnimation(BMAP_ANIMATION_BOUNCE);
-            // let marker = new BMap.Marker(point);
+            let label = new BMap.Label(item.userName + "-" + item.temperature, {
+              offset: new BMap.Size(20, -10),
+            });
+            marker.enableMassClear();
 
             marker.addEventListener("click", function (e) {
               let userIdObj = {
                 userId: e.target.userId,
               };
               showMemberInfo(userIdObj);
+              marker.setLabel(label);
             });
             markers.push(marker);
             pointArray.push(point);
@@ -1715,6 +1712,7 @@ export default {
     // 定位
     const location = () => {
       let point = new BMap.Point(positionPoint.lng, positionPoint.lat);
+      console.log(positionPoint);
       map.centerAndZoom(point, positionPoint.level);
     };
     // 增大缩放等级
