@@ -189,9 +189,9 @@ import { reactive, ref, onMounted, watchEffect } from "@vue/composition-api";
 import { Message } from "element-ui";
 import { cloneArray, cloneObject } from "@/utils/common";
 import { Map } from "@/map";
-import onLineIcon from "./images/marker_online.png";
-import unLineIcon from "./images/marker_unline.png";
-import dangerIcon from "./images/marker_danger.png";
+import onLineIcon from "@/views/images/marker_online.png";
+import unLineIcon from "@/views/images/marker_unline.png";
+import dangerIcon from "@/views/images/marker_danger.png";
 import pointAggre from "@/views/images/pointAggre.png"; // 点聚合
 import railPosition from "@/views/images/railPosition.png"; // 围栏标注
 import railPositionIcon from "@/views/images/railPositionIcon.png"; // 围栏标注
@@ -870,6 +870,7 @@ export default {
                 type: "success",
                 message: "修改成功",
               });
+              modifyBaiduMap();
             } else {
               root.$message({
                 type: "error",
