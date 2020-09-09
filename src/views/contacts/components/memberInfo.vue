@@ -44,33 +44,39 @@
             <span v-if="!currentMemberInfo.online">
               <svg-icon iconClass="unline" class="unline online_icon"></svg-icon>离线
             </span>
-            <div v-if="currentMemberInfo.online" class="electricBox">
-              <span>
+            <div class="electricBox">
+              <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric0"
                   class="electric my_icon online_icon"
                   v-if="currentMemberInfo.electric==='0'"
                 ></svg-icon>
               </span>
-              <span>
+              <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric1"
                   class="electric my_icon online_icon"
                   v-if="currentMemberInfo.electric==='1'"
                 ></svg-icon>
               </span>
-              <span>
+              <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric2"
                   class="electric my_icon online_icon"
                   v-if="currentMemberInfo.electric==='2'"
                 ></svg-icon>
               </span>
-              <span>
+              <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric3"
                   class="electric my_icon"
                   v-if="currentMemberInfo.electric==='3'"
+                ></svg-icon>
+              </span>
+              <span v-if="!currentMemberInfo.online">
+                <svg-icon
+                  iconClass="power_placeholder"
+                  class="electric my_icon"
                 ></svg-icon>
               </span>
             </div>
@@ -116,11 +122,6 @@
           <li>
             <span>电话：</span>
             <i>{{ currentMemberInfo.tel }}</i>
-          </li>
-          <li>
-            <span>备注：</span>
-            <i v-if="currentMemberInfo.remarks!=null">{{ currentMemberInfo.remarks }}</i>
-            <i v-else>暂无数据</i>
           </li>
           <li>
             <span>住址：</span>
@@ -185,6 +186,11 @@
                 </i>
               </a>
             </el-tooltip>
+          </li>
+          <li>
+            <span>备注：</span>
+            <i v-if="currentMemberInfo.remarks!=null">{{ currentMemberInfo.remarks }}</i>
+            <i v-else>暂无数据</i>
           </li>
         </ul>
       </div>
@@ -990,7 +996,7 @@ $contactsHeight: 592px;
         }
         .electricBox {
           display: inline-block;
-          margin: 0 4px 0 -6px;
+          margin: 0 12px 0 3px;
           vertical-align: middle;
         }
         .positionBox {
