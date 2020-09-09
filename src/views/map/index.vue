@@ -283,10 +283,27 @@
               <li @click.stop="cutFull" :class="{'item_active': item_active.cutFull}">全屏</li>
               <li @click.stop="searchMeber">搜索用户</li>
               <li @click.stop="searchCity">搜索地址</li>
-              <li @click.stop="location">定位</li>
             </ul>
           </div>
         </div>
+      </div>
+
+      <div class="zoom_control">
+        <el-tooltip class="item" effect="light" content="定位" placement="right">
+          <div class="control" @click.stop="location">
+            <svg-icon iconClass="map_location"></svg-icon>
+          </div>
+        </el-tooltip>
+        <el-tooltip class="item" effect="light" content="放大一级" placement="right">
+          <div class="control" @click.stop="upRoom">
+            <svg-icon iconClass="map_up"></svg-icon>
+          </div>
+        </el-tooltip>
+        <el-tooltip class="item" effect="light" content="缩小一级" placement="right">
+          <div class="control" @click.stop="downRoom">
+            <svg-icon iconClass="map_down"></svg-icon>
+          </div>
+        </el-tooltip>
       </div>
     </div>
     <!-- alanysis 数据分析模块 end -->
@@ -398,13 +415,13 @@
           sortable
         ></el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="type" label="告警类型" width="120" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="type" label="告警类型" width="110" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="125" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="210"
+          width="190"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -869,7 +886,7 @@ export default {
       showMemberInfo_drawer.visible = false;
       contactsModule.memberInfo = false;
     };
-    /** 表格添加单击事件
+    /** 表格、标注添加单击事件
      *  { userId: 0 }
      */
     const showMemberInfo = (row) => {
@@ -877,6 +894,7 @@ export default {
       contactsModule.memberInfo = true;
       showMemberInfo_drawer.visible = true;
       currentMemberInfo.name = row.name;
+
       /**
        * 查询用户所属的所有部门
        */
@@ -969,7 +987,32 @@ export default {
             currentMemberInfo[key] === undefined ||
             currentMemberInfo[key] === ""; // 验证值是否为空
           if (verify) {
-            currentMemberInfo[key] = "暂无数据";
+            if (key == "online") {
+              // 在线情况
+              let time =
+                new Date().getTime() -
+                new Date(currentMemberInfo.gmtCreate).getTime();
+              let step = deviceStep.step;
+              if (time < step) {
+                currentMemberInfo.online = true;
+              } else {
+                currentMemberInfo.online = false;
+              }
+            } else {
+              currentMemberInfo[key] = "暂无数据";
+            }
+          }
+          if (key == "online") {
+            // 在线情况
+            let time =
+              new Date().getTime() -
+              new Date(currentMemberInfo.lastUpdate).getTime();
+            let step = deviceStep.step;
+            if (time < step) {
+              currentMemberInfo.online = true;
+            } else {
+              currentMemberInfo.online = false;
+            }
           }
         }
       });
@@ -1012,7 +1055,7 @@ export default {
     let positionPoint = reactive({
       lng: 0,
       lat: 0,
-      level: 19
+      level: 19,
     });
     ((window) => {
       getCorpInfo().then((res) => {
@@ -1072,28 +1115,7 @@ export default {
         }); // 创建Map实例
         let locationPoint = new BMap.Point(data.lng, data.lat);
         window.map = map;
-        // 靠左上角位置
-        let navigationControl = new BMap.NavigationControl({
-          anchor: BMAP_ANCHOR_TOP_LEFT,
-          offset: {
-            width: 430,
-            height: 220,
-          },
-          // LARGE类型
-          type: BMAP_NAVIGATION_CONTROL_LARGE,
-          // 启用显示定位
-          enableGeolocation: true,
-        });
-        //右上角，仅包含平移和缩放按钮
-        let top_right_navigation = new BMap.NavigationControl({
-          anchor: BMAP_ANCHOR_TOP_LEFT,
-          offset: {
-            width: 430,
-            height: 220,
-          },
-          type: BMAP_NAVIGATION_CONTROL_SMALL,
-        });
-        map.addControl(top_right_navigation);
+        window.locationPoint = locationPoint;
         map.centerAndZoom(locationPoint, positionPoint.level); // 初始化地图,用城市名设置地图中心点
         let myIcon = new BMap.Icon(address_location, new BMap.Size(85, 48));
         let marker = new BMap.Marker(locationPoint, { icon: myIcon }); // 创建标注
@@ -1105,6 +1127,7 @@ export default {
           message: "",
         };
         let infoWindow = new BMap.InfoWindow(response, opts); // 创建信息窗口对象
+        window.infoWindow = infoWindow;
         map.openInfoWindow(infoWindow, locationPoint); //开启信息窗口
         marker.addEventListener("click", function () {
           map.openInfoWindow(infoWindow, locationPoint); //开启信息窗口
@@ -1513,7 +1536,6 @@ export default {
       let option = historyOption;
       option.series[0].data = historyData[res].data;
       option.series[0].name = historyData[res].name;
-      option.legend.data = historyData.legend = [historyData[res].name];
       option.title.text = historyData[res].name;
       historyChart.setOption(option);
     };
@@ -1695,6 +1717,34 @@ export default {
       let point = new BMap.Point(positionPoint.lng, positionPoint.lat);
       map.centerAndZoom(point, positionPoint.level);
     };
+    // 增大缩放等级
+    const upRoom = () => {
+      let level = map.getZoom();
+      if (level == 19) {
+        root.$message({
+          type: "warning",
+          message: "地图已经放大到最大等级",
+        });
+      } else {
+        level++;
+        map.closeInfoWindow(infoWindow, locationPoint);
+        map.setZoom(level);
+      }
+    };
+    // 缩小缩放等级
+    const downRoom = () => {
+      let level = map.getZoom();
+      if (level == 6) {
+        root.$message({
+          type: "warning",
+          message: "地图已经缩放到最小等级",
+        });
+      } else {
+        level--;
+        map.closeInfoWindow(infoWindow, locationPoint);
+        map.setZoom(level);
+      }
+    };
 
     /**搜索
      *
@@ -1854,6 +1904,8 @@ export default {
       searchMeber,
       searchCity,
       location,
+      upRoom,
+      downRoom,
       search_toggle,
       member,
       address,
@@ -2105,9 +2157,9 @@ $transitionTime: 0.3s;
         float: right;
       }
       .btnBox {
-        top: 3px;
+        top: 8px;
         position: absolute;
-        left: 145px;
+        right: 50px;
         z-index: 1;
         .echartsTogglebtn {
           color: #000;
@@ -2209,6 +2261,25 @@ $transitionTime: 0.3s;
     }
     .tool_right_active {
       color: #1579f3;
+    }
+  }
+  .zoom_control {
+    overflow: hidden;
+    position: absolute;
+    top: 31%;
+    left: 22%;
+    .control {
+      height: 16px;
+      width: 16px;
+      background-color: #fff;
+      cursor: pointer;
+      @include webkit("box-shadow", 1px 2px 1px rgba(0, 0, 0, 0.15));
+      text-align: center;
+      margin: 5px 0;
+      padding: 5px;
+    }
+    .control:nth-child(2) {
+      margin-bottom: -4px;
     }
   }
   #search_city {

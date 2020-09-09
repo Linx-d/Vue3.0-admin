@@ -1,6 +1,7 @@
 const history = {
   title: {
     text: "告警总数",
+    left: "center",
   },
   tooltip: {
     trigger: "axis",
@@ -11,9 +12,9 @@ const history = {
       }
   }
   },
-  legend: {
-    data: ["告警总数"]
-  },
+  // legend: {
+  //   data: ["告警总数"]
+  // },
   grid: {
     left: "3%",
     right: "4%",
