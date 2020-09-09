@@ -38,13 +38,13 @@
             </span>
           </p>
           <div class="info_status">
-            <span v-if="!currentMemberInfo.online">
+            <span v-if="currentMemberInfo.online">
               <svg-icon iconClass="online1" class="online my_icon online_icon"></svg-icon>在线
             </span>
-            <span v-if="currentMemberInfo.online">
+            <span v-if="!currentMemberInfo.online">
               <svg-icon iconClass="unline" class="unline online_icon"></svg-icon>离线
             </span>
-            <div v-if="!currentMemberInfo.online" class="electricBox">
+            <div v-if="currentMemberInfo.online" class="electricBox">
               <span>
                 <svg-icon
                   iconClass="electric0"
@@ -74,25 +74,32 @@
                 ></svg-icon>
               </span>
             </div>
+            <el-tooltip class="item" effect="light" content="最新位置" placement="bottom">
+              <p class="positionBox">
+                <a class="info_position" href="#temperature_box" @click="newPosition">
+                  <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
+                </a>
+                <span>{{ currentMemberInfo.location }}</span>
+              </p>
+            </el-tooltip>
           </div>
-
-          <el-tooltip class="item" effect="light" content="最新位置" placement="bottom">
-            <p>
-              <a class="info_position" href="#temperature_box" @click="newPosition">
-                <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
-              </a>
-              <span>{{ currentMemberInfo.location }}</span>
-            </p>
-          </el-tooltip>
         </div>
-        <el-tooltip class="item" effect="light" content="最新温度" placement="top">
+        <el-tooltip class="item" effect="light" content="温度" placement="top">
           <div
+            v-if="currentMemberInfo.online"
             :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
           >
             {{ currentMemberInfo.temperature }}
             <span
               v-show="currentMemberInfo.temperature!='暂无数据'"
             >°C</span>
+          </div>
+          <div
+            v-else
+            :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
+          >
+            --.-
+            <span v-show="currentMemberInfo.temperature!='暂无数据'">°C</span>
           </div>
         </el-tooltip>
       </div>
@@ -308,6 +315,7 @@ import {
 import { listRail } from "@/api/railApi";
 import personTravel from "@/views/images/personTravel.png";
 import address_location from "@/views/images/address_location.png";
+import member_location from "@/views/images/member_location.png";
 import address_position from "@/views/images/address_position.png";
 export default {
   name: "memberList",
@@ -783,7 +791,7 @@ export default {
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
           map.centerAndZoom(point, 13); // 将个人作为地图中心点
           pointArray.push(point);
-          let mIcon = new BMap.Icon(address_location, new BMap.Size(85, 48));
+          let mIcon = new BMap.Icon(member_location, new BMap.Size(85, 48));
           let marker = new BMap.Marker(point, { icon: mIcon });
           map.addOverlay(marker); //添加一个标注
           map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
@@ -821,7 +829,7 @@ export default {
       let lng = props.currentMemberInfo.addressLongitude,
         lat = props.currentMemberInfo.addressLatitude;
       let point = new BMap.Point(lng, lat);
-      let myIcon = new BMap.Icon(address_position, new BMap.Size(48, 48)); //address_location, address_position
+      let myIcon = new BMap.Icon(address_position, new BMap.Size(32, 32)); //address_location, address_position
       map.addOverlay(new BMap.Marker(point, { icon: myIcon }));
       map.centerAndZoom(point, 19);
     };
@@ -982,15 +990,20 @@ $contactsHeight: 592px;
         }
         .electricBox {
           display: inline-block;
+          margin: 0 4px 0 -6px;
+          vertical-align: middle;
+        }
+        .positionBox {
+          display: inline-block;
         }
       }
       .info_position {
         display: inline-block;
-        width: 1.9em;
-        height: 1.9em;
+        width: 1.5em;
+        height: 1.5em;
         vertical-align: middle;
-        margin-left: -9px;
-        margin-right: 1px;
+        margin-left: -7px;
+        margin-right: 5px;
       }
     }
     .info_head_main {
@@ -998,6 +1011,7 @@ $contactsHeight: 592px;
       right: 150px;
       top: 35px;
       font-size: 42px;
+      cursor: pointer;
     }
     .danger {
       color: #bf4739;
@@ -1027,8 +1041,8 @@ $contactsHeight: 592px;
   .info_position {
     position: relative;
     .quick_position {
-      width: 1.9em;
-      height: 1.9em;
+      width: 1.5em;
+      height: 1.5em;
       position: absolute;
       top: -3px;
       left: 3px;
