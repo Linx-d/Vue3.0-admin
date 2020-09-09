@@ -150,7 +150,7 @@
                 </el-dialog>
 
                 <el-dialog
-                  title="移除部门"
+                  title="删除部门"
                   :visible.sync="dialogVisible"
                   width="30%"
                   :before-close="handleClose"
@@ -329,7 +329,7 @@ export default {
     let treeData = reactive({
       status: false,
     });
-    let memberLabel = ref("移除部门");
+    let memberLabel = ref("删除部门");
     let departData = reactive([
       {
         label: "",
@@ -480,7 +480,7 @@ export default {
             const index = children.findIndex((d) => d.id === data.id);
             children.splice(index, 1);
             root.$message({
-              message: "成功移除部门",
+              message: "成功删除部门",
               type: "success",
             });
           } else {
@@ -890,7 +890,7 @@ export default {
 
     /**
      * dialogDel 显示 btn
-     * type: 移除部门
+     * type: 删除部门
      */
     const dialogDel = (data, node) => {
       removeData = {
@@ -898,10 +898,10 @@ export default {
         node: node,
       };
       let id = removeData.data.id || 0;
-      memberLabel.value = `是否移除'${removeData.data.label}'`;
+      memberLabel.value = `是否删除'${removeData.data.label}', 以及该部门下的子部门？`;
       if (companyData.companyId == id) {
         root.$message({
-          message: "不能移除顶级部门",
+          message: "不能删除顶级部门",
           type: "warning",
         });
       } else {
@@ -911,7 +911,7 @@ export default {
 
     /**
      * dialogDelHide 隐藏 btn
-     * type: 移除部门
+     * type: 删除部门
      */
     const dialogDelHide = () => {
       dialogVisible.value = false;
