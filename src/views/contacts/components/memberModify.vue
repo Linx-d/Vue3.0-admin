@@ -136,7 +136,6 @@ export default {
       let year = val.getFullYear();
       let month = val.getMonth() + 1;
       let date = val.getDate();
-      console.log(month, "val");
       if (month < 10) {
         month = "0" + month;
       }
@@ -144,7 +143,6 @@ export default {
         date = "0" + date;
       }
       props.modifyMemberInfo.age = year + "-" + month + "-" + date;
-      console.log(props.modifyMemberInfo, "modifyInfo");
     };
     /**方法
      *

@@ -694,11 +694,19 @@ export default {
       status: false,
     });
     const searchItem_active_fn = (index) => {
+      // initial, modifyMemberInfo 初始化
+      for (let key in initial) {
+        initial[key] = "";
+      }
+      for (let key in modifyMemberInfo) {
+        modifyMemberInfo[key] = "";
+      }
       // 设置tree节点不高亮显示
       searchResult_list.status = false;
       // 激活样式
       searchResult_list.data.forEach((item, itemIndex) => {
         if (itemIndex === index) {
+          currentMemberInfo.name = item.name;
           let step = deviceStep.step;
           // 在线情况
           let time = new Date().getTime() - new Date(item.gmtCreate).getTime();
@@ -709,19 +717,7 @@ export default {
           }
           item.active = true;
           let userId = parseInt(item.id);
-
-          for (let key in modifyMemberInfo) {
-            if (key == "id") {
-              modifyMemberInfo[key] = item.userId;
-              initial[key] = item.userId;
-            } else {
-              modifyMemberInfo[key] = item[key];
-              initial[key] = item[key];
-            }
-          }
-
           // 获得成员个人信息
-          currentMemberInfo.name = item.name;
           /**
            * 查询用户所属的所有部门
            */
@@ -817,6 +813,18 @@ export default {
                 currentMemberInfo[key] = data[key];
               }
             }
+
+            // 编辑信息
+            for (let key in modifyMemberInfo) {
+              if (key == "id") {
+                modifyMemberInfo[key] = item.id;
+                initial[key] = item.id;
+              } else {
+                modifyMemberInfo[key] = data[key];
+                initial[key] = data[key];
+              }
+            }
+            console.log(modifyMemberInfo, initial);
             for (let key in currentMemberInfo) {
               if (key === "railName" || key == "online" || key == "remarks") {
                 continue;
@@ -826,7 +834,11 @@ export default {
                 currentMemberInfo[key] === undefined ||
                 currentMemberInfo[key] === ""; // 验证值是否为空
               if (verify) {
-                currentMemberInfo[key] = "暂无数据";
+                if (key == "address") {
+                  continue;
+                } else {
+                  currentMemberInfo[key] = "暂无数据";
+                }
               }
             }
           });

@@ -122,7 +122,8 @@
           </li>
           <li>
             <span>住址：</span>
-            <i>{{ currentMemberInfo.address }}</i>
+            <i v-if="currentMemberInfo.address">{{ currentMemberInfo.address }}</i>
+            <i v-else>暂无数据</i>
             <a class="info_position" href="#temperature_box" @click="new_address">
               <svg-icon iconClass="address_info" class="quick_position"></svg-icon>
             </a>
