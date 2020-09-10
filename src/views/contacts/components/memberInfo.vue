@@ -7,7 +7,7 @@
       <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
-      <a class="memberLink" href="javascript:;" @click="modifyMemberInfo">编辑</a>
+      <a class="memberLink" href="javascript:;" @click="memberInfoModify">编辑</a>
       <!--
       <a class="memberLink" href="javascript:;">编辑</a>
       <a class="memberLink" href="javascript:;">移除</a>
@@ -74,10 +74,7 @@
                 ></svg-icon>
               </span>
               <span v-if="!currentMemberInfo.online">
-                <svg-icon
-                  iconClass="power_placeholder"
-                  class="electric my_icon"
-                ></svg-icon>
+                <svg-icon iconClass="power_placeholder" class="electric my_icon"></svg-icon>
               </span>
             </div>
             <el-tooltip class="item" effect="light" content="最新位置" placement="bottom">
@@ -189,8 +186,15 @@
           </li>
           <li>
             <span>备注：</span>
-            <i v-if="currentMemberInfo.remarks!=null">{{ currentMemberInfo.remarks }}</i>
-            <i v-else>暂无数据</i>
+            <i v-show="currentMemberInfo.remarks">{{ currentMemberInfo.remarks }}</i>
+            <strong
+              hefr="javascript:;"
+              class="modifyInfoBtn"
+              @click="modifyRemarks(currentMemberInfo.userId, currentMemberInfo.remarks)"
+            >
+              <strong v-if="currentMemberInfo.remarks">修改</strong>
+              <strong v-else>添加</strong>
+            </strong>
           </li>
         </ul>
       </div>
@@ -306,6 +310,37 @@
           ></el-pagination>
         </div>
       </el-dialog>
+
+      <!-- 修改备注 弹出框 -->
+      <el-dialog
+        title="修改备注"
+        :visible.sync="modifyData.remarks.visible"
+        :before-close="modifyBefore"
+        :close-on-click-modal="false"
+        :modal="modifyData.remarks.modal"
+      >
+        <el-form
+          :model="currentMemberInfo"
+          :rules="rules"
+          ref="currentMemberInfo"
+          label-width="100px"
+          class="employeeInfoClass"
+        >
+          <el-form-item label="remarks" :label-width="modifyData.formLabelWidth" prop="remarks">
+            <el-input
+              type="textarea"
+              v-model="modifyData.remarks.txt"
+              autocomplete="off"
+              @keyup.enter.native="confirmOpen('currentMemberInfo')"
+              maxlength="50"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="modifyBefore()">取 消</el-button>
+          <el-button type="primary" @click="confirmOpen('currentMemberInfo')">确 定</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -317,6 +352,7 @@ import {
   batchDeleteRailUser,
   listDeviceAlarmInfoByUserId,
   batchUpdateUser,
+  updateRemarks,
 } from "@/api/contactsApi";
 import { listRail } from "@/api/railApi";
 import personTravel from "@/views/images/personTravel.png";
@@ -338,12 +374,16 @@ export default {
       type: Object,
       default: () => {},
     },
+    modifyMemberInfo: {
+      type: Object,
+      default: () => {},
+    },
     showMemberInfo_drawer: {
       type: Object,
       default: () => {},
     },
   },
-  setup(props, { root }) {
+  setup(props, { root, refs }) {
     /**加载动画
      *
      */
@@ -739,7 +779,7 @@ export default {
       }
     };
     // 编辑
-    const modifyMemberInfo = () => {
+    const memberInfoModify = () => {
       switchModule(contactsModule, "memberModify");
     };
     const temperature = ref(true);
@@ -773,10 +813,71 @@ export default {
       }
       return "";
     };
+
+    // 修改备注
+    const modifyData = reactive({
+      id: null,
+      remarks: {
+        visible: false,
+        txt: "",
+        modal: true
+      },
+      formLabelWidth: "120px",
+    });
+    const modifyRemarks = (id, remarks) => {
+      let parmas = {
+        id: id,
+        remarks: "2020.9.10日出现体温异常，在围栏2进行隔离14天",
+      };
+      if(props.showMemberInfo_drawer.status.map) {
+        modifyData.remarks.modal = false;
+      }
+      modifyData.id = id;
+      modifyData.remarks.txt = remarks;
+      modifyData.remarks.visible = true;
+      console.log(modifyData, "parmas");
+      // updateRemarks(parmas).then((res) => {
+      //   console.log(res, "res");
+      //   remarks = "2020.9.10日出现体温异常，在围栏2进行隔离14天";
+      // });
+    };
+    const confirmOpen = (formName) => {
+      refs[formName].validate((valid) => {
+        if (valid) {
+          let parmas = new URLSearchParams();
+          parmas.append("id", modifyData.id);
+          parmas.append("remarks", modifyData.remarks.txt);
+          updateRemarks(parmas).then((res) => {
+            let code = res.code;
+            if (code === 0) {
+              props.currentMemberInfo.remarks = modifyData.remarks.txt;
+              modifyData.remarks.visible = false;
+              props.modifyMemberInfo.remarks = modifyData.remarks.txt;
+              root.$message({
+                type: "success",
+                message: "修改成功",
+              });
+            } else {
+              root.$message({
+                type: "warning",
+                message: res.msg,
+              });
+            }
+          });
+        } else {
+          return false;
+        }
+      });
+    };
+    const rules = reactive({
+      remarks: [{ min: 0, max: 50, message: '长度在 0 到 50 个字符' }],
+    });
+    const modifyBefore = () => {
+      modifyData.remarks.visible = false;
+    };
     /**
      * 百度地图方法
      */
-    let map = null;
     ((window) => {
       watchEffect(() => {
         // 成员坐标
@@ -791,8 +892,8 @@ export default {
           radius: props.currentMemberInfo.radius,
         };
         Map("ak").then((BMap) => {
-          map = new BMap.Map("memberMapShow"); // 创建Map实例
-          window.map = map;
+          let map = new BMap.Map("memberMapShow"); // 创建Map实例
+          window.map_info = map;
           let pointArray = [];
           let point = new BMap.Point(location.lng, location.lat); // 创建点坐标
           map.centerAndZoom(point, 13); // 将个人作为地图中心点
@@ -829,15 +930,15 @@ export default {
     const newPosition = () => {
       let lng = props.currentMemberInfo.userLongitude;
       let lat = props.currentMemberInfo.userLatitude;
-      map.centerAndZoom(new BMap.Point(lng, lat), 19);
+      map_info.centerAndZoom(new BMap.Point(lng, lat), 19);
     };
     const new_address = () => {
       let lng = props.currentMemberInfo.addressLongitude,
         lat = props.currentMemberInfo.addressLatitude;
       let point = new BMap.Point(lng, lat);
       let myIcon = new BMap.Icon(address_position, new BMap.Size(32, 32)); //address_location, address_position
-      map.addOverlay(new BMap.Marker(point, { icon: myIcon }));
-      map.centerAndZoom(point, 19);
+      map_info.addOverlay(new BMap.Marker(point, { icon: myIcon }));
+      map_info.centerAndZoom(point, 19);
     };
     onMounted(() => {
       memberInfoEcharts();
@@ -909,7 +1010,7 @@ export default {
       handleSizeChange,
       positionHandle,
       memberInfoBack,
-      modifyMemberInfo,
+      memberInfoModify,
       bindOpen,
       unBindOpen,
       addRail,
@@ -925,6 +1026,11 @@ export default {
       content,
       newPosition,
       new_address,
+      modifyRemarks,
+      modifyData,
+      rules,
+      confirmOpen,
+      modifyBefore,
     };
   },
 };
@@ -1068,6 +1174,7 @@ $contactsHeight: 592px;
         }
         i {
           font-style: normal;
+          margin-right: 10px;
         }
         margin-bottom: 15px;
         .railText {

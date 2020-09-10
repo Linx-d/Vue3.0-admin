@@ -1,4 +1,4 @@
-import service from "@/utils/request"
+import service from "@/utils/request";
 
 /**
  * 查询所有部门
@@ -65,7 +65,7 @@ export function updateDepartment(data) {
 export function addMember(data) {
   return service.request({
     method: "post",
-    url: "/dept/addMember?userId="+data.userId+"&depId="+data.depId //url: "/dept/addMember",
+    url: "/dept/addMember?userId=" + data.userId + "&depId=" + data.depId, //url: "/dept/addMember",
   });
 }
 
@@ -113,7 +113,11 @@ export function listUserByDepartment(data) {
 export function listUserByNoDepartment(pageNum, pageSize) {
   return service.request({
     method: "get",
-    url: "/dept/listUserByNoDepartment?pageNum=" + pageNum + "&pageSize=" + pageSize
+    url:
+      "/dept/listUserByNoDepartment?pageNum=" +
+      pageNum +
+      "&pageSize=" +
+      pageSize,
   });
 }
 
@@ -127,7 +131,7 @@ export function listUserByNoDepartment(pageNum, pageSize) {
 export function removeMember(data) {
   return service.request({
     method: "post",
-    url: "/dept/removeMember?depId="+data.depId+"&userIds="+data.userIds
+    url: "/dept/removeMember?depId=" + data.depId + "&userIds=" + data.userIds,
   });
 }
 
@@ -159,7 +163,7 @@ export function listDepartmentByPid(data) {
 export function listUserLocationById(data) {
   return service.request({
     method: "post",
-    url: "/deviceData/listUserLocationById?userId=" + data.userId
+    url: "/deviceData/listUserLocationById?userId=" + data.userId,
   });
 }
 
@@ -174,7 +178,7 @@ export function listDeviceAlarmInfoByUserId(data) {
   return service.request({
     method: "post",
     url: "/device/listDeviceAlarmInfoByUserId",
-    data
+    data,
   });
 }
 
@@ -188,7 +192,7 @@ export function listDeviceAlarmInfoByUserId(data) {
 export function getMaxDepartmentId() {
   return service.request({
     method: "get",
-    url: "/dept/getMaxDepartmentId"
+    url: "/dept/getMaxDepartmentId",
   });
 }
 
@@ -208,7 +212,8 @@ export function getMaxDepartmentId() {
 export function batchUpdateUser(data) {
   return service.request({
     method: "post",
-    url: "/rail/batchUpdateUser?railId=" + data.railId + "&userId=" + data.userId
+    url:
+      "/rail/batchUpdateUser?railId=" + data.railId + "&userId=" + data.userId,
   });
 }
 
@@ -222,7 +227,7 @@ export function batchUpdateUser(data) {
 export function batchDeleteRailUser(data) {
   return service.request({
     method: "post",
-    url: "/rail/batchDeleteRailUser?userId=" + data
+    url: "/rail/batchDeleteRailUser?userId=" + data,
   });
 }
 
@@ -250,7 +255,7 @@ export function fuzzySearchNotGroup(data) {
 export function fuzzySearch(data) {
   return service.request({
     method: "get",
-    url: "/user/fuzzySearch?scope=all"+"&keyword="+data.keyword,
+    url: "/user/fuzzySearch?scope=all" + "&keyword=" + data.keyword,
   });
 }
 
@@ -301,6 +306,29 @@ export function updateUser(data) {
   return service.request({
     method: "post",
     url: "/user/updateUser",
+    data,
+  });
+}
+
+/**
+ * 修改用户备注
+ *
+ * @export
+ * @param {
+    "id": "10000",
+    "remarks": "温度异常"
+  }
+* @returns {
+    "data": null,
+    "code": 0,
+    "msg": "成功"
+  }
+*/
+export function updateRemarks(data) {
+  return service.request({
+    method: "post",
+    // url: "/user/updateRemarks?id="+data.id+"&remarks="+data.remarks,
+    url: "/user/updateRemarks",
     data
   });
 }

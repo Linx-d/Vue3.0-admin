@@ -186,6 +186,7 @@
         :currentMemberInfo="currentMemberInfo"
         :tmpHistory="tmpHistory"
         :showMemberInfo_drawer="showMemberInfo_drawer"
+        :modifyMemberInfo="modifyMemberInfo"
       ></contactsInfo>
       <contactsModify
         v-show="contactsModule.memberModify"
