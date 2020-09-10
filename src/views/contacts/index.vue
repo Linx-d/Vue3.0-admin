@@ -220,6 +220,7 @@ import {
   listDeviceAlarmInfoByUserId,
   listUserLocationById,
   listDepartmentByUser,
+  select,
 } from "@/api/contactsApi";
 import { getLoginEmployee, selectEmpDepRoleByEmpId } from "@/api/employeeApi";
 import { translateDataToTree, switchModule } from "@/utils/common";
@@ -237,13 +238,31 @@ export default {
   name: "contacts",
   components: { contactsInfo, contactsModify, contactsList },
   setup(props, { root, refs, set, nextTick }) {
+    /**
+     * 设备频率
+     */
+    let deviceStep = reactive({
+      step: 0,
+    });
+    select().then((res) => {
+      let hours = new Date().getHours(),
+        dayInterval = res.data.dayInterval,
+        dayTime = res.data.dayTime,
+        nightInterval = res.data.nightInterval,
+        nightTime = res.data.nightTime;
+      if (hours >= dayTime && hours <= nightTime) {
+        deviceStep.step = dayInterval * 60 * 1000 * 2;
+      } else {
+        deviceStep.step = nightInterval * 60 * 1000 * 2;
+      }
+    });
     /**判断组件在地图、个人信息等中使用
-     * 
+     *
      */
     const showMemberInfo_drawer = reactive({
       status: {
         map: false,
-        info: true
+        info: true,
       },
     });
     /**
@@ -313,7 +332,7 @@ export default {
       tnumber: null,
       pnumber: 109,
       tableData: [],
-      data: []
+      data: [],
     });
     // 当前成员温度随时间变化的历史数据
     /**
@@ -680,8 +699,26 @@ export default {
       // 激活样式
       searchResult_list.data.forEach((item, itemIndex) => {
         if (itemIndex === index) {
+          let step = deviceStep.step;
+          // 在线情况
+          let time = new Date().getTime() - new Date(item.gmtCreate).getTime();
+          if (time < step) {
+            currentMemberInfo.online = true;
+          } else {
+            currentMemberInfo.online = false;
+          }
           item.active = true;
           let userId = parseInt(item.id);
+
+          for (let key in modifyMemberInfo) {
+            if (key == "id") {
+              modifyMemberInfo[key] = item.userId;
+              initial[key] = item.userId;
+            } else {
+              modifyMemberInfo[key] = item[key];
+              initial[key] = item[key];
+            }
+          }
 
           // 获得成员个人信息
           currentMemberInfo.name = item.name;
@@ -713,6 +750,11 @@ export default {
               error_tmp = [],
               new_errorTableData = [];
             array.forEach((item) => {
+              if (item.alarmType == 2 || item.alarmType == 3) {
+                item.userName = currentMemberInfo.name;
+                item.tel = currentMemberInfo.tel;
+                tmpHistory.data.push(item);
+              }
               // temperature
               newArr_time.push(item.gmtCreate);
               let temperature = Number(item.temperature).toFixed(1);
@@ -764,12 +806,19 @@ export default {
                 let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
                 let age = parseInt((newDate - date) / oneDay);
                 currentMemberInfo[key] = age;
+                currentMemberInfo.date = data[key];
+                modifyMemberInfo.age = data[key];
+                initial.age = data[key];
+              } else if (key === "temperature") {
+                currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
+              } else if (key == "online") {
+                continue;
               } else {
                 currentMemberInfo[key] = data[key];
               }
             }
             for (let key in currentMemberInfo) {
-              if (key === "railName") {
+              if (key === "railName" || key == "online" || key == "remarks") {
                 continue;
               }
               let verify =
@@ -1018,10 +1067,10 @@ export default {
             let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
             let age = parseInt((newDate - date) / oneDay);
             data[i].age = age;
-            if(data[i].temperature>37.3) {
-              data[i].status="温度异常";
-            }else {
-              data[i].status="";
+            if (data[i].temperature > 37.3) {
+              data[i].status = "温度异常";
+            } else {
+              data[i].status = "";
             }
             memberData.data.push(data[i]);
           }
@@ -1140,7 +1189,7 @@ export default {
       hideDepartLeave, // 鼠标离开 控制左侧导航栏隐藏的菜单栏函数
       memberListPaging,
       loading,
-      showMemberInfo_drawer
+      showMemberInfo_drawer,
     };
   },
 };
