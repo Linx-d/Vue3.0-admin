@@ -7,7 +7,7 @@
       <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
-      <a class="memberLink" href="javascript:;" @click="memberInfoModify">编辑</a>
+      <a v-if="loginEmployeeInfo.role.id!=3" class="memberLink" href="javascript:;" @click="memberInfoModify">编辑</a>
       <!--
       <a class="memberLink" href="javascript:;">编辑</a>
       <a class="memberLink" href="javascript:;">移除</a>
@@ -355,6 +355,7 @@ import {
   batchUpdateUser,
   updateRemarks,
 } from "@/api/contactsApi";
+import { getLoginEmployee } from "@/api/employeeApi";
 import { listRail } from "@/api/railApi";
 import personTravel from "@/views/images/personTravel.png";
 import address_location from "@/views/images/address_location.png";
@@ -385,6 +386,28 @@ export default {
     },
   },
   setup(props, { root, refs }) {
+    /**
+     * 登录人员详情
+     */
+    let loginEmployeeInfo = reactive({
+      id: null,
+      name: "123",
+      role: {
+        id: 1,
+        name: "role",
+      },
+      tel: "",
+      gmtCreate: "",
+    });
+    getLoginEmployee().then((res) => {
+      let data = res.data;
+      let roleId = data.role ? data.role.id : null;
+      loginEmployeeInfo.id = data.id;
+      loginEmployeeInfo.name = data.name;
+      loginEmployeeInfo.tel = data.tel;
+      loginEmployeeInfo.gmtCreate = data.gmtCreate || "暂无";
+      loginEmployeeInfo.role = data.role || "暂无";
+    });
     /**加载动画
      *
      */
@@ -821,7 +844,7 @@ export default {
       remarks: {
         visible: false,
         txt: "",
-        modal: true
+        modal: true,
       },
       formLabelWidth: "120px",
     });
@@ -830,7 +853,7 @@ export default {
         id: id,
         remarks: "2020.9.10日出现体温异常，在围栏2进行隔离14天",
       };
-      if(props.showMemberInfo_drawer.status.map) {
+      if (props.showMemberInfo_drawer.status.map) {
         modifyData.remarks.modal = false;
       }
       modifyData.id = id;
@@ -871,7 +894,7 @@ export default {
       });
     };
     const rules = reactive({
-      remarks: [{ min: 0, max: 50, message: '长度在 0 到 50 个字符' }],
+      remarks: [{ min: 0, max: 50, message: "长度在 0 到 50 个字符" }],
     });
     const modifyBefore = () => {
       modifyData.remarks.visible = false;
@@ -1006,6 +1029,7 @@ export default {
       loading,
       paging,
       database,
+      loginEmployeeInfo,
       handleCurrentChange,
       handleCurrentChange_tmp,
       handleSizeChange,
