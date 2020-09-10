@@ -289,6 +289,21 @@
       </div>
 
       <div class="zoom_control">
+        <div class="move_box">
+          <div class="moving" @click.stop="map_move('up')" title="向上平移">
+            <svg-icon iconClass="move_top"></svg-icon>
+          </div>
+          <div class="moving" @click.stop="map_move('down')" title="向下平移">
+            <svg-icon iconClass="move_down"></svg-icon>
+          </div>
+          <div class="moving" @click.stop="map_move('left')" title="向左平移">
+            <svg-icon iconClass="move_left"></svg-icon>
+          </div>
+          <div class="moving" @click.stop="map_move('right')" title="向右平移">
+            <svg-icon iconClass="move_right"></svg-icon>
+          </div>
+          <div class="moving"></div>
+        </div>
         <el-tooltip class="item" effect="light" content="定位" placement="right">
           <div class="control" @click.stop="location">
             <svg-icon iconClass="map_location"></svg-icon>
@@ -1743,7 +1758,23 @@ export default {
         map.setZoom(level);
       }
     };
-
+    // 移动地图
+    const map_move = (data) => {
+      switch (data) {
+        case "up":
+          map.panBy(0, -200, true);
+          break;
+        case "down":
+          map.panBy(0, 200, true);
+          break;
+        case "left":
+          map.panBy(-200, 0, true);
+          break;
+        case "right":
+          map.panBy(200, 0, true);
+          break;
+      }
+    };
     /**搜索
      *
      */
@@ -1904,6 +1935,7 @@ export default {
       location,
       upRoom,
       downRoom,
+      map_move,
       search_toggle,
       member,
       address,
@@ -2273,11 +2305,43 @@ $transitionTime: 0.3s;
       cursor: pointer;
       @include webkit("box-shadow", 1px 2px 1px rgba(0, 0, 0, 0.15));
       text-align: center;
-      margin: 5px 0;
+      margin: 5px 0 5px 11px;
       padding: 5px;
     }
-    .control:nth-child(2) {
+    .control:nth-child(3) {
       margin-bottom: -4px;
+    }
+    .move_box {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      .moving {
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        text-align: center;
+        cursor: pointer;
+      }
+      .moving:nth-child(1) {
+        top: 0;
+        left: 16px;
+      }
+      .moving:nth-child(2) {
+        bottom: 0;
+        left: 16px;
+      }
+      .moving:nth-child(3) {
+        left: 0;
+        top: 16px;
+      }
+      .moving:nth-child(4) {
+        right: 0;
+        top: 16px;
+      }
+      .moving:nth-child(5) {
+        right: 16px;
+        top: 16px;
+      }
     }
   }
   #search_city {
