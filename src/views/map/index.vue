@@ -1059,6 +1059,8 @@ export default {
             let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
             let age = parseInt((newDate - date) / oneDay);
             currentMemberInfo[key] = age;
+          }else if(key == "temperature") {
+            currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
           } else {
             currentMemberInfo[key] = data[key];
           }
@@ -1353,6 +1355,9 @@ export default {
             onlineStatic: 0,
           };
           scaleStatic.managerPerson = data.length;
+          data.forEach(item => {
+            item.temperature = parseFloat(item.temperature).toFixed(1);
+          });
           database.onlineContent = data;
           database.temperatureContent = data;
           data.forEach((item) => {
@@ -1962,6 +1967,7 @@ export default {
         let data = res.data,
           code = res.code,
           msg = res.msg;
+          
         if (code == 0) {
           database.alarmContent = data;
           // 地址逆解析

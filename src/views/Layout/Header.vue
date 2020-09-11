@@ -2,7 +2,7 @@
   <header class="frame_head qui_clear">
     <div class="frame_head_top">
       <a class="frame_logo" href="javascript:;">
-        <h1>如泰科技</h1>
+        <h1>{{ corporationInfo.name }}</h1>
       </a>
       <aside class="frame_operation">
         <!-- <a href="javascript:;">文档</a>
@@ -39,9 +39,13 @@ import {
   computed,
   watchEffect,
 } from "@vue/composition-api";
+import { getCorpInfo } from "@/api/corporationApi";
 export default {
   name: "frame",
   setup(props, { root }) {
+    /**导航栏
+     *
+     */
     const navList = reactive([
       {
         index: 0,
@@ -99,6 +103,16 @@ export default {
       },
     });
 
+    /**企业信息
+     *
+     */
+    const corporationInfo = reactive({
+      name: "",
+    });
+    getCorpInfo().then((res) => {
+      corporationInfo.name = res.data.name;
+    });
+
     /**
      * 生命周期函数 onMounted
      */
@@ -123,7 +137,6 @@ export default {
      * 退出登录
      */
     const logOut = () => {
-
       sessionStorage.clear();
       // 清除历史堆栈
       let Backlen = history.length;
@@ -144,6 +157,7 @@ export default {
       stepStyle,
       navTrigger,
       logOut,
+      corporationInfo,
     };
   },
 };
