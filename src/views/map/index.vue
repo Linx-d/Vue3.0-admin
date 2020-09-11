@@ -27,20 +27,28 @@
       <div class="alanysis_top">
         <div
           class="case_open_left-a"
-          @click="echarts_toggle.online=false"
-          v-if="echarts_toggle.online"
+          @click="spreadEcharts('online')"
+          @mouseenter="toogleIcon('online', true)"
+          @mouseleave="toogleIcon('online', false)"
+          v-if="icon_toggle.online.visible"
         >
-          <svg-icon iconClass="open_echarts1" class="echartsSvg"></svg-icon>
+          <el-tooltip effect="light" content="在线情况" placement="right">
+            <svg-icon :iconClass="icon_toggle.online.icon" class="echartsSvg"></svg-icon>
+          </el-tooltip>
         </div>
         <div
           class="case_open_left-b"
-          @click="echarts_toggle.temperature=false"
-          v-if="echarts_toggle.temperature"
+          @click="spreadEcharts('temperature')"
+          @mouseenter="toogleIcon('temperature', true)"
+          @mouseleave="toogleIcon('temperature', false)"
+          v-if="icon_toggle.temperature.visible"
         >
-          <svg-icon iconClass="open_echarts2" class="echartsSvg"></svg-icon>
+          <el-tooltip effect="light" content="温度异常统计" placement="right">
+            <svg-icon :iconClass="icon_toggle.temperature.icon" class="echartsSvg"></svg-icon>
+          </el-tooltip>
         </div>
-        <div :class="['alanysis-a', {'echarts_hide': echarts_toggle.online}]">
-          <div class="case_close_right" @click="echarts_toggle.online=true">
+        <div :class="['alanysis-a', {'echarts_hide': icon_toggle.online.visible}]">
+          <div class="case_close_right" @click="icon_toggle.online.visible=true">
             <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
           </div>
           <div class="case_top_right"></div>
@@ -71,8 +79,8 @@
             </div>
           </div>
         </div>
-        <div :class="['alanysis-b', {'echarts_hide': echarts_toggle.temperature}]">
-          <div class="case_close_right" @click="echarts_toggle.temperature=true">
+        <div :class="['alanysis-b', {'echarts_hide': icon_toggle.temperature.visible}]">
+          <div class="case_close_right" @click="icon_toggle.temperature.visible=true">
             <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
           </div>
           <div class="case_top_right"></div>
@@ -85,22 +93,30 @@
       <div class="alanysis_bottom">
         <div
           class="case_open_left-l"
-          @click="echarts_toggle.alarm=false"
-          v-if="echarts_toggle.alarm"
+          @click="spreadEcharts('alarm')"
+          @mouseenter="toogleIcon('alarm', true)"
+          @mouseleave="toogleIcon('alarm', false)"
+          v-if="icon_toggle.alarm.visible"
         >
-          <svg-icon iconClass="open_echarts3" class="echartsSvg"></svg-icon>
+          <el-tooltip effect="light" content="警告统计" placement="right">
+            <svg-icon :iconClass="icon_toggle.alarm.icon" class="echartsSvg"></svg-icon>
+          </el-tooltip>
         </div>
         <div
           class="case_open_left-r"
-          @click="echarts_toggle.history=false"
-          v-if="echarts_toggle.history"
+          @click="spreadEcharts('history')"
+          @mouseenter="toogleIcon('history', true)"
+          @mouseleave="toogleIcon('history', false)"
+          v-if="icon_toggle.history.visible"
         >
-          <svg-icon iconClass="open_echarts4" class="echartsSvg"></svg-icon>
+          <el-tooltip effect="light" content="历史告警" placement="left">
+            <svg-icon :iconClass="icon_toggle.history.icon" class="echartsSvg"></svg-icon>
+          </el-tooltip>
         </div>
         <div
-          :class="['alanysis_bottom_L', 'echartsIndivi', {'echarts_hide': echarts_toggle.alarm}]"
+          :class="['alanysis_bottom_L', 'echartsIndivi', {'echarts_hide': icon_toggle.alarm.visible}]"
         >
-          <div class="case_close_right" @click="echarts_toggle.alarm=true">
+          <div class="case_close_right" @click="icon_toggle.alarm.visible=true">
             <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
           </div>
           <div class="case_top_right"></div>
@@ -156,9 +172,9 @@
         </div>
 
         <div
-          :class="['alanysis_bottom_R', 'echartsIndivi', {'echarts_hide': echarts_toggle.history}]"
+          :class="['alanysis_bottom_R', 'echartsIndivi', {'echarts_hide': icon_toggle.history.visible}]"
         >
-          <div class="case_close_right" @click="echarts_toggle.history=true">
+          <div class="case_close_right" @click="icon_toggle.history.visible=true">
             <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
           </div>
           <div class="btnBox">
@@ -185,13 +201,17 @@
       <div class="alanysis_topRight">
         <div
           class="case_open_left-t"
-          @click="echarts_toggle.system=false"
-          v-if="echarts_toggle.system"
+          @click="spreadEcharts('system')"
+          @mouseenter="toogleIcon('system', true)"
+          @mouseleave="toogleIcon('system', false)"
+          v-if="icon_toggle.system.visible"
         >
-          <svg-icon iconClass="open_echarts5" class="echartsSvg"></svg-icon>
+          <el-tooltip effect="light" content="疫情统计" placement="left">
+            <svg-icon :iconClass="icon_toggle.system.icon" class="echartsSvg"></svg-icon>
+          </el-tooltip>
         </div>
-        <div :class="['alanysis_right', {'echarts_hide': echarts_toggle.system}]">
-          <div class="case_close_right" @click="echarts_toggle.system=true">
+        <div :class="['alanysis_right', {'echarts_hide': icon_toggle.system.visible}]">
+          <div class="case_close_right" @click="icon_toggle.system.visible=true">
             <svg-icon iconClass="close_echarts" class="closeIcon"></svg-icon>
           </div>
           <div class="case_top_right"></div>
@@ -310,13 +330,13 @@
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="放大一级" placement="right">
-          <div class="control" @click.stop="upRoom">
-            <svg-icon iconClass="map_up"></svg-icon>
+          <div class="control" @click.stop="upRoom" @mouseenter="toogleIcon('up', true)" @mouseleave="toogleIcon('up', false)">
+            <svg-icon :iconClass="icon_toggle.up.icon"></svg-icon>
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="缩小一级" placement="right">
-          <div class="control" @click.stop="downRoom">
-            <svg-icon iconClass="map_down"></svg-icon>
+          <div class="control" @click.stop="downRoom" @mouseenter="toogleIcon('down', true)" @mouseleave="toogleIcon('down', false)">
+            <svg-icon :iconClass="icon_toggle.down.icon"></svg-icon>
           </div>
         </el-tooltip>
       </div>
@@ -566,14 +586,64 @@ export default {
     /**显示隐藏图表
      * 值是false 时为显示, true 为隐藏
      */
-    const echarts_toggle = reactive({
-      online: false, // 在线
-      alarm: false, // 警告
-      history: false, // 历史
-      system: false, // 疫情
-      temperature: false, // 温度
-      mask: false, // 覆盖层
+    const icon_toggle = reactive({
+      // 在线
+      online: {
+        visible: false,
+        icon: "open_echarts1",
+        spread: "spread_right",
+        handle: "open_echarts1",
+      },
+      // 温度
+      temperature: {
+        visible: false,
+        icon: "open_echarts2",
+        spread: "spread_right",
+        handle: "open_echarts2",
+      },
+      // 警告
+      alarm: {
+        visible: false,
+        icon: "open_echarts3",
+        spread: "spread_right",
+        handle: "open_echarts3",
+      },
+      // 历史
+      history: {
+        visible: false,
+        icon: "open_echarts4",
+        spread: "spread_left",
+        handle: "open_echarts4",
+      },
+      // 疫情
+      system: {
+        visible: false,
+        icon: "open_echarts5",
+        spread: "spread_left",
+        handle: "open_echarts5",
+      },
+      up: { icon: "map_up", spread: "map_upActive", handle: "map_up" },
+      down: { icon: "map_down", spread: "map_downActive", handle: "map_down" },
+      mask: { visible: false }, // 覆盖层
     });
+    // 点击图标展开图表
+    const spreadEcharts = (data) => {
+      icon_toggle[data].visible = false;
+      icon_toggle[data].icon = icon_toggle[data].handle;
+    };
+    /** 鼠标移入移出图标事件
+     * @param {
+     data: "", 
+     status: true // true: 移入; false: 移出
+     }
+     */
+    const toogleIcon = (data, status) => {
+      if (status) {
+        icon_toggle[data].icon = icon_toggle[data].spread;
+      } else {
+        icon_toggle[data].icon = icon_toggle[data].handle;
+      }
+    };
     /**
      * 设备频率
      */
@@ -1919,7 +1989,9 @@ export default {
       });
     });
     return {
-      echarts_toggle,
+      icon_toggle,
+      spreadEcharts,
+      toogleIcon,
       full,
       alarmData,
       alanysisStatus,
@@ -2640,7 +2712,7 @@ $transitionTime: 0.3s;
 }
 /*---------------------table end-----------------------*/
 .echartsSvg {
-  width: 1.3em;
-  height: 1.3em;
+  width: 2em;
+  height: 2em;
 }
 </style>
