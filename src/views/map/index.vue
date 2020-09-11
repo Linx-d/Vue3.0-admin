@@ -330,12 +330,22 @@
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="放大一级" placement="right">
-          <div class="control" @click.stop="upRoom" @mouseenter="toogleIcon('up', true)" @mouseleave="toogleIcon('up', false)">
+          <div
+            class="control"
+            @click.stop="upRoom"
+            @mouseenter="toogleIcon('up', true)"
+            @mouseleave="toogleIcon('up', false)"
+          >
             <svg-icon :iconClass="icon_toggle.up.icon"></svg-icon>
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="缩小一级" placement="right">
-          <div class="control" @click.stop="downRoom" @mouseenter="toogleIcon('down', true)" @mouseleave="toogleIcon('down', false)">
+          <div
+            class="control"
+            @click.stop="downRoom"
+            @mouseenter="toogleIcon('down', true)"
+            @mouseleave="toogleIcon('down', false)"
+          >
             <svg-icon :iconClass="icon_toggle.down.icon"></svg-icon>
           </div>
         </el-tooltip>
@@ -1404,9 +1414,14 @@ export default {
             let marker = new BMap.Marker(point, { icon: myIcon });
             marker.userId = item.userId;
             // 文字标签
-            let label = new BMap.Label(item.userName + "-" + item.temperature, {
+            let label = new BMap.Label(item.userName, {
               offset: new BMap.Size(20, -10),
             });
+            label.setStyle({
+                color: "black",
+                border: "1px solid #1089e7",
+                fontSize: "12px"
+              });
             marker.enableMassClear();
 
             marker.addEventListener("click", function (e) {
