@@ -7,7 +7,12 @@
       <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
       </a>
-      <a v-if="loginEmployeeInfo.role.id!=3" class="memberLink" href="javascript:;" @click="memberInfoModify">编辑</a>
+      <a
+        v-if="loginEmployeeInfo.role.id!=3"
+        class="memberLink"
+        href="javascript:;"
+        @click="memberInfoModify"
+      >编辑</a>
       <!--
       <a class="memberLink" href="javascript:;">编辑</a>
       <a class="memberLink" href="javascript:;">移除</a>
@@ -894,7 +899,7 @@ export default {
       });
     };
     const rules = reactive({
-      remarks: [{ min: 0, max: 50, message: "长度在 0 到 50 个字符" }],
+      remarks: [{ min: 0, max: 2000, message: "长度在 0 到 2000 个字符" }],
     });
     const modifyBefore = () => {
       modifyData.remarks.visible = false;
@@ -1200,6 +1205,9 @@ $contactsHeight: 592px;
         i {
           font-style: normal;
           margin-right: 10px;
+          line-height: 25px;
+          font-size: 15px;
+          letter-spacing: 0.3px;
         }
         margin-bottom: 15px;
         .railText {

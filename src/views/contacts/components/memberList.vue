@@ -15,19 +15,20 @@
         <div class="cnt_tool">
           <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
           <a class="memberLink" href="javascript:;" @click="delMemberBtn">移除成员</a>
-          <a
+          <!-- <a
             class="memberLink"
             href="javascript:;"
             @click="screenAbnormal(currentDepart.id, 'abnormal')"
-          >筛选异常成员</a>
+          >{{ screen.content.abnormal }}</a>
           <a
             class="memberLink"
             href="javascript:;"
             @click="screenAbnormal(currentDepart.id, 'normal')"
-          >筛选正常成员</a>
+          >{{ screen.content.normal }}</a> -->
         </div>
 
         <el-table
+          v-if="!screen.visible"
           ref="multipleTable_remove"
           :data="memberData.data"
           :row-class-name="tableRowClassName"
@@ -49,26 +50,65 @@
           <el-table-column label="操作" show-overflow-tooltip width="150">
             <template slot-scope="scope">
               <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                @click="delMember(scope.row.userId,scope.row)"
-              >移除</el-button>
+              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)">移除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-table
+          v-if="screen.visible"
+          ref="multipleTable_remove"
+          :data="screen.show"
+          :row-class-name="tableRowClassName"
+          tooltip-effect="dark"
+          style="width: 100%"
+          @selection-change="handleSelectionChange_remove"
+          :row-style="{'font-size': '13px','height': '37px', 'font-family': 'Microsoft YaHei'}"
+          :header-row-style="{'font-size': '13px', 'padding': 0, 'font-family': 'Microsoft YaHei'}"
+          :cell-style="{'padding': 0, 'font-family': 'Microsoft YaHei'}"
+        >
+          <el-table-column type="selection" width="45"></el-table-column>
+          <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="80"></el-table-column>
+          <el-table-column prop="sex" label="性别" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="age" label="年龄" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="tel" label="电话" sortable show-overflow-tooltip width="110"></el-table-column>
+          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="170"></el-table-column>
+          <el-table-column prop="status" label="状态" sortable show-overflow-tooltip width="75"></el-table-column>
+          <el-table-column label="操作" show-overflow-tooltip width="150">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
+              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)">移除</el-button>
             </template>
           </el-table-column>
         </el-table>
 
         <div class="cnt_tool">
           <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
+          <a class="memberLink" href="javascript:;" @click="delMemberBtn">移除成员</a>
         </div>
         <div class="block" v-show="changeModule.status">
+          <!-- 普通 -->
           <el-pagination
+            v-if="!screen.visible"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             :page-sizes="[15, 20, 30, 40]"
             :page-size="memberListPaging.pageSize"
             layout="total, sizes, prev, pager, next, jumper"
             :total="memberData.total"
+            class="pagingConfig"
+          ></el-pagination>
+
+          <!-- 筛选 -->
+          <el-pagination
+            v-else
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :page-sizes="[15, 20, 30, 40]"
+            :page-size="memberListPaging.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="screen.total"
             class="pagingConfig"
           ></el-pagination>
         </div>
@@ -401,7 +441,9 @@ export default {
             initial.age = data[key];
           } else if (key === "temperature") {
             currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
-          } else {
+          } else if(key=='online'){
+            continue;
+          }else{
             currentMemberInfo[key] = data[key];
           }
         }
@@ -460,7 +502,7 @@ export default {
       if (len == 0) {
         root.$message({
           type: "warning",
-          message: "请选择要移除部门的成员",
+          message: "请选择要移除的部门成员",
         });
       } else {
         let data = [];
@@ -471,15 +513,20 @@ export default {
       }
     };
 
+    // 筛选
     const screen = reactive({
-      visible: true,
+      visible: false, // 控制显示
       pageNum: 1,
       pageSize: 15,
       pagesizes: [15, 20, 30, 40],
       total: 0,
       show: [],
       data: [],
-    }); // 筛选
+      content: {
+        normal: "筛选正常用户",
+        abnormal: "筛选异常用户",
+      }
+    });
     const screenAbnormal = (departId, txt) => {
       let parmas = new URLSearchParams();
       parmas.append("id", departId);
@@ -489,6 +536,21 @@ export default {
           data = res.data.list,
           start = screen.pageSize * (screen.pageNum - 1),
           end = screen.pageSize * screen.pageNum;
+          data.forEach(item => {
+            item.temperature = Number(item.temperature).toFixed(1);
+
+            // age
+            let newDate = new Date().getTime();
+            let date = new Date(item.age).getTime();
+            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+            let age = parseInt((newDate - date) / oneDay);
+            item.age = age;
+            if(item.temperature>37.3) {
+              item.status="温度异常";
+            }else {
+              item.status="";
+            }
+          });
         if (code == 0) {
           screen.visible = false;
           if (txt == "abnormal") {
@@ -501,6 +563,8 @@ export default {
             });
           }
           screen.show = screen.data.slice(start, end);
+          screen.visible = true;
+          screen.total = screen.data.length;
           console.log(screen);
         } else {
           root.$message({
@@ -510,7 +574,7 @@ export default {
         }
       });
     };
-    const screenNormal = (id) => {};
+
     const noDepart = (pageNum, pageSize) => {
       addNodepart_loading.value = true;
       listUserByNoDepartment(pageNum, pageSize).then((res) => {
