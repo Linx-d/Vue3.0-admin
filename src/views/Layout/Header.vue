@@ -109,15 +109,24 @@ export default {
     const corporationInfo = reactive({
       name: "",
     });
-    getCorpInfo().then((res) => {
-      corporationInfo.name = res.data.name;
-    });
-
+    function getCorpInfo_fn() {
+      getCorpInfo().then((res) => {
+        corporationInfo.name = res.data.name;
+      });
+    }
+    getCorpInfo_fn();
     /**
      * 生命周期函数 onMounted
      */
     onMounted(() => {
       //getSms(1);
+    });
+    watchEffect(() => {
+      let modifyCorporationInfo = root.$store.state.corporation.corporInfo;
+      if (modifyCorporationInfo=='true') {
+        getCorpInfo_fn();
+        root.$store.commit('SET_CORPORINFOFALSE');
+      }
     });
     /***
      * 声明函数

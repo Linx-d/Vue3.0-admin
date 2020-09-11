@@ -385,9 +385,7 @@ export default {
         { required: true, message: "请输入地址" },
         { min: 2, max: 20, message: "长度在 2 到 20 个字符" },
       ],
-      email: [
-        { validator: validateEmail }
-      ],
+      email: [{ validator: validateEmail }],
     });
     const submitForm = (formName, key, val, status) => {
       refs[formName].validate((valid) => {
@@ -397,6 +395,9 @@ export default {
           updateCorporation(modifyData).then((res) => {
             let code = res.code;
             if (code === 0) {
+              if (key == "name") {
+                root.$store.commit('SET_CORPORINFO');
+              }
               root.$message({
                 type: "success",
                 message: "修改成功",

@@ -1,21 +1,20 @@
-import { getLoginEmployee } from "@/api/employeeApi";
-if (!sessionStorage.getItem("adminInfo")) {
-  getLoginEmployee().then((res) => {
-    let data = JSON.stringify(res);
-    sessionStorage.setItem("adminInfo", data);
-  });
-}
-// 使用
-// console.log(JSON.parse(root.$store.state.corporation.adminInfo));
+sessionStorage.setItem('modifyCorporationInfo', 'false');
 const corporation = {
   state: {
-    adminInfo: sessionStorage.getItem("adminInfo"),
+    corporInfo: sessionStorage.getItem("modifyCorporationInfo"),
   },
   getters: {
-    adminInfo: (state) => state.adminInfo,
+    corporInfo: (state) => state.CorporInfo,
   },
   mutations: {
-    SET_ADMININFO() {},
+    SET_CORPORINFO(state) {
+      state.corporInfo = 'true';
+      sessionStorage.setItem('modifyCorporationInfo', state.corporInfo);
+    },
+    SET_CORPORINFOFALSE(state) {
+      state.corporInfo = 'false';
+      sessionStorage.setItem('modifyCorporationInfo', state.corporInfo);
+    },
   },
   actions: {},
   modules: {},

@@ -9,7 +9,6 @@
 import Header from "./views/Layout/Header";
 import Footer from "./views/Layout/Footer";
 import { computed, ref, watchEffect } from "@vue/composition-api";
-import { getCorpInfo } from "@/api/corporationApi"; // 获取企业地址
 export default {
   name: "App",
   components: { Header, Footer },
