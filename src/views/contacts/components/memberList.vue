@@ -13,8 +13,8 @@
     <div class="cnt_bottom">
       <div class="has_member" v-show="changeModule.status">
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
-          <a class="memberLink" href="javascript:;" @click="delMemberBtn">移除成员</a>
+          <a class="memberLink" href="javascript:;" @click="addMemberBtn" v-if="memberListPaging.id!=-1">添加成员</a>
+          <a class="memberLink" href="javascript:;" @click="delMemberBtn" v-if="memberListPaging.id!=-1">移除成员</a>
           <!-- <a
             class="memberLink"
             href="javascript:;"
@@ -24,7 +24,7 @@
             class="memberLink"
             href="javascript:;"
             @click="screenAbnormal(currentDepart.id, 'normal')"
-          >{{ screen.content.normal }}</a> -->
+          >{{ screen.content.normal }}</a>-->
         </div>
 
         <el-table
@@ -39,18 +39,19 @@
           :header-row-style="{'font-size': '13px', 'padding': 0, 'font-family': 'Microsoft YaHei'}"
           :cell-style="{'padding': 0, 'font-family': 'Microsoft YaHei'}"
         >
-          <el-table-column type="selection" width="45"></el-table-column>
+          <el-table-column type="selection" width="45" v-if="memberListPaging.id!=-1"></el-table-column>
           <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="80"></el-table-column>
           <el-table-column prop="sex" label="性别" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="age" label="年龄" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="tel" label="电话" sortable show-overflow-tooltip width="110"></el-table-column>
-          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="170"></el-table-column>
+          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="170" v-if="memberListPaging.id!=-1"></el-table-column>
+          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="205" v-else></el-table-column>
           <el-table-column prop="status" label="状态" sortable show-overflow-tooltip width="75"></el-table-column>
           <el-table-column label="操作" show-overflow-tooltip width="150">
             <template slot-scope="scope">
               <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
-              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)">移除</el-button>
+              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)" v-if="memberListPaging.id!=-1">移除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -78,14 +79,14 @@
           <el-table-column label="操作" show-overflow-tooltip width="150">
             <template slot-scope="scope">
               <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
-              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)">移除</el-button>
+              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)" v-if="memberListPaging.id!=-1">移除</el-button>
             </template>
           </el-table-column>
         </el-table>
 
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;" @click="addMemberBtn">添加成员</a>
-          <a class="memberLink" href="javascript:;" @click="delMemberBtn">移除成员</a>
+          <a class="memberLink" href="javascript:;" @click="addMemberBtn" v-if="memberListPaging.id!=-1">添加成员</a>
+          <a class="memberLink" href="javascript:;" @click="delMemberBtn" v-if="memberListPaging.id!=-1">移除成员</a>
         </div>
         <div class="block" v-show="changeModule.status">
           <!-- 普通 -->
@@ -441,9 +442,9 @@ export default {
             initial.age = data[key];
           } else if (key === "temperature") {
             currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
-          } else if(key=='online'){
+          } else if (key == "online") {
             continue;
-          }else{
+          } else {
             currentMemberInfo[key] = data[key];
           }
         }
@@ -525,7 +526,7 @@ export default {
       content: {
         normal: "筛选正常用户",
         abnormal: "筛选异常用户",
-      }
+      },
     });
     const screenAbnormal = (departId, txt) => {
       let parmas = new URLSearchParams();
@@ -536,21 +537,21 @@ export default {
           data = res.data.list,
           start = screen.pageSize * (screen.pageNum - 1),
           end = screen.pageSize * screen.pageNum;
-          data.forEach(item => {
-            item.temperature = Number(item.temperature).toFixed(1);
+        data.forEach((item) => {
+          item.temperature = Number(item.temperature).toFixed(1);
 
-            // age
-            let newDate = new Date().getTime();
-            let date = new Date(item.age).getTime();
-            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
-            let age = parseInt((newDate - date) / oneDay);
-            item.age = age;
-            if(item.temperature>37.3) {
-              item.status="温度异常";
-            }else {
-              item.status="";
-            }
-          });
+          // age
+          let newDate = new Date().getTime();
+          let date = new Date(item.age).getTime();
+          let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+          let age = parseInt((newDate - date) / oneDay);
+          item.age = age;
+          if (item.temperature > 37.3) {
+            item.status = "温度异常";
+          } else {
+            item.status = "";
+          }
+        });
         if (code == 0) {
           screen.visible = false;
           if (txt == "abnormal") {
@@ -661,52 +662,100 @@ export default {
      * 查询部门成员
      */
     const selectChildMember = (memberListPaging) => {
-      let params = new URLSearchParams(); // text post 提交
-      params.append("id", memberListPaging.id);
-      params.append("pageNum", memberListPaging.pageNum);
-      params.append("pageSize", memberListPaging.pageSize);
-      listUserByDepartment(params).then((res) => {
-        props.memberData.data.splice(0, props.memberData.data.length);
-        let data = res.data.list ? res.data.list : res.data;
+      if (memberListPaging.id === -1) {
+        listUserByNoDepartment(
+          memberListPaging.pageNum,
+          memberListPaging.pageSize
+        ).then((res) => {
+          props.memberData.data.splice(0, props.memberData.data.length);
+          let data = res.data.list ? res.data.list : res.data;
 
-        let size = res.data.size,
-          hasPreviousPage = res.data.hasPreviousPage;
-        let verify = res.data.total != 0 ? true : false;
-        if (size === 0) {
-          if (hasPreviousPage) {
-            props.memberListPaging.pageNum--;
-            selectChildMember(props.memberListPaging);
+          let size = res.data.size,
+            hasPreviousPage = res.data.hasPreviousPage;
+          let verify = res.data.total != 0 ? true : false;
+          if (size === 0) {
+            if (hasPreviousPage) {
+              props.memberListPaging.pageNum--;
+              selectChildMember(props.memberListPaging);
+            } else {
+              changeModule.status = verify;
+            }
           } else {
             changeModule.status = verify;
           }
-        } else {
-          changeModule.status = verify;
-        }
 
-        props.memberData.data.total = res.data.total;
-        props.currentDepart.length = data.length;
-        props.memberData.total = res.data.total;
-        let i = 0,
-          len = data.length;
-        for (i; i < len; i++) {
-          // temperatrue
-          data[i].temperature = Number(data[i].temperature).toFixed(1);
+          props.memberData.data.total = res.data.total;
+          props.currentDepart.length = data.length;
+          props.memberData.total = res.data.total;
+          let i = 0,
+            len = data.length;
+          for (i; i < len; i++) {
+            // temperatrue
+            data[i].temperature = Number(data[i].temperature).toFixed(1);
 
-          // age
-          let newDate = new Date().getTime();
-          let date = new Date(data[i].age).getTime();
-          let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
-          let age = parseInt((newDate - date) / oneDay);
-          data[i].age = age;
-          if (data[i].temperature > 37.3) {
-            data[i].status = "温度异常";
-          } else {
-            data[i].status = "";
+            // age
+            let newDate = new Date().getTime();
+            let date = new Date(data[i].age).getTime();
+            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+            let age = parseInt((newDate - date) / oneDay);
+            data[i].age = age;
+            if (data[i].temperature > 37.3) {
+              data[i].status = "温度异常";
+            } else {
+              data[i].status = "";
+            }
+            props.memberData.data.push(data[i]);
           }
-          props.memberData.data.push(data[i]);
-        }
-        //[ ... memberData.data] = data;
-      });
+          //[ ... memberData.data] = data;
+        });
+      } else {
+        let params = new URLSearchParams(); // text post 提交
+        params.append("id", memberListPaging.id);
+        params.append("pageNum", memberListPaging.pageNum);
+        params.append("pageSize", memberListPaging.pageSize);
+        listUserByDepartment(params).then((res) => {
+          props.memberData.data.splice(0, props.memberData.data.length);
+          let data = res.data.list ? res.data.list : res.data;
+
+          let size = res.data.size,
+            hasPreviousPage = res.data.hasPreviousPage;
+          let verify = res.data.total != 0 ? true : false;
+          if (size === 0) {
+            if (hasPreviousPage) {
+              props.memberListPaging.pageNum--;
+              selectChildMember(props.memberListPaging);
+            } else {
+              changeModule.status = verify;
+            }
+          } else {
+            changeModule.status = verify;
+          }
+
+          props.memberData.data.total = res.data.total;
+          props.currentDepart.length = data.length;
+          props.memberData.total = res.data.total;
+          let i = 0,
+            len = data.length;
+          for (i; i < len; i++) {
+            // temperatrue
+            data[i].temperature = Number(data[i].temperature).toFixed(1);
+
+            // age
+            let newDate = new Date().getTime();
+            let date = new Date(data[i].age).getTime();
+            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+            let age = parseInt((newDate - date) / oneDay);
+            data[i].age = age;
+            if (data[i].temperature > 37.3) {
+              data[i].status = "温度异常";
+            } else {
+              data[i].status = "";
+            }
+            props.memberData.data.push(data[i]);
+          }
+          //[ ... memberData.data] = data;
+        });
+      }
     };
 
     /**弹出框

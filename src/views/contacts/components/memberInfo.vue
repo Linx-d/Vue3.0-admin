@@ -173,12 +173,12 @@
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip
+            <!-- <el-tooltip
               class="item"
               effect="light"
               :content="content.position.txt"
               placement="left"
-            >
+            > -->
               <a href="javascript:;" @click="positionHandle('position')">
                 <span>位置告警：</span>
                 <i>
@@ -188,7 +188,7 @@
                   >次</span>
                 </i>
               </a>
-            </el-tooltip>
+            <!-- </el-tooltip> -->
           </li>
           <li>
             <span>备注：</span>
