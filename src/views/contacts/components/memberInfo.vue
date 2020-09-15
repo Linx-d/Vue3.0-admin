@@ -332,7 +332,7 @@
           label-width="100px"
           class="employeeInfoClass"
         >
-          <el-form-item label="remarks" :label-width="modifyData.formLabelWidth" prop="remarks">
+          <el-form-item label="备注" :label-width="modifyData.formLabelWidth" prop="remarks">
             <el-input
               type="textarea"
               v-model="modifyData.remarks.txt"

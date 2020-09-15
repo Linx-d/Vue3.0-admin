@@ -1069,7 +1069,7 @@ export default {
             let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
             let age = parseInt((newDate - date) / oneDay);
             currentMemberInfo[key] = age;
-          }else if(key == "temperature") {
+          } else if (key == "temperature") {
             currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
           } else {
             currentMemberInfo[key] = data[key];
@@ -1365,7 +1365,7 @@ export default {
             onlineStatic: 0,
           };
           scaleStatic.managerPerson = data.length;
-          data.forEach(item => {
+          data.forEach((item) => {
             item.temperature = parseFloat(item.temperature).toFixed(1);
           });
           database.onlineContent = data;
@@ -1418,10 +1418,10 @@ export default {
               offset: new BMap.Size(20, -10),
             });
             label.setStyle({
-                color: "black",
-                border: "1px solid #1089e7",
-                fontSize: "12px"
-              });
+              color: "black",
+              border: "1px solid #1089e7",
+              fontSize: "12px",
+            });
             marker.enableMassClear();
 
             marker.addEventListener("click", function (e) {
@@ -1982,7 +1982,7 @@ export default {
         let data = res.data,
           code = res.code,
           msg = res.msg;
-          
+
         if (code == 0) {
           database.alarmContent = data;
           // 地址逆解析
@@ -2441,7 +2441,7 @@ $transitionTime: 0.3s;
     position: absolute;
     left: 0px;
     top: -78px;
-    opacity: 0;
+    display: none;
     transition: 0.3s;
     .city-input {
       -webkit-appearance: none;
@@ -2465,7 +2465,7 @@ $transitionTime: 0.3s;
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
-    opacity: 1 !important;
+    display: block !important;
   }
   .city_none {
     display: none !important;
@@ -2477,14 +2477,14 @@ $transitionTime: 0.3s;
     position: absolute;
     left: 0;
     top: -78px;
-    opacity: 0;
+    display: none;
     transition: 0.3s;
   }
   .person_show {
     position: absolute !important;
     left: 0 !important;
     top: -1px !important;
-    opacity: 1 !important;
+    display: block !important;
   }
   .person_none {
     display: none !important;
