@@ -127,19 +127,19 @@
     <el-dialog
       title="修改企业名称"
       :visible.sync="modifyCorpData.dialogNameVisible"
-      :before-close="modifyBefore"
+      :before-close="modifyCancle"
       :close-on-click-modal="false"
     >
       <el-form
-        :model="corpInfo"
+        :model="corpInfoModify"
         :rules="rules"
-        ref="corpInfo"
+        ref="corpInfoModify"
         label-width="100px"
         class="corpInfoClass"
       >
         <el-form-item label="企业名称" :label-width="modifyCorpData.formLabelWidth" prop="name">
           <el-input
-            v-model="corpInfo.name"
+            v-model="corpInfoModify.name"
             autocomplete="off"
             maxlength="20"
             @keyup.enter.native="confirmNameOpen"
@@ -156,19 +156,19 @@
     <el-dialog
       title="修改联系电话"
       :visible.sync="modifyCorpData.dialogTelVisible"
-      :before-close="modifyBefore"
+      :before-close="modifyCancle"
       :close-on-click-modal="false"
     >
       <el-form
-        :model="corpInfo"
+        :model="corpInfoModify"
         :rules="rules"
-        ref="corpInfo"
+        ref="corpInfoModify"
         label-width="100px"
         class="corpInfoClass"
       >
         <el-form-item label="联系电话" :label-width="modifyCorpData.formLabelWidth" prop="tel">
           <el-input
-            v-model="corpInfo.tel"
+            v-model="corpInfoModify.tel"
             autocomplete="off"
             @keyup.enter.native="confirmTelOpen()"
             maxlength="20"
@@ -185,19 +185,19 @@
     <el-dialog
       title="修改企业地址"
       :visible.sync="modifyCorpData.dialogAddressVisible"
-      :before-close="modifyBefore"
+      :before-close="modifyCancle"
       :close-on-click-modal="false"
     >
       <el-form
-        :model="corpInfo"
+        :model="corpInfoModify"
         :rules="rules"
-        ref="corpInfo"
+        ref="corpInfoModify"
         label-width="100px"
         class="corpInfoClass"
       >
         <el-form-item label="企业地址" :label-width="modifyCorpData.formLabelWidth" prop="address">
           <el-input
-            v-model="corpInfo.address"
+            v-model="corpInfoModify.address"
             autocomplete="off"
             maxlength="20"
             @keyup.enter.native="confirmAddressOpen()"
@@ -214,19 +214,19 @@
     <el-dialog
       title="修改企业座机"
       :visible.sync="modifyCorpData.dialogLandlineVisible"
-      :before-close="modifyBefore"
+      :before-close="modifyCancle"
       :close-on-click-modal="false"
     >
       <el-form
-        :model="corpInfo"
+        :model="corpInfoModify"
         :rules="rules"
-        ref="corpInfo"
+        ref="corpInfoModify"
         label-width="100px"
         class="corpInfoClass"
       >
         <el-form-item label="企业座机" :label-width="modifyCorpData.formLabelWidth" prop="landline">
           <el-input
-            v-model="corpInfo.landline"
+            v-model="corpInfoModify.landline"
             autocomplete="off"
             @keyup.enter.native="confirmLandlineOpen()"
             maxlength="20"
@@ -243,19 +243,19 @@
     <el-dialog
       title="修改企业邮箱"
       :visible.sync="modifyCorpData.dialogEmailVisible"
-      :before-close="modifyBefore"
+      :before-close="modifyCancle"
       :close-on-click-modal="false"
     >
       <el-form
-        :model="corpInfo"
+        :model="corpInfoModify"
         :rules="rules"
-        ref="corpInfo"
+        ref="corpInfoModify"
         label-width="100px"
         class="corpInfoClass"
       >
         <el-form-item label="企业邮箱" :label-width="modifyCorpData.formLabelWidth" prop="email">
           <el-input
-            v-model="corpInfo.email"
+            v-model="corpInfoModify.email"
             autocomplete="off"
             @keyup.enter.native="confirmEmailOpen()"
             maxlength="20"
@@ -310,7 +310,24 @@ export default {
     /**企业信息
      *
      */
+    // 与view绑定
     let corpInfo = reactive({
+      id: "ww2e7b5f3c87c34c17",
+      name: "测试",
+      logoUrl:
+        "https://p.qlogo.cn/bizmail/x9CrcRIuFWvA8VQcstTibfPAsrpcpFulOZwapfGCNwjkJMVUibNl0kWA/0",
+      tel: "",
+      email: "",
+      landline: "",
+      address: "",
+      gmtCreate: "2020-06-11 16:29:08",
+      gmtModified: "2020-06-11T16:29:08",
+      member: 1000,
+      employeeNum: 0,
+      departmentNum: 0,
+    });
+    // 用于修改的企业信息
+    let corpInfoModify = reactive({
       id: "ww2e7b5f3c87c34c17",
       name: "测试",
       logoUrl:
@@ -328,7 +345,7 @@ export default {
     getCorpInfo().then((response) => {
       let data = response.data;
       for (let key in data) {
-        corpInfo[key] = data[key];
+        corpInfo[key] = corpInfoModify[key] = data[key];
       }
     });
 
@@ -396,12 +413,14 @@ export default {
             let code = res.code;
             if (code === 0) {
               if (key == "name") {
-                root.$store.commit('SET_CORPORINFO');
+                root.$store.commit("SET_CORPORINFO");
               }
               root.$message({
                 type: "success",
                 message: "修改成功",
               });
+              refs[formName].model[key] = val;
+              corpInfo[key] = val;
               modifyCorpData[status] = false;
               let myGeo = new BMap.Geocoder();
               myGeo.getPoint(
@@ -434,6 +453,7 @@ export default {
       });
     };
     const resetForm = (formName) => {
+      corpInfoModify = corpInfo;
       refs[formName].resetFields();
     };
     const modifyHandle = (data) => {
@@ -456,51 +476,46 @@ export default {
       }
     };
     const confirmNameOpen = () => {
-      submitForm("corpInfo", "name", corpInfo.name, "dialogNameVisible");
+      submitForm("corpInfoModify", "name", corpInfoModify.name, "dialogNameVisible");
     };
     const confirmTelOpen = () => {
-      submitForm("corpInfo", "tel", corpInfo.tel, "dialogTelVisible");
+      submitForm("corpInfoModify", "tel", corpInfoModify.tel, "dialogTelVisible");
     };
     const confirmAddressOpen = () => {
       submitForm(
-        "corpInfo",
+        "corpInfoModify",
         "address",
-        corpInfo.address,
+        corpInfoModify.address,
         "dialogAddressVisible"
       );
     };
     const confirmEmailOpen = () => {
-      submitForm("corpInfo", "email", corpInfo.email, "dialogEmailVisible");
+      submitForm("corpInfoModify", "email", corpInfoModify.email, "dialogEmailVisible");
     };
     const confirmLandlineOpen = () => {
       submitForm(
-        "corpInfo",
+        "corpInfoModify",
         "landline",
-        corpInfo.landline,
+        corpInfoModify.landline,
         "dialogLandlineVisible"
       );
     };
     const modifyCancle = () => {
-      resetForm("corpInfo");
       for (let key in modifyCorpData) {
         if (key == "formLabelWidth") continue;
         modifyCorpData[key] = false;
       }
-    };
-    const modifyBefore = () => {
-      resetForm("corpInfo");
-      for (let key in modifyCorpData) {
-        if (key == "formLabelWidth") continue;
-        modifyCorpData[key] = false;
+      for(let key in corpInfo) {
+        corpInfoModify[key] = corpInfo[key];
       }
     };
     watchEffect(() => {});
     onMounted(() => {});
     return {
       corpInfo,
+      corpInfoModify,
       rules,
       modifyCorpData,
-      modifyBefore,
       modifyCancle,
       modifyHandle,
       confirmNameOpen,
@@ -529,13 +544,14 @@ $mainWidth: 705px;
     height: 158px;
     border-bottom: 1px solid #e4e6e9;
     .logo_zi {
-      height: 128px;
-      width: 120px;
+      height: 159px;
+      width: 200px;
       padding-top: 30px;
       color: #787878;
       font-size: 14px;
+      @include webkit("box-sizing", border-box);
       img {
-        width: 200px;
+        width: 100%;
       }
     }
   }
