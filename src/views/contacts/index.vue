@@ -583,6 +583,17 @@ export default {
                     item.hasAuthority = false;
                   });
                 } else {
+                  // 未分组成员部门
+                  let ungroupedDepart = {
+                    id: -1,
+                    pid: 6,
+                    name: "未分组成员",
+                    label: "未分组成员",
+                    hasAuthority: false,
+                    children: [],
+                    displayOrder: 10001,
+                  };
+                  data.push(ungroupedDepart);
                   data.forEach((item) => {
                     item.hasAuthority = true;
                   });
@@ -614,6 +625,13 @@ export default {
                 } else {
                   departData[0].hasAuthority = false;
                 }
+                // 未分组用户禁止操作
+                departData[0].children.forEach((item) => {
+                  if (item.id == -1) {
+                    item.hasAuthority = false;
+                    return;
+                  }
+                });
               }
             })
             .then((res) => {
@@ -824,7 +842,6 @@ export default {
                 initial[key] = data[key];
               }
             }
-            console.log(modifyMemberInfo, initial);
             for (let key in currentMemberInfo) {
               if (key === "railName" || key == "online" || key == "remarks") {
                 continue;
@@ -1057,40 +1074,75 @@ export default {
      * 查询部门成员
      */
     const selectChildMember = (memberListPaging) => {
-      let params = new URLSearchParams(); // text post 提交
-      params.append("id", memberListPaging.id);
-      params.append("pageNum", memberListPaging.pageNum);
-      params.append("pageSize", memberListPaging.pageSize);
-      listUserByDepartment(params).then((res) => {
-        let code = res.code;
-        if (code === 0) {
-          memberData.data.splice(0, memberData.data.length);
-          let data = res.data.list ? res.data.list : res.data;
-          memberData.total = res.data.total;
-          currentDepart.length = data.length;
-          let i = 0,
-            len = data.length;
-          for (i; i < len; i++) {
-            data[i].temperature = Number(data[i].temperature).toFixed(1);
-
-            // age
-            let newDate = new Date().getTime();
-            let date = new Date(data[i].age).getTime();
-            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
-            let age = parseInt((newDate - date) / oneDay);
-            data[i].age = age;
-            if (data[i].temperature > 37.3) {
-              data[i].status = "温度异常";
-            } else {
-              data[i].status = "";
+      console.log(memberListPaging, "memberListPaging");
+      if (memberListPaging.id === -1) {
+        listUserByNoDepartment(
+          memberListPaging.pageNum,
+          memberListPaging.pageSize
+        ).then((res) => {
+          let code = res.code;
+          if (code === 0) {
+            memberData.data.splice(0, memberData.data.length);
+            let data = res.data.list ? res.data.list : res.data;
+            memberData.total = res.data.total;
+            currentDepart.length = data.length;
+            let i = 0,
+              len = data.length;
+            for (i; i < len; i++) {
+              data[i].temperature = Number(data[i].temperature).toFixed(1);
+              // age
+              let newDate = new Date().getTime();
+              let date = new Date(data[i].age).getTime();
+              let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+              let age = parseInt((newDate - date) / oneDay);
+              data[i].age = age;
+              if (data[i].temperature > 37.3) {
+                data[i].status = "温度异常";
+              } else {
+                data[i].status = "";
+              }
+              memberData.data.push(data[i]);
             }
-            memberData.data.push(data[i]);
+            //[ ... memberData.data] = data;
+          } else if (code === 10004) {
+            memberData.total = res.data;
           }
-          //[ ... memberData.data] = data;
-        } else if (code === 10004) {
-          memberData.total = res.data;
-        }
-      });
+        });
+      } else {
+        let params = new URLSearchParams(); // text post 提交
+        params.append("id", memberListPaging.id);
+        params.append("pageNum", memberListPaging.pageNum);
+        params.append("pageSize", memberListPaging.pageSize);
+        listUserByDepartment(params).then((res) => {
+          let code = res.code;
+          if (code === 0) {
+            memberData.data.splice(0, memberData.data.length);
+            let data = res.data.list ? res.data.list : res.data;
+            memberData.total = res.data.total;
+            currentDepart.length = data.length;
+            let i = 0,
+              len = data.length;
+            for (i; i < len; i++) {
+              data[i].temperature = Number(data[i].temperature).toFixed(1);
+              // age
+              let newDate = new Date().getTime();
+              let date = new Date(data[i].age).getTime();
+              let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+              let age = parseInt((newDate - date) / oneDay);
+              data[i].age = age;
+              if (data[i].temperature > 37.3) {
+                data[i].status = "温度异常";
+              } else {
+                data[i].status = "";
+              }
+              memberData.data.push(data[i]);
+            }
+            //[ ... memberData.data] = data;
+          } else if (code === 10004) {
+            memberData.total = res.data;
+          }
+        });
+      }
     };
     /**
      * 左侧工具栏点击事件
