@@ -326,7 +326,7 @@
         </div>
         <el-tooltip class="item" effect="light" content="定位" placement="right">
           <div class="control" @click.stop="location">
-            <svg-icon iconClass="map_location"></svg-icon>
+            <svg-icon iconClass="map_location" className="moving_icon"></svg-icon>
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="放大一级" placement="right">
@@ -336,7 +336,7 @@
             @mouseenter="toogleIcon('up', true)"
             @mouseleave="toogleIcon('up', false)"
           >
-            <svg-icon :iconClass="icon_toggle.up.icon"></svg-icon>
+            <svg-icon :iconClass="icon_toggle.up.icon" className="moving_icon"></svg-icon>
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="缩小一级" placement="right">
@@ -346,7 +346,7 @@
             @mouseenter="toogleIcon('down', true)"
             @mouseleave="toogleIcon('down', false)"
           >
-            <svg-icon :iconClass="icon_toggle.down.icon"></svg-icon>
+            <svg-icon :iconClass="icon_toggle.down.icon" className="moving_icon"></svg-icon>
           </div>
         </el-tooltip>
       </div>
@@ -370,13 +370,14 @@
         @row-click="showMemberInfo"
       >
         <el-table-column fixed prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="250"
+          width="230"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -411,13 +412,14 @@
         @row-click="showMemberInfo"
       >
         <el-table-column prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="250"
+          width="230"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -459,14 +461,15 @@
           show-overflow-tooltip
           sortable
         ></el-table-column>
+        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="type" label="告警类型" width="110" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="125" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="140" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
-          label="最新上传数据时间"
-          width="190"
+          label="上传数据时间"
+          width="140"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -501,13 +504,14 @@
         @row-click="showMemberInfo"
       >
         <el-table-column prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="address" label="当前所在地址" width="170" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="250"
+          width="230"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -732,6 +736,7 @@ export default {
       database.online.pageSize = 15;
       let len = database.online.data.length;
       database.online.data.splice(0, len);
+      console.log(database,'database');
       if (val == "on") {
         database.online.title = "在线用户";
         database.onlineContent.forEach((item) => {
@@ -1366,6 +1371,13 @@ export default {
           };
           scaleStatic.managerPerson = data.length;
           data.forEach((item) => {
+            let gmtTime =
+              new Date().getTime() - new Date(item.gmtCreate).getTime();
+            item.deviceOnline = '离线';
+            let step = deviceStep.step;
+            if (gmtTime < step) {
+              item.deviceOnline = '在线';
+            }
             item.temperature = parseFloat(item.temperature).toFixed(1);
           });
           database.onlineContent = data;
@@ -1373,10 +1385,10 @@ export default {
           data.forEach((item) => {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
-            let deviceOline = false;
+            let deviceOnline = false;
             let step = deviceStep.step;
             if (gmtTime < step) {
-              deviceOline = true;
+              deviceOnline = true;
             }
             // 地址逆解析
             let lng = item.longitude,
@@ -1400,7 +1412,7 @@ export default {
               status.temperatureStatic++;
               myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
             }
-            if (deviceOline) {
+            if (deviceOnline) {
               status.onlineStatic++;
               myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
             }
@@ -1922,6 +1934,7 @@ export default {
       let id = [item.id];
       listDeviceAlarmInfoByUserId(id).then((res) => {
         if (res.code === 0) {
+          console.log(res, 'res');
           let lng = res.data[0].longitude;
           let lat = res.data[0].latitude;
           map.centerAndZoom(new BMap.Point(lng, lat), 19); // 初始化地图,设置中心点坐标和地图级别
@@ -1956,6 +1969,16 @@ export default {
           database.personContent = data;
           // 地址逆解析
           database.personContent.forEach((item) => {
+            // 登录
+            let gmtTime =
+              new Date().getTime() - new Date(item.gmtCreate).getTime();
+            item.deviceOnline = '离线';
+            let step = deviceStep.step;
+            if (gmtTime < step) {
+              item.deviceOnline = '在线';
+            }
+
+            // 地址
             let lng = item.longitude,
               lat = item.latitude;
             let pt = new BMap.Point(lng, lat);
@@ -1987,6 +2010,16 @@ export default {
           database.alarmContent = data;
           // 地址逆解析
           database.alarmContent.forEach((item) => {
+            // 登录
+            let gmtTime =
+              new Date().getTime() - new Date(item.gmtCreate).getTime();
+            item.deviceOnline = '离线';
+            let step = deviceStep.step;
+            if (gmtTime < step) {
+              item.deviceOnline = '在线';
+            }
+
+            // 地址
             let lng = item.longitude,
               lat = item.latitude;
             let pt = new BMap.Point(lng, lat);
@@ -2392,14 +2425,17 @@ $transitionTime: 0.3s;
     top: 31%;
     left: 22%;
     .control {
-      height: 16px;
-      width: 16px;
+      height: 20px;
+      width: 20px;
       background-color: #fff;
       cursor: pointer;
       @include webkit("box-shadow", 1px 2px 1px rgba(0, 0, 0, 0.15));
       text-align: center;
-      margin: 5px 0 5px 11px;
+      margin: 12px 0 5px 11px;
       padding: 5px;
+      .moving_icon {
+        margin-top: 2px;
+      }
     }
     .control:nth-child(3) {
       margin-bottom: -4px;

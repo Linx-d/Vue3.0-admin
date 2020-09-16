@@ -1074,7 +1074,6 @@ export default {
      * 查询部门成员
      */
     const selectChildMember = (memberListPaging) => {
-      console.log(memberListPaging, "memberListPaging");
       if (memberListPaging.id === -1) {
         listUserByNoDepartment(
           memberListPaging.pageNum,
@@ -1102,6 +1101,15 @@ export default {
                 data[i].status = "";
               }
               memberData.data.push(data[i]);
+
+              // 登录
+              let gmtTime =
+                new Date().getTime() - new Date(data[i].gmtCreate).getTime();
+              data[i].deviceOnline = "离线";
+              let step = deviceStep.step;
+              if (gmtTime < step) {
+                data[i].deviceOnline = "在线";
+              }
             }
             //[ ... memberData.data] = data;
           } else if (code === 10004) {
@@ -1134,6 +1142,15 @@ export default {
                 data[i].status = "温度异常";
               } else {
                 data[i].status = "";
+              }
+
+              // 登录
+              let gmtTime =
+                new Date().getTime() - new Date(data[i].gmtCreate).getTime();
+              data[i].deviceOnline = "离线";
+              let step = deviceStep.step;
+              if (gmtTime < step) {
+                data[i].deviceOnline = "在线";
               }
               memberData.data.push(data[i]);
             }

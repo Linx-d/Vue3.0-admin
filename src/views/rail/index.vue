@@ -555,9 +555,9 @@ export default {
         listByRailData.forEach((item) => {
           let gmtTime =
             new Date().getTime() - new Date(item.gmtCreate).getTime();
-          let deviceOline = false;
+          let deviceOnline = false;
           if (gmtTime < 300001) {
-            deviceOline = true;
+            deviceOnline = true;
           }
           let temperature = parseFloat(item.temperature);
           let electric = item.electric;
@@ -566,7 +566,7 @@ export default {
             status.temperatureStatic++;
             myIcon = new BMap.Icon(dangerIcon, new BMap.Size(32, 32));
           }
-          if (deviceOline) {
+          if (deviceOnline) {
             status.onlineStatic++;
             myIcon = new BMap.Icon(onLineIcon, new BMap.Size(32, 32));
           }
