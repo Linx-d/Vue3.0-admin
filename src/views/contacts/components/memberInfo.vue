@@ -28,6 +28,13 @@
     </div>-->
     <div class="info_main">
       <div class="info_head">
+        <div class="progress_bar">
+          <el-progress
+            :percentage="percentageData.percentage"
+            :color="customColorMethod"
+            :show-text="false"
+          ></el-progress>
+        </div>
         <div class="info_head_l">
           <!-- <svg-icon iconClass="info" class="info_svg"></svg-icon> -->
           <el-image
@@ -164,7 +171,9 @@
 
             <span v-else>暂无</span>
           </li>
-          <li>
+          <li
+            :class="{depart_margin_top: currentMemberInfo.listDepart!=null&&currentMemberInfo.listDepart.length!=0}"
+          >
             <el-tooltip class="item" effect="light" :content="content.tmp.txt" placement="left">
               <a href="javascript:;" @click="toggleAbnormal">
                 <span>体温告警：</span>
@@ -343,7 +352,7 @@
               v-model="modifyData.remarks.txt"
               autocomplete="off"
               @keyup.enter.native="confirmOpen('currentMemberInfo')"
-              maxlength="50"
+              maxlength="2000"
             ></el-input>
           </el-form-item>
         </el-form>
@@ -911,6 +920,34 @@ export default {
     const modifyBefore = () => {
       modifyData.remarks.visible = false;
     };
+
+    /** 温度标记
+     *
+     */
+    const percentageData = reactive({
+      percentage: 0,
+    });
+    const customColorMethod = (percentage) => {
+      if (percentage < 74.6) {
+        return "#008000";
+      } else if (percentage < 82) {
+        return "#bf4739";
+      } else {
+        return "#e6a23c";
+      }
+    };
+    const increase = () => {
+      this.percentage += 10;
+      if (this.percentage > 100) {
+        this.percentage = 100;
+      }
+    };
+    const decrease = () => {
+      this.percentage -= 10;
+      if (this.percentage < 0) {
+        this.percentage = 0;
+      }
+    };
     /**
      * 百度地图方法
      */
@@ -982,6 +1019,8 @@ export default {
     });
     watchEffect(() => {
       if (props.contactsModule.memberInfo) {
+        // 温度标记
+        percentageData.percentage = props.currentMemberInfo.temperature * 2;
         // if (!temperature) {
         // 温度异常逆解析地址
         let tmp_len = props.tmpHistory.newArr_position.length;
@@ -1068,6 +1107,11 @@ export default {
       rules,
       confirmOpen,
       modifyBefore,
+      // 温度标记
+      percentageData,
+      customColorMethod,
+      increase,
+      decrease,
     };
   },
 };
@@ -1117,6 +1161,13 @@ $contactsHeight: 592px;
     padding: 20px 0 20px;
     position: relative;
     @include webkit("box-sizing", border-box);
+    .progress_bar {
+      position: absolute;
+      top: 85px;
+      right: 146px;
+      width: 122px;
+      overflow: hidden;
+    }
     .info_head_l {
       float: left;
       .info_svg {
@@ -1238,6 +1289,9 @@ $contactsHeight: 592px;
         .railText {
           margin-right: 10px;
         }
+      }
+      .depart_margin_top {
+        margin-top: -10px;
       }
     }
   }
