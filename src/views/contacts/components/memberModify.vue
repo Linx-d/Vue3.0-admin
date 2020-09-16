@@ -173,9 +173,6 @@ export default {
                   let age = parseInt((newDate - date) / oneDay);
                   memberData[key] = age;
                 }
-                if(key =="remarks") {
-                  memberData[key] = "暂无数据";
-                }
               }
               switchModule(props.contactsModule, "memberInfo");
             } else {

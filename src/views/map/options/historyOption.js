@@ -39,6 +39,7 @@ const history = {
       name: "告警总数",
       type: "line",
       stack: "start",
+      smooth: true,
       data: [120, 132, 101, 134, 90, 230, 210],
     }
   ],
