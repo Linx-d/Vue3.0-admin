@@ -1,5 +1,12 @@
 <template>
   <div class="chunk_cnt">
+    <div
+      class="close_drawer_box"
+      v-if="showMemberInfo_drawer.status.map"
+      @click="memberInfoBack(showMemberInfo_drawer)"
+    >
+      <svg-icon iconClass="close_drawer" class="close_drawer"></svg-icon>
+    </div>
     <div class="info_title">
       <span>成员详情</span>
     </div>
@@ -13,16 +20,12 @@
         href="javascript:;"
         @click="memberInfoModify"
       >编辑</a>
-      <!--
-      <a class="memberLink" href="javascript:;">编辑</a>
-      <a class="memberLink" href="javascript:;">移除</a>
-      -->
     </div>
-    <div class="cnt_tool" v-if="showMemberInfo_drawer.status.map">
+    <!-- <div class="cnt_tool" v-if="showMemberInfo_drawer.status.map">
       <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
         <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>关闭
       </a>
-    </div>
+    </div>-->
     <div class="info_main">
       <div class="info_head">
         <div class="info_head_l">
@@ -43,7 +46,7 @@
             </span>
           </p>
           <div class="info_status">
-            <span v-if="currentMemberInfo.online">
+            <span v-if="currentMemberInfo.online" :class="{online_txt: currentMemberInfo.online}">
               <svg-icon iconClass="online1" class="online my_icon online_icon"></svg-icon>在线
             </span>
             <span v-if="!currentMemberInfo.online">
@@ -120,6 +123,8 @@
           <li>
             <span>性别：</span>
             <i>{{ currentMemberInfo.sex }}</i>
+            <svg-icon v-show="currentMemberInfo.sex=='男'" iconClass="boy" class="sex_icon"></svg-icon>
+            <svg-icon v-show="currentMemberInfo.sex=='女'" iconClass="girl" class="sex_icon"></svg-icon>
           </li>
           <li>
             <span>电话：</span>
@@ -178,16 +183,16 @@
               effect="light"
               :content="content.position.txt"
               placement="left"
-            > -->
-              <a href="javascript:;" @click="positionHandle('position')">
-                <span>位置告警：</span>
-                <i>
-                  {{ currentMemberInfo.pnumber }}&nbsp;
-                  <span
-                    v-show="currentMemberInfo.pnumber!='暂无数据'"
-                  >次</span>
-                </i>
-              </a>
+            >-->
+            <a href="javascript:;" @click="positionHandle('position')">
+              <span>位置告警：</span>
+              <i>
+                {{ currentMemberInfo.pnumber }}&nbsp;
+                <span
+                  v-show="currentMemberInfo.pnumber!='暂无数据'"
+                >次</span>
+              </i>
+            </a>
             <!-- </el-tooltip> -->
           </li>
           <li>
@@ -735,7 +740,7 @@ export default {
           dataZoom: [
             {
               type: "inside",
-              start: 90,
+              start: 95,
               end: 100,
             },
             {
@@ -772,6 +777,7 @@ export default {
               name: "",
               type: "line",
               data: newArr_tmp,
+              smooth: true,
               markPoint: {
                 data: [
                   { type: "max", name: "最大值" },
@@ -805,6 +811,7 @@ export default {
         switchModule(contactsModule, "memberList");
       } else if (map) {
         data.visible = false;
+        temperature.value = true;
       }
     };
     // 编辑
@@ -1069,6 +1076,16 @@ export default {
 $contactsHeight: 592px;
 .chunk_cnt {
   height: $contactsHeight;
+  position: relative;
+  .close_drawer_box {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    .close_drawer {
+    }
+  }
   .info_title {
     font-size: 18px;
     font-weight: 700;
@@ -1119,6 +1136,9 @@ $contactsHeight: 592px;
       }
       .info_status {
         margin-bottom: 10px;
+        .online_txt {
+          color: #008000 !important;
+        }
         .online_icon {
           vertical-align: middle;
           margin-right: 5px;
@@ -1169,7 +1189,8 @@ $contactsHeight: 592px;
     .departManagersBoxAll {
       overflow: auto;
       line-height: 32px;
-      margin-bottom: 0 !important;
+      margin-bottom: 5px !important;
+      margin-top: -3px !important;
       .departManagers {
         width: 92%;
         float: right;
@@ -1177,6 +1198,9 @@ $contactsHeight: 592px;
           margin-right: 15px;
         }
       }
+    }
+    .sex_icon {
+      vertical-align: middle;
     }
   }
 
@@ -1202,14 +1226,15 @@ $contactsHeight: 592px;
           color: #787878;
           margin-right: 15px;
         }
-        i {
+        i,
+        strong {
           font-style: normal;
           margin-right: 10px;
           line-height: 25px;
           font-size: 15px;
           letter-spacing: 0.3px;
         }
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         .railText {
           margin-right: 10px;
         }
