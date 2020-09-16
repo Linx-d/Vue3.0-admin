@@ -290,3 +290,36 @@
 :focus {
   outline: none;
 }
+
+/**上传头像 login */
+.avatar-uploader {
+  text-align: center;
+  .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .el-upload:hover {
+    border-color: #409eff;
+  }
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+#modify_photo .el-dialog {
+  width: 500px;
+  min-width: 500px;
+}
+/**上传头像 end */
