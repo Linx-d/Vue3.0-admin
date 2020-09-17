@@ -134,7 +134,7 @@
                 >
                   <td :title="rail.railName">{{ rail.railName }}</td>
                   <td :title="rail.personSum">{{ rail.personSum }}</td>
-                  <td :title="rail.personSum" class="railTemperatrue">{{ rail.abnormalPerson }}</td>
+                  <td :title="rail.abnormalPerson" class="railTemperatrue">{{ rail.abnormalPerson }}</td>
                   <td :title="rail.gmtCreate">{{ rail.gmtCreate }}</td>
                   <td :title="rail.gmtModified">{{ rail.gmtModified }}</td>
                   <td :title="rail.radius">{{ rail.radius }}</td>

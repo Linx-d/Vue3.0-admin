@@ -326,7 +326,7 @@
         </div>
         <el-tooltip class="item" effect="light" content="定位" placement="right">
           <div class="control" @click.stop="location">
-            <svg-icon iconClass="map_location" className="moving_icon"></svg-icon>
+            <svg-icon iconClass="map_location" class="moving_icon"></svg-icon>
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="放大一级" placement="right">
@@ -336,7 +336,7 @@
             @mouseenter="toogleIcon('up', true)"
             @mouseleave="toogleIcon('up', false)"
           >
-            <svg-icon :iconClass="icon_toggle.up.icon" className="moving_icon"></svg-icon>
+            <svg-icon :iconClass="icon_toggle.up.icon" class="moving_icon"></svg-icon>
           </div>
         </el-tooltip>
         <el-tooltip class="item" effect="light" content="缩小一级" placement="right">
@@ -346,7 +346,7 @@
             @mouseenter="toogleIcon('down', true)"
             @mouseleave="toogleIcon('down', false)"
           >
-            <svg-icon :iconClass="icon_toggle.down.icon" className="moving_icon"></svg-icon>
+            <svg-icon :iconClass="icon_toggle.down.icon" class="moving_icon"></svg-icon>
           </div>
         </el-tooltip>
       </div>
@@ -366,11 +366,20 @@
         max-height="500"
         height="500"
         v-loading="database.online.loading"
-        :row-class-name="tableRowClassName"
         @row-click="showMemberInfo"
+        :cell-style="cellStyle"
+        :stripe="true"
       >
         <el-table-column fixed prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="deviceOnline" label="状态" width="80" show-overflow-tooltip sortable>
+          <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.deviceOnline === '在线' ? 'success' : 'primary'"
+                disable-transitions
+              >{{scope.row.deviceOnline}}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
@@ -405,14 +414,30 @@
       <el-table
         :data="database.temperature.show"
         style="width: 100%"
+        :cell-style="cellStyle"
         max-height="500"
         height="500"
         v-loading="database.temperature.loading"
-        :row-class-name="tableRowClassName"
         @row-click="showMemberInfo"
+        :stripe="true"
       >
         <el-table-column prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column
+          prop="deviceOnline"
+          label="状态"
+          width="80"
+          show-overflow-tooltip
+          sortable
+          class="cell_online"
+        >
+        <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.deviceOnline === '在线' ? 'success' : 'primary'"
+                disable-transitions
+              >{{scope.row.deviceOnline}}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
@@ -447,10 +472,10 @@
       <el-table
         :data="database.alarm.show"
         style="width: 100%"
+        :cell-style="cellStyle"
         max-height="500"
         height="500"
         v-loading="database.alarm.loading"
-        :row-class-name="tableRowClassName"
         @row-click="showMemberInfo"
       >
         <el-table-column
@@ -461,18 +486,20 @@
           show-overflow-tooltip
           sortable
         ></el-table-column>
-        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="deviceOnline" label="状态" width="80" show-overflow-tooltip sortable>
+          <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.deviceOnline === '在线' ? 'success' : 'primary'"
+                disable-transitions
+              >{{scope.row.deviceOnline}}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="type" label="告警类型" width="110" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="125" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="140" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column
-          prop="gmtCreate"
-          label="上传数据时间"
-          width="140"
-          show-overflow-tooltip
-          sortable
-        ></el-table-column>
+        <el-table-column prop="gmtCreate" label="上传数据时间" width="140" show-overflow-tooltip sortable></el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
@@ -497,14 +524,22 @@
       <el-table
         :data="database.person.show"
         style="width: 100%"
+        :cell-style="cellStyle"
         max-height="500"
         height="500"
         v-loading="database.person.loading"
-        :row-class-name="tableRowClassName"
         @row-click="showMemberInfo"
       >
         <el-table-column prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="deviceOnline" label="登录" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="deviceOnline" label="状态" width="80" show-overflow-tooltip sortable>
+          <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.deviceOnline === '在线' ? 'success' : 'primary'"
+                disable-transitions
+              >{{scope.row.deviceOnline}}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table-column>
         <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
@@ -736,7 +771,6 @@ export default {
       database.online.pageSize = 15;
       let len = database.online.data.length;
       database.online.data.splice(0, len);
-      console.log(database,'database');
       if (val == "on") {
         database.online.title = "在线用户";
         database.onlineContent.forEach((item) => {
@@ -1101,7 +1135,7 @@ export default {
                 currentMemberInfo.online = false;
               }
             } else {
-              currentMemberInfo[key] = "暂无数据";
+              // currentMemberInfo[key] = "暂无数据";
             }
           }
           if (key == "online") {
@@ -1120,6 +1154,32 @@ export default {
       });
     };
     /*----------------------------获取个人信息 end---------------------------------------*/
+
+    /**指定单元格设置样式
+     *
+     */
+    const cellStyle = ({ row, column, rowIndex, columnIndex }) => {
+      // 在线
+      if (columnIndex === 1 && row.deviceOnline == "在线") {
+        console.log(columnIndex, "columnIndex");
+        console.log(row, "row");
+        return "color: green;";
+      } else if (columnIndex === 1 && row.deviceOnline == "离线") {
+        console.log(columnIndex, "columnIndex");
+        console.log(row, "row");
+        return "color: #919191;";
+      }
+
+      // 温度
+      let temperature = parseFloat(row.temperature).toFixed(1);
+      if(columnIndex ==2 && temperature>=37.3) {
+        return "color: #da5646;";
+      }else if(columnIndex ==2 && temperature<37.3 ) {
+        return "color: green;";
+      }else {
+        return ""; 
+      }
+    };
 
     /**
      * 图表框
@@ -1373,10 +1433,10 @@ export default {
           data.forEach((item) => {
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
-            item.deviceOnline = '离线';
+            item.deviceOnline = "离线";
             let step = deviceStep.step;
             if (gmtTime < step) {
-              item.deviceOnline = '在线';
+              item.deviceOnline = "在线";
             }
             item.temperature = parseFloat(item.temperature).toFixed(1);
           });
@@ -1934,7 +1994,7 @@ export default {
       let id = [item.id];
       listDeviceAlarmInfoByUserId(id).then((res) => {
         if (res.code === 0) {
-          console.log(res, 'res');
+          console.log(res, "res");
           let lng = res.data[0].longitude;
           let lat = res.data[0].latitude;
           map.centerAndZoom(new BMap.Point(lng, lat), 19); // 初始化地图,设置中心点坐标和地图级别
@@ -1969,13 +2029,13 @@ export default {
           database.personContent = data;
           // 地址逆解析
           database.personContent.forEach((item) => {
-            // 登录
+            // 状态
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
-            item.deviceOnline = '离线';
+            item.deviceOnline = "离线";
             let step = deviceStep.step;
             if (gmtTime < step) {
-              item.deviceOnline = '在线';
+              item.deviceOnline = "在线";
             }
 
             // 地址
@@ -2010,13 +2070,13 @@ export default {
           database.alarmContent = data;
           // 地址逆解析
           database.alarmContent.forEach((item) => {
-            // 登录
+            // 状态
             let gmtTime =
               new Date().getTime() - new Date(item.gmtCreate).getTime();
-            item.deviceOnline = '离线';
+            item.deviceOnline = "离线";
             let step = deviceStep.step;
             if (gmtTime < step) {
-              item.deviceOnline = '在线';
+              item.deviceOnline = "在线";
             }
 
             // 地址
@@ -2089,6 +2149,7 @@ export default {
       contactsModule,
       currentMemberInfo,
       tmpHistory,
+      cellStyle,
     };
   },
 };
