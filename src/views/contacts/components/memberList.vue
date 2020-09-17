@@ -13,8 +13,18 @@
     <div class="cnt_bottom">
       <div class="has_member" v-show="changeModule.status">
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;" @click="addMemberBtn" v-if="memberListPaging.id!=-1">添加成员</a>
-          <a class="memberLink" href="javascript:;" @click="delMemberBtn" v-if="memberListPaging.id!=-1">移除成员</a>
+          <a
+            class="memberLink"
+            href="javascript:;"
+            @click="addMemberBtn"
+            v-if="memberListPaging.id!=-1"
+          >添加成员</a>
+          <a
+            class="memberLink"
+            href="javascript:;"
+            @click="delMemberBtn"
+            v-if="memberListPaging.id!=-1"
+          >移除成员</a>
           <!-- <a
             class="memberLink"
             href="javascript:;"
@@ -31,27 +41,53 @@
           v-if="!screen.visible"
           ref="multipleTable_remove"
           :data="memberData.data"
-          :row-class-name="tableRowClassName"
+          :cell-style="cellStyle"
           tooltip-effect="dark"
           style="width: 100%"
           @selection-change="handleSelectionChange_remove"
           :row-style="{'font-size': '13px','height': '37px', 'font-family': 'Microsoft YaHei'}"
           :header-row-style="{'font-size': '13px', 'padding': 0, 'font-family': 'Microsoft YaHei'}"
-          :cell-style="{'padding': 0, 'font-family': 'Microsoft YaHei'}"
         >
           <el-table-column type="selection" width="45" v-if="memberListPaging.id!=-1"></el-table-column>
-          <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="80"></el-table-column>
+          <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="deviceOnline" label="状态" sortable show-overflow-tooltip width="70">
+            <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.deviceOnline === '在线' ? 'success' : 'primary'"
+                disable-transitions
+              >{{scope.row.deviceOnline}}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="sex" label="性别" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="age" label="年龄" sortable show-overflow-tooltip width="70"></el-table-column>
-          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="tel" label="电话" sortable show-overflow-tooltip width="110"></el-table-column>
-          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="170" v-if="memberListPaging.id!=-1"></el-table-column>
-          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="205" v-else></el-table-column>
-          <el-table-column prop="status" label="状态" sortable show-overflow-tooltip width="75"></el-table-column>
-          <el-table-column label="操作" show-overflow-tooltip width="150">
+          <el-table-column
+            prop="address"
+            label="住址"
+            sortable
+            show-overflow-tooltip
+            width="170"
+            v-if="memberListPaging.id!=-1"
+          ></el-table-column>
+          <el-table-column
+            prop="address"
+            label="住址"
+            sortable
+            show-overflow-tooltip
+            width="170"
+            v-else
+          ></el-table-column>
+          <el-table-column prop="status" label="警告" sortable show-overflow-tooltip width="75"></el-table-column>
+          <el-table-column label="操作" show-overflow-tooltip width="85">
             <template slot-scope="scope">
-              <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
-              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)" v-if="memberListPaging.id!=-1">移除</el-button>
+              <el-button @click="compileTool(scope.row)" type="text" size="small">查看</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="delMember(scope.row.userId,scope.row)"
+                v-if="memberListPaging.id!=-1"
+              >移除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -60,33 +96,71 @@
           v-if="screen.visible"
           ref="multipleTable_remove"
           :data="screen.show"
-          :row-class-name="tableRowClassName"
+          :cell-style="cellStyle"
           tooltip-effect="dark"
           style="width: 100%"
           @selection-change="handleSelectionChange_remove"
           :row-style="{'font-size': '13px','height': '37px', 'font-family': 'Microsoft YaHei'}"
           :header-row-style="{'font-size': '13px', 'padding': 0, 'font-family': 'Microsoft YaHei'}"
-          :cell-style="{'padding': 0, 'font-family': 'Microsoft YaHei'}"
         >
-          <el-table-column type="selection" width="45"></el-table-column>
+          <el-table-column type="selection" width="25"></el-table-column>
           <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="80"></el-table-column>
+          <el-table-column prop="deviceOnline" label="状态" sortable show-overflow-tooltip width="70">
+            <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.deviceOnline === '在线' ? 'success' : 'primary'"
+                disable-transitions
+              >{{scope.row.deviceOnline}}</el-tag>
+            </template>
+          </el-table-column>
+          </el-table-column>
+          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="sex" label="性别" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="age" label="年龄" sortable show-overflow-tooltip width="70"></el-table-column>
-          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="tel" label="电话" sortable show-overflow-tooltip width="110"></el-table-column>
-          <el-table-column prop="address" label="住址" sortable show-overflow-tooltip width="170"></el-table-column>
-          <el-table-column prop="status" label="状态" sortable show-overflow-tooltip width="75"></el-table-column>
+          <el-table-column
+            prop="address"
+            label="住址"
+            sortable
+            show-overflow-tooltip
+            width="120"
+            v-if="memberListPaging.id!=-1"
+          ></el-table-column>
+          <el-table-column
+            prop="address"
+            label="住址"
+            sortable
+            show-overflow-tooltip
+            width="145"
+            v-else
+          ></el-table-column>
+          <el-table-column prop="status" label="警告" sortable show-overflow-tooltip width="75"></el-table-column>
           <el-table-column label="操作" show-overflow-tooltip width="150">
             <template slot-scope="scope">
-              <el-button size="mini" @click="compileTool(scope.row)">查看</el-button>
-              <el-button size="mini" type="danger" @click="delMember(scope.row.userId,scope.row)" v-if="memberListPaging.id!=-1">移除</el-button>
+              <el-button @click="compileTool(scope.row)" type="text" size="small">查看</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="delMember(scope.row.userId,scope.row)"
+                v-if="memberListPaging.id!=-1"
+              >移除</el-button>
             </template>
           </el-table-column>
         </el-table>
 
         <div class="cnt_tool">
-          <a class="memberLink" href="javascript:;" @click="addMemberBtn" v-if="memberListPaging.id!=-1">添加成员</a>
-          <a class="memberLink" href="javascript:;" @click="delMemberBtn" v-if="memberListPaging.id!=-1">移除成员</a>
+          <a
+            class="memberLink"
+            href="javascript:;"
+            @click="addMemberBtn"
+            v-if="memberListPaging.id!=-1"
+          >添加成员</a>
+          <a
+            class="memberLink"
+            href="javascript:;"
+            @click="delMemberBtn"
+            v-if="memberListPaging.id!=-1"
+          >移除成员</a>
         </div>
         <div class="block" v-show="changeModule.status">
           <!-- 普通 -->
@@ -143,7 +217,7 @@
         style="width: 100%;"
         height="300px"
         @selection-change="handleSelectionChange"
-        :row-class-name="tableRowClassName"
+        :cell-style="cellStyleAdd"
         @scroll="tableScroll"
         class="addScroll"
       >
@@ -151,10 +225,10 @@
         <el-table-column label="姓名" width="100" show-overflow-tooltip sortable>
           <template slot-scope="scope">{{ scope.row.name }}</template>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="温度" width="100" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="电话" width="170" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="地址" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="remark" label="状态" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="remark" label="警告" show-overflow-tooltip sortable></el-table-column>
       </el-table>
       <div slot="footer" class="dialog-footer">
         <el-button @click="toggleSelection()">取 消</el-button>
@@ -452,13 +526,6 @@ export default {
           if (key === "railName" || key == "online" || key == "remarks") {
             continue;
           }
-          let verify =
-            currentMemberInfo[key] === null ||
-            currentMemberInfo[key] === undefined ||
-            currentMemberInfo[key] === ""; // 验证值是否为空
-          if (verify) {
-            currentMemberInfo[key] = "暂无数据";
-          }
         }
       });
     };
@@ -669,7 +736,6 @@ export default {
         ).then((res) => {
           props.memberData.data.splice(0, props.memberData.data.length);
           let data = res.data.list ? res.data.list : res.data;
-
           let size = res.data.size,
             hasPreviousPage = res.data.hasPreviousPage;
           let verify = res.data.total != 0 ? true : false;
@@ -896,13 +962,33 @@ export default {
           });
         });
     };
-    // 异常状态表格
-    const tableRowClassName = ({ row, rowIndex }) => {
-      let temperature = parseFloat(row.temperature);
-      if (temperature >= 37.3) {
-        return "warning-row";
+
+    /**指定单元格设置样式
+     *
+     */
+    // 成员列表
+    const cellStyle = ({ row, column, rowIndex, columnIndex }) => {
+      // 温度
+      let temperature = parseFloat(row.temperature).toFixed(1);
+      if (columnIndex == 3 && temperature >= 37.3) {
+        return "color: #da5646; padding: 0;";
+      } else if (columnIndex == 3 && temperature < 37.3) {
+        return "color: green; padding: 0;";
+      } else {
+        return "padding: 0;";
       }
-      return "";
+    };
+    // 添加成员
+    const cellStyleAdd = ({ row, column, rowIndex, columnIndex }) => {
+      // 温度
+      let temperature = parseFloat(row.temperature).toFixed(1);
+      if (columnIndex == 3 && temperature >= 37.3) {
+        return "color: #da5646;";
+      } else if (columnIndex == 3 && temperature < 37.3) {
+        return "color: green;";
+      } else {
+        return "";
+      }
     };
 
     onMounted(() => {});
@@ -921,7 +1007,8 @@ export default {
       toggleSelection,
       handleSelectionChange,
       handleSelectionChange_remove,
-      tableRowClassName,
+      cellStyle,
+      cellStyleAdd,
       dialogTableVisible,
       addMemberList,
       tableScroll,
