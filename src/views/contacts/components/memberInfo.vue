@@ -178,11 +178,13 @@
               <a href="javascript:;" @click="toggleAbnormal">
                 <span>体温告警：</span>
                 <i>
-                  {{ currentMemberInfo.tnumber }}&nbsp;
-                  <span
-                    v-show="currentMemberInfo.tnumber!='暂无数据'"
-                  >次</span>
-                </i>
+                <span
+                  v-show="currentMemberInfo.tnumber!=null"
+                >{{ currentMemberInfo.tnumber }} 次</span>
+                <span
+                  v-show="currentMemberInfo.tnumber==null"
+                >0 次</span>
+              </i>
               </a>
             </el-tooltip>
           </li>
@@ -196,10 +198,12 @@
             <a href="javascript:;" @click="positionHandle('position')">
               <span>位置告警：</span>
               <i>
-                {{ currentMemberInfo.pnumber }}&nbsp;
                 <span
-                  v-show="currentMemberInfo.pnumber!='暂无数据'"
-                >次</span>
+                  v-show="currentMemberInfo.pnumber!=null"
+                >{{ currentMemberInfo.pnumber }} 次</span>
+                <span
+                  v-show="currentMemberInfo.pnumber==null"
+                >0 次</span>
               </i>
             </a>
             <!-- </el-tooltip> -->
@@ -1246,12 +1250,19 @@ $contactsHeight: 592px;
         width: 92%;
         float: right;
         .depart_item {
+          border: none;
           margin-right: 15px;
+          text-overflow: inherit;
+        }
+        .depart_item:hover {
+          background-color: #fff;
         }
       }
     }
     .sex_icon {
       vertical-align: middle;
+      width: 1.3em;
+      height: 1.3em;
     }
   }
 
