@@ -11,7 +11,7 @@ const online = {
     legend: {
         orient: 'vertical',
         left: 'left',
-        data: ['体温异常人数', '体温正常人数']
+        data: ['温度异常人数', '温度正常人数']
     },
     series: [{
         name: '访问来源',
@@ -20,11 +20,11 @@ const online = {
         center: ['50%', '60%'],
         data: [{
                 value: 0,
-                name: '体温正常人数'
+                name: '温度正常人数'
             },
             {
                 value: 0,
-                name: '体温异常人数'
+                name: '温度异常人数'
             }
         ],
         emphasis: {

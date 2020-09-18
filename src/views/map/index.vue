@@ -380,7 +380,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="温度" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
@@ -438,7 +438,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="温度" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
@@ -495,7 +495,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="温度" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="type" label="告警类型" width="110" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="125" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="140" show-overflow-tooltip sortable></el-table-column>
@@ -540,7 +540,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column prop="temperature" label="体温" width="80" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="temperature" label="温度" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="tel" label="联系方式" width="140" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="address" label="当前所在地址" width="150" show-overflow-tooltip sortable></el-table-column>
         <el-table-column
@@ -806,7 +806,7 @@ export default {
       let len = database.temperature.data.length;
       database.temperature.data.splice(0, len);
       if (val == "normal") {
-        database.temperature.title = "体温正常用户";
+        database.temperature.title = "温度正常用户";
         database.temperatureContent.forEach((item) => {
           let temperature = parseFloat(item.temperature);
           let marking = deviceStep.marking;
@@ -815,7 +815,7 @@ export default {
           }
         });
       } else {
-        database.temperature.title = "体温异常用户";
+        database.temperature.title = "温度异常用户";
         database.temperatureContent.forEach((item) => {
           let temperature = parseFloat(item.temperature);
           let marking = deviceStep.marking;
@@ -1159,22 +1159,11 @@ export default {
      *
      */
     const cellStyle = ({ row, column, rowIndex, columnIndex }) => {
-      // 在线
-      if (columnIndex === 1 && row.deviceOnline == "在线") {
-        console.log(columnIndex, "columnIndex");
-        console.log(row, "row");
-        return "color: green;";
-      } else if (columnIndex === 1 && row.deviceOnline == "离线") {
-        console.log(columnIndex, "columnIndex");
-        console.log(row, "row");
-        return "color: #919191;";
-      }
-
       // 温度
       let temperature = parseFloat(row.temperature).toFixed(1);
-      if(columnIndex ==2 && temperature>=37.3) {
+      if(column.label == "温度" && temperature>=37.3) {
         return "color: #da5646;";
-      }else if(columnIndex ==2 && temperature<37.3 ) {
+      }else if(column.label == "温度" && temperature<37.3 ) {
         return "color: green;";
       }else {
         return ""; 
@@ -1631,7 +1620,7 @@ export default {
       adaptionEchartsV2(onlineChart);
       // 处理点击事件并且跳转到相应的开始
       onlineChart.on("click", function (params) {
-        if (params.name == "体温正常人数") {
+        if (params.name == "温度正常人数") {
           temperatureHandle("normal");
         } else {
           temperatureHandle("abnormal");
@@ -1889,7 +1878,6 @@ export default {
     // 定位
     const location = () => {
       let point = new BMap.Point(positionPoint.lng, positionPoint.lat);
-      console.log(positionPoint);
       map.centerAndZoom(point, positionPoint.level);
     };
     // 增大缩放等级
@@ -1994,7 +1982,6 @@ export default {
       let id = [item.id];
       listDeviceAlarmInfoByUserId(id).then((res) => {
         if (res.code === 0) {
-          console.log(res, "res");
           let lng = res.data[0].longitude;
           let lat = res.data[0].latitude;
           map.centerAndZoom(new BMap.Point(lng, lat), 19); // 初始化地图,设置中心点坐标和地图级别
@@ -2505,6 +2492,7 @@ $transitionTime: 0.3s;
       position: relative;
       width: 48px;
       height: 48px;
+      left: 2px;
       .moving {
         width: 16px;
         height: 16px;
