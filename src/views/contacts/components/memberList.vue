@@ -729,6 +729,7 @@ export default {
      * 查询部门成员
      */
     const selectChildMember = (memberListPaging) => {
+      // 未分组成员部门
       if (memberListPaging.id === -1) {
         listUserByNoDepartment(
           memberListPaging.pageNum,
@@ -770,10 +771,21 @@ export default {
             } else {
               data[i].status = "";
             }
+
+            // 登录
+            let gmtTime =
+              new Date().getTime() - new Date(data[i].gmtCreate).getTime();
+            data[i].deviceOnline = "离线";
+            let step = deviceStep.step;
+            if (gmtTime < step) {
+              data[i].deviceOnline = "在线";
+            }
+
             props.memberData.data.push(data[i]);
           }
           //[ ... memberData.data] = data;
         });
+      // 已分组成员部门
       } else {
         let params = new URLSearchParams(); // text post 提交
         params.append("id", memberListPaging.id);
@@ -817,6 +829,15 @@ export default {
             } else {
               data[i].status = "";
             }
+            // 登录
+            let gmtTime =
+              new Date().getTime() - new Date(data[i].gmtCreate).getTime();
+            data[i].deviceOnline = "离线";
+            let step = deviceStep.step;
+            if (gmtTime < step) {
+              data[i].deviceOnline = "在线";
+            }
+            
             props.memberData.data.push(data[i]);
           }
           //[ ... memberData.data] = data;
@@ -966,7 +987,7 @@ export default {
     /**指定单元格设置样式
      *
      */
-    // 成员列表
+    // 成员列表表格
     const cellStyle = ({ row, column, rowIndex, columnIndex }) => {
       // 温度
       let temperature = parseFloat(row.temperature).toFixed(1);
@@ -978,7 +999,7 @@ export default {
         return "padding: 0;";
       }
     };
-    // 添加成员
+    // 添加成员表格
     const cellStyleAdd = ({ row, column, rowIndex, columnIndex }) => {
       // 温度
       let temperature = parseFloat(row.temperature).toFixed(1);
