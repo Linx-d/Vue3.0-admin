@@ -323,3 +323,29 @@
   min-width: 500px;
 }
 /**上传头像 end */
+
+.el-tag {
+  background-color: #ecf5ff;
+  display: inline-block;
+  height: 32px;
+  padding: 0 10px;
+  line-height: 30px;
+  font-size: 12px;
+  color: #409eff;
+  border: 1px solid #d9ecff;
+  border-radius: 4px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.el-tag.el-tag--success {
+  background-color: #d7efca !important;
+  border-color: #d7efca !important;
+  color: #67c23a !important;
+}
+
+.el-tag.el-tag--primary {
+  background-color: #dfe0e1 !important;
+  border-color: #dfe0e1 !important;
+  color: #919599 !important;
+}

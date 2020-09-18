@@ -75,7 +75,7 @@
             label="住址"
             sortable
             show-overflow-tooltip
-            width="170"
+            width="210"
             v-else
           ></el-table-column>
           <el-table-column prop="status" label="警告" sortable show-overflow-tooltip width="75"></el-table-column>
@@ -970,9 +970,9 @@ export default {
     const cellStyle = ({ row, column, rowIndex, columnIndex }) => {
       // 温度
       let temperature = parseFloat(row.temperature).toFixed(1);
-      if (columnIndex == 3 && temperature >= 37.3) {
+      if (column.label == "温度" && temperature >= 37.3) {
         return "color: #da5646; padding: 0;";
-      } else if (columnIndex == 3 && temperature < 37.3) {
+      } else if (column.label == "温度" && temperature < 37.3) {
         return "color: green; padding: 0;";
       } else {
         return "padding: 0;";
@@ -982,9 +982,9 @@ export default {
     const cellStyleAdd = ({ row, column, rowIndex, columnIndex }) => {
       // 温度
       let temperature = parseFloat(row.temperature).toFixed(1);
-      if (columnIndex == 3 && temperature >= 37.3) {
+      if (column.label == "温度" && temperature >= 37.3) {
         return "color: #da5646;";
-      } else if (columnIndex == 3 && temperature < 37.3) {
+      } else if (column.label == "温度" && temperature < 37.3) {
         return "color: green;";
       } else {
         return "";
