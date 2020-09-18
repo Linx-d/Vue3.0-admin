@@ -280,7 +280,7 @@
       </div>
 
       <!-- tool_box -->
-      <div class="tool_box">
+      <div :class="['tool_box', {'tool_box_right': icon_toggle.system.visible}]">
         <!-- <div class="tool_left tool-common">城市</div> -->
         <!-- <span class="frame_operation_dep"></span> -->
         <!-- <div class="tool_middle tool-common"></div> -->
@@ -308,7 +308,7 @@
         </div>
       </div>
 
-      <div class="zoom_control">
+      <div :class="['zoom_control', {'zoom_control_left': icon_toggle.alarm.visible}]">
         <div class="move_box">
           <div class="moving" @click.stop="map_move('up')" title="向上平移">
             <svg-icon iconClass="move_top"></svg-icon>
@@ -2427,6 +2427,7 @@ $transitionTime: 0.3s;
     position: absolute;
     top: 13%;
     right: 22%;
+    transition: $transient_time;
     .tool-common {
       display: inline-block;
       cursor: pointer;
@@ -2467,11 +2468,16 @@ $transitionTime: 0.3s;
       color: #1579f3;
     }
   }
+  .tool_box_right {
+    top: 18%;
+    right: 2%;
+  }
   .zoom_control {
     overflow: hidden;
     position: absolute;
     top: 31%;
     left: 22%;
+    transition: $transient_time;
     .control {
       height: 20px;
       width: 20px;
@@ -2521,6 +2527,10 @@ $transitionTime: 0.3s;
         top: 16px;
       }
     }
+  }
+  .zoom_control_left {
+    top: 68%;
+    left: 1.4%;
   }
   #search_city {
     position: absolute;

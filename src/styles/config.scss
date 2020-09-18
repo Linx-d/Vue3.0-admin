@@ -10,6 +10,8 @@ $scrollHeight_corporation: 750px; //左侧导航栏bgc
 
 $layout-min-width: 1366px;// 统一设置最小宽度
 
+$transient_time: .5s;// 过渡时间
+
 @mixin webkit ($type, $value) {
   -webkit-#{$type}: $value;
   -moz-#{$type}: $value;
