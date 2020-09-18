@@ -837,13 +837,18 @@ export default {
             if (gmtTime < step) {
               data[i].deviceOnline = "在线";
             }
-            
+
             props.memberData.data.push(data[i]);
           }
           //[ ... memberData.data] = data;
         });
       }
     };
+    
+    // 定时刷新获取成员最新数据
+    setInterval(() => {
+      selectChildMember(props.memberListPaging);
+    }, 1000);
 
     /**弹出框
      *
