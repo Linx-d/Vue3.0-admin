@@ -170,6 +170,7 @@
             @current-change="handleCurrentChange"
             :page-sizes="[15, 20, 30, 40]"
             :page-size="memberListPaging.pageSize"
+            :current-page="memberListPaging.pageNum"
             layout="total, sizes, prev, pager, next, jumper"
             :total="memberData.total"
             class="pagingConfig"
@@ -182,6 +183,7 @@
             @current-change="handleCurrentChange"
             :page-sizes="[15, 20, 30, 40]"
             :page-size="memberListPaging.pageSize"
+            :current-page="memberListPaging.pageNum"
             layout="total, sizes, prev, pager, next, jumper"
             :total="screen.total"
             class="pagingConfig"
@@ -359,6 +361,9 @@ export default {
       } else {
         changeModule.status = true;
       }
+
+      // 切换页码时刷新获取成员最新数据
+      selectChildMember(props.memberListPaging);
     });
 
     /**
