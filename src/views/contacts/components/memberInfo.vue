@@ -28,13 +28,16 @@
     </div>-->
     <div class="info_main">
       <div class="info_head">
+        <div class="progress_box"></div>
         <div class="progress_bar">
           <el-progress
             :percentage="percentageData.percentage"
             :color="customColorMethod"
             :show-text="false"
+            :stoke-width="20"
           ></el-progress>
         </div>
+
         <div class="info_head_l">
           <!-- <svg-icon iconClass="info" class="info_svg"></svg-icon> -->
           <el-image
@@ -178,13 +181,9 @@
               <a href="javascript:;" @click="toggleAbnormal">
                 <span>体温告警：</span>
                 <i>
-                <span
-                  v-show="currentMemberInfo.tnumber!=null"
-                >{{ currentMemberInfo.tnumber }} 次</span>
-                <span
-                  v-show="currentMemberInfo.tnumber==null"
-                >0 次</span>
-              </i>
+                  <span v-show="currentMemberInfo.tnumber!=null">{{ currentMemberInfo.tnumber }} 次</span>
+                  <span v-show="currentMemberInfo.tnumber==null">0 次</span>
+                </i>
               </a>
             </el-tooltip>
           </li>
@@ -198,12 +197,8 @@
             <a href="javascript:;" @click="positionHandle('position')">
               <span>位置告警：</span>
               <i>
-                <span
-                  v-show="currentMemberInfo.pnumber!=null"
-                >{{ currentMemberInfo.pnumber }} 次</span>
-                <span
-                  v-show="currentMemberInfo.pnumber==null"
-                >0 次</span>
+                <span v-show="currentMemberInfo.pnumber!=null">{{ currentMemberInfo.pnumber }} 次</span>
+                <span v-show="currentMemberInfo.pnumber==null">0 次</span>
               </i>
             </a>
             <!-- </el-tooltip> -->
@@ -932,9 +927,9 @@ export default {
       percentage: 0,
     });
     const customColorMethod = (percentage) => {
-      if (percentage < 74.6) {
+      if (percentage < 37.3*1.27) {
         return "#008000";
-      } else if (percentage < 82) {
+      } else if (percentage < 41*1.27) {
         return "#bf4739";
       } else {
         return "#e6a23c";
@@ -1024,7 +1019,7 @@ export default {
     watchEffect(() => {
       if (props.contactsModule.memberInfo) {
         // 温度标记
-        percentageData.percentage = props.currentMemberInfo.temperature * 2;
+        percentageData.percentage = props.currentMemberInfo.temperature * 1.27;
         // if (!temperature) {
         // 温度异常逆解析地址
         let tmp_len = props.tmpHistory.newArr_position.length;
@@ -1165,13 +1160,6 @@ $contactsHeight: 592px;
     padding: 20px 0 20px;
     position: relative;
     @include webkit("box-sizing", border-box);
-    .progress_bar {
-      position: absolute;
-      top: 85px;
-      right: 146px;
-      width: 122px;
-      overflow: hidden;
-    }
     .info_head_l {
       float: left;
       .info_svg {
@@ -1252,7 +1240,6 @@ $contactsHeight: 592px;
         .depart_item {
           border: none;
           margin-right: 15px;
-          text-overflow: inherit;
         }
         .depart_item:hover {
           background-color: #fff;
@@ -1265,7 +1252,23 @@ $contactsHeight: 592px;
       height: 1.3em;
     }
   }
-
+  // 进度条
+  .progress_box {
+    position: absolute;
+    top: 145px;
+    right: 169px;
+    width: 119px;
+    height: 320px;
+    background-image: url("../../images/thermometer.png");
+  }
+  .progress_bar {
+    position: absolute;
+    top: 288px;
+    right: 115px;
+    width: 232px;
+    overflow: hidden;
+    transform: rotate(-90deg);
+  }
   .info_position {
     position: relative;
     .quick_position {
