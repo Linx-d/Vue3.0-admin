@@ -28,14 +28,13 @@
     </div>-->
     <div class="info_main">
       <div class="info_head">
-        <div class="progress_box"></div>
-        <div class="progress_bar">
-          <el-progress
-            :percentage="percentageData.percentage"
-            :color="customColorMethod"
-            :show-text="false"
-            :stoke-width="20"
-          ></el-progress>
+        <div class="progress_box" :style="{'background-image': progressData.img}">
+          <div class="progress_bg" :style="{'width': progressData.width, 'height': '233px' }">
+            <div
+              class="progress_content"
+              :style="{'width': progressData.width, 'height': progressData.height, 'background': progressData.color, }"
+            ></div>
+          </div>
         </div>
 
         <div class="info_head_l">
@@ -66,33 +65,33 @@
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric0"
-                  class="electric my_icon online_icon"
+                  class="electric my_icon_power online_icon"
                   v-if="currentMemberInfo.electric==='0'"
                 ></svg-icon>
               </span>
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric1"
-                  class="electric my_icon online_icon"
+                  class="electric my_icon_power online_icon"
                   v-if="currentMemberInfo.electric==='1'"
                 ></svg-icon>
               </span>
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric2"
-                  class="electric my_icon online_icon"
+                  class="electric my_icon_power online_icon"
                   v-if="currentMemberInfo.electric==='2'"
                 ></svg-icon>
               </span>
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric3"
-                  class="electric my_icon"
+                  class="electric my_icon_power"
                   v-if="currentMemberInfo.electric==='3'"
                 ></svg-icon>
               </span>
               <span v-if="!currentMemberInfo.online">
-                <svg-icon iconClass="power_placeholder" class="electric my_icon"></svg-icon>
+                <svg-icon iconClass="power_placeholder" class="electric my_icon_power"></svg-icon>
               </span>
             </div>
             <el-tooltip class="item" effect="light" content="最新位置" placement="bottom">
@@ -379,6 +378,8 @@ import personTravel from "@/views/images/personTravel.png";
 import address_location from "@/views/images/address_location.png";
 import member_location from "@/views/images/member_location.png";
 import address_position from "@/views/images/address_position.png";
+import thermometer_normal from "@/views/images/thermometer_normal.png";
+import thermometer_abnormal from "@/views/images/thermometer_abnormal.png";
 export default {
   name: "memberList",
   props: {
@@ -920,33 +921,16 @@ export default {
       modifyData.remarks.visible = false;
     };
 
-    /** 温度标记
+    /** 温度计
      *
      */
-    const percentageData = reactive({
-      percentage: 0,
+    const progressData = reactive({
+      temperature: 0,
+      img: "",
+      corlor: "#008000",
+      height: 0,
+      width: "6px",
     });
-    const customColorMethod = (percentage) => {
-      if (percentage < 37.3*1.27) {
-        return "#008000";
-      } else if (percentage < 41*1.27) {
-        return "#bf4739";
-      } else {
-        return "#e6a23c";
-      }
-    };
-    const increase = () => {
-      this.percentage += 10;
-      if (this.percentage > 100) {
-        this.percentage = 100;
-      }
-    };
-    const decrease = () => {
-      this.percentage -= 10;
-      if (this.percentage < 0) {
-        this.percentage = 0;
-      }
-    };
     /**
      * 百度地图方法
      */
@@ -1019,7 +1003,31 @@ export default {
     watchEffect(() => {
       if (props.contactsModule.memberInfo) {
         // 温度标记
-        percentageData.percentage = props.currentMemberInfo.temperature * 1.27;
+        let temperature_progress = props.currentMemberInfo.temperature;
+        let progressInit = 15;
+        let progressStep = 33 / progressInit;
+        let progressStep1 = 0;
+        let progressHeight = 0;
+        progressData.temperature = temperature_progress;
+        if (temperature_progress < 37.3) {
+          progressData.img = "url('" + thermometer_normal + "')";
+          progressData.color = "#008000";
+        } else {
+          progressData.img = "url('" + thermometer_abnormal + "')";
+          progressData.color = "#bf4739";
+        }
+
+        if (temperature_progress < progressInit) {
+          progressHeight = temperature_progress * progressStep + "px";
+        } else {
+          progressStep1 = 28 / 5;
+          progressHeight =
+            (progressInit - 1) * progressStep +
+            (temperature_progress - (progressInit - 1)) * progressStep1 +
+            "px";
+        }
+        progressData.height = progressHeight;
+
         // if (!temperature) {
         // 温度异常逆解析地址
         let tmp_len = props.tmpHistory.newArr_position.length;
@@ -1107,10 +1115,7 @@ export default {
       confirmOpen,
       modifyBefore,
       // 温度标记
-      percentageData,
-      customColorMethod,
-      increase,
-      decrease,
+      progressData,
     };
   },
 };
@@ -1174,7 +1179,9 @@ $contactsHeight: 592px;
         margin-bottom: 10px;
         .info_small {
           margin-left: 5px;
-          vertical-align: top;
+          vertical-align: middle;
+          width: 1.5em;
+          height: 1.5em;
         }
       }
       .info_status {
@@ -1255,19 +1262,26 @@ $contactsHeight: 592px;
   // 进度条
   .progress_box {
     position: absolute;
-    top: 145px;
-    right: 169px;
-    width: 119px;
-    height: 320px;
-    background-image: url("../../images/thermometer.png");
-  }
-  .progress_bar {
-    position: absolute;
-    top: 288px;
-    right: 115px;
-    width: 232px;
-    overflow: hidden;
-    transform: rotate(-90deg);
+    top: 106.5px;
+    right: 78.5px;
+    width: 300px;
+    height: 400px;
+    .progress_bg {
+      position: absolute;
+      left: 49%;
+      top: 68px;
+      transform: translateX(-50%);
+      background: #fff;
+      border-radius: 3px;
+      overflow: hidden;
+
+      .progress_content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        border-radius: 3px;
+      }
+    }
   }
   .info_position {
     position: relative;
@@ -1302,6 +1316,12 @@ $contactsHeight: 592px;
         margin-bottom: 10px;
         .railText {
           margin-right: 10px;
+        }
+      }
+      li:last-child {
+        width: 418px;
+        strong {
+          word-break: keep-all
         }
       }
       .depart_margin_top {
@@ -1358,5 +1378,11 @@ $contactsHeight: 592px;
 .my_icon {
   width: 1.2em;
   height: 1.2em;
+}
+.my_icon_power,
+.departSvg {
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
 }
 </style>
