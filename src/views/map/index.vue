@@ -1118,26 +1118,6 @@ export default {
           if (key === "railName") {
             continue;
           }
-          let verify =
-            currentMemberInfo[key] === null ||
-            currentMemberInfo[key] === undefined ||
-            currentMemberInfo[key] === ""; // 验证值是否为空
-          if (verify) {
-            if (key == "online") {
-              // 在线情况
-              let time =
-                new Date().getTime() -
-                new Date(currentMemberInfo.gmtCreate).getTime();
-              let step = deviceStep.step;
-              if (time < step) {
-                currentMemberInfo.online = true;
-              } else {
-                currentMemberInfo.online = false;
-              }
-            } else {
-              // currentMemberInfo[key] = "暂无数据";
-            }
-          }
           if (key == "online") {
             // 在线情况
             let time =
@@ -1149,6 +1129,10 @@ export default {
             } else {
               currentMemberInfo.online = false;
             }
+          }else if(key == "userLongitude") {
+            currentMemberInfo[key] = data.longitude;
+          }else if(key == "userLatitude") {
+            currentMemberInfo[key] = data.latitude;
           }
         }
       });
