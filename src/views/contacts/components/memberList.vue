@@ -853,7 +853,7 @@ export default {
     // 定时刷新获取成员最新数据
     setInterval(() => {
       selectChildMember(props.memberListPaging);
-    }, 1000);
+    }, 5000);
 
     /**弹出框
      *
