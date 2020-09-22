@@ -358,7 +358,7 @@
       :title="database.online.title"
       :visible.sync="database.online.visible"
       :close-on-click-modal="false"
-      class="online_dialog"
+      class="online_dialog universal_dialog table_dialog"
     >
       <el-table
         :data="database.online.show"
@@ -366,6 +366,7 @@
         max-height="500"
         height="500"
         v-loading="database.online.loading"
+        :header-cell-class-name="'universal_table'"
         @row-click="showMemberInfo"
         :cell-style="cellStyle"
         :stripe="true"
@@ -386,7 +387,7 @@
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="230"
+          width="210"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -409,7 +410,7 @@
       :title="database.temperature.title"
       :visible.sync="database.temperature.visible"
       :close-on-click-modal="false"
-      class="temperature_dialog"
+      class="temperature_dialog universal_dialog table_dialog"
     >
       <el-table
         :data="database.temperature.show"
@@ -444,7 +445,7 @@
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="230"
+          width="210"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -467,7 +468,7 @@
       :title="database.alarm.title"
       :visible.sync="database.alarm.visible"
       :close-on-click-modal="false"
-      class="alarm_dialog"
+      class="alarm_dialog universal_dialog table_dialog table_dialog"
     >
       <el-table
         :data="database.alarm.show"
@@ -519,7 +520,7 @@
       :title="database.person.title"
       :visible.sync="database.person.visible"
       :close-on-click-modal="false"
-      class="person_dialog"
+      class="person_dialog universal_dialog table_dialog"
     >
       <el-table
         :data="database.person.show"
@@ -546,7 +547,7 @@
         <el-table-column
           prop="gmtCreate"
           label="最新上传数据时间"
-          width="230"
+          width="210"
           show-overflow-tooltip
           sortable
         ></el-table-column>
@@ -615,7 +616,7 @@ import { adaptionEchartsV2 } from "@/utils/common"; // 图表自适应
 import alarmOption from "./options/alarmOption.js"; // 告警模块
 import deviceOption from "./options/deviceOption.js"; // 设备模块
 import historyOption from "./options/historyOption.js"; // 历史告警模块
-import onlineOption from "./options/onlineOption.js"; // 在线统计模块
+import temperatureOption from "./options/temperatureOption.js"; // 在线统计模块
 import systemOption from "./options/systemOption.js"; // 系统统计模块
 import onLineIcon from "@/views/images/marker_online.png";
 import unLineIcon from "@/views/images/marker_unline.png";
@@ -774,8 +775,7 @@ export default {
       if (val == "on") {
         database.online.title = "在线用户";
         database.onlineContent.forEach((item) => {
-          let temperature = parseFloat(item.temperature),
-            gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
+          let gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
           let step = deviceStep.step;
           if (gmt < step) {
             database.online.data.push(item);
@@ -784,8 +784,7 @@ export default {
       } else {
         database.online.title = "离线用户";
         database.onlineContent.forEach((item) => {
-          let temperature = parseFloat(item.temperature),
-            gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
+          let gmt = new Date().getTime() - new Date(item.gmtCreate).getTime();
           let step = deviceStep.step;
           if (gmt >= step) {
             database.online.data.push(item);
@@ -1595,27 +1594,33 @@ export default {
     /**
      * 温度异常 abnormal
      */
-    let onlineChart = null;
+    let temperatureChart = null;
     const online = (status) => {
-      let onlineChart = root.$echarts.init(
+      let temperatureChart = root.$echarts.init(
         document.getElementById("online"),
         "dark"
       );
-      adaptionEchartsV2(onlineChart);
+      adaptionEchartsV2(temperatureChart);
       // 处理点击事件并且跳转到相应的开始
-      onlineChart.on("click", function (params) {
+      temperatureChart.on("click", function (params) {
         if (params.name == "温度正常人数") {
           temperatureHandle("normal");
         } else {
           temperatureHandle("abnormal");
         }
       });
-      let option = onlineOption;
-      onlineOption.series[0].data[0].value =
-        status.personStatic - status.temperatureStatic;
-      onlineOption.series[0].data[1].value = status.temperatureStatic;
+      let option = temperatureOption,
+        normal = status.personStatic - status.temperatureStatic,
+        abnormal = status.temperatureStatic;
+      temperatureOption.series[0].data[0].value = normal;
+      temperatureOption.series[0].data[0].name = `温度正常人数：${normal}人`;
+      temperatureOption.legend.data[0] = `温度正常人数：${normal}人`;
+
+      temperatureOption.series[0].data[1].value = abnormal;
+      temperatureOption.series[0].data[1].name = `温度异常人数：${abnormal}人`;
+      temperatureOption.legend.data[1] = `温度异常人数：${abnormal}人`;
       // 使用刚指定的配置项和数据显示图表。
-      onlineChart.setOption(option);
+      temperatureChart.setOption(option);
     };
 
     /**
@@ -1759,7 +1764,7 @@ export default {
     watchEffect(() => {
       adaptionEchartsV2(systemChart);
       adaptionEchartsV2(historyChart);
-      adaptionEchartsV2(onlineChart);
+      adaptionEchartsV2(temperatureChart);
     });
     const loading = ref(true);
 
@@ -1809,7 +1814,7 @@ export default {
       // 切换
       root.$store.commit("SET_FULL"); // commit 不用指向 map模块
       adaptionEchartsV2(systemChart);
-      adaptionEchartsV2(onlineChart);
+      adaptionEchartsV2(temperatureChart);
       adaptionEchartsV2(historyChart);
       if (alanysisStatus.status) {
         fullScreen(document.body);

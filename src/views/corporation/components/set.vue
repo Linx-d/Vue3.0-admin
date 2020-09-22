@@ -93,6 +93,7 @@
     <!-- 修改名称 弹出框 -->
     <el-dialog
       title="修改名称"
+      class="universal_dialog"
       :visible.sync="modifyStaffData.dialogNameVisible"
       :before-close="modifyNameBefore"
       :close-on-click-modal="false"
@@ -123,6 +124,7 @@
     <!-- 修改联系方式 弹出框 -->
     <el-dialog
       title="修改联系方式"
+      class="universal_dialog"
       :visible.sync="modifyStaffData.dialogTelVisible"
       :before-close="modifyTelBefore"
       :close-on-click-modal="false"
@@ -152,6 +154,7 @@
     <!-- 修改电子邮箱 弹出框 -->
     <el-dialog
       title="修改电子邮箱"
+      class="universal_dialog"
       :visible.sync="modifyStaffData.dialogEmailVisible"
       :before-close="modifyEmailBefore"
       :close-on-click-modal="false"

@@ -91,7 +91,7 @@
                 <el-dialog
                   title="添加部门"
                   :visible.sync="dialogFormVisible"
-                  class="addDialog"
+                  class="addDialog universal_dialog"
                   :append-to-body="true"
                   :close-on-click-modal="false"
                 >
@@ -121,7 +121,7 @@
                 <el-dialog
                   title="修改部门名称"
                   :visible.sync="modifyData.visibel"
-                  class="modifyDialog"
+                  class="modifyDialog universal_dialog"
                   :close-on-click-modal="false"
                   :append-to-body="true"
                   :destroy-on-close="true"
@@ -154,7 +154,7 @@
                   :visible.sync="dialogVisible"
                   width="30%"
                   :before-close="handleClose"
-                  class="addDialog"
+                  class="addDialog universal_dialog"
                   :close-on-click-modal="false"
                 >
                   <span>{{ memberLabel }}</span>

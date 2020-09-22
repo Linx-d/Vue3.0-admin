@@ -1,8 +1,8 @@
-const online = {
+const temperature = {
     title: {
-        text: '统计',
+        text: '温度统计',
         subtext: '信息',
-        left: 'center'
+        left: 'left'
     },
     tooltip: {
         trigger: 'item',
@@ -10,7 +10,7 @@ const online = {
     },
     legend: {
         orient: 'vertical',
-        left: 'left',
+        left: 'center',
         data: ['温度异常人数', '温度正常人数']
     },
     series: [{
@@ -37,4 +37,4 @@ const online = {
     }]
 };
 
-export default online;
+export default temperature;
