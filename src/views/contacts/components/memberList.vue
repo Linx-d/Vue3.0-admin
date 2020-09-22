@@ -47,6 +47,7 @@
           @selection-change="handleSelectionChange_remove"
           :row-style="{'font-size': '13px','height': '37px', 'font-family': 'Microsoft YaHei'}"
           :header-row-style="{'font-size': '13px', 'padding': 0, 'font-family': 'Microsoft YaHei'}"
+          @cell-click="compileTool"
         >
           <el-table-column type="selection" width="45" v-if="memberListPaging.id!=-1"></el-table-column>
           <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="70"></el-table-column>
@@ -204,6 +205,7 @@
     </div>
     <el-dialog
       id="nodepart_dialog"
+      class="universal_dialog table_input_dialog"
       title="未分组成员"
       :visible.sync="dialogTableVisible.status"
       :close-on-click-modal="false"
