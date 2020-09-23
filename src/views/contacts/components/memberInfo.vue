@@ -259,12 +259,18 @@
       <el-dialog
         title="围栏列表"
         :visible.sync="dialogRailVisible.status"
-        class="railTable"
+        class="railTable universal_dialog table_dialog"
         id="memberRailList"
         :close-on-click-modal="false"
         :modal="false"
       >
-        <el-table :data="railList.data" style="width: 100%" max-height="400">
+        <el-table
+          :data="railList.data"
+          style="width: 100%"
+          max-height="400"
+          :row-class-name="'universal_table_row'"
+          :header-row-class-name="'universal_table_header'"
+        >
           <el-table-column
             fixed
             prop="railName"
@@ -1321,7 +1327,7 @@ $contactsHeight: 592px;
       li:last-child {
         width: 418px;
         strong {
-          word-break: keep-all
+          word-break: keep-all;
         }
       }
       .depart_margin_top {

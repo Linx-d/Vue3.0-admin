@@ -210,20 +210,25 @@
       :visible.sync="dialogTableVisible.status"
       :close-on-click-modal="false"
     >
-      <el-input placeholder="请输入名字或电话" v-model="nodepart_input.txt" @input="nodepart_fn" clearable>
-        <i slot="prefix" class="el-input__icon el-icon-search"></i>
-      </el-input>
+      <el-form>
+        <el-form-item label="成员名称">
+          <el-input placeholder="请输入名字或电话" v-model="nodepart_input.txt" @input="nodepart_fn" clearable>
+            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+          </el-input>
+        </el-form-item>
+      </el-form>
       <el-table
         ref="multipleTable"
         v-loading="addNodepart_loading"
         :data="ungrouped.data"
         tooltip-effect="dark"
+        :row-class-name="'universal_table_row'"
+        :header-row-class-name="'universal_table_header'"
         style="width: 100%;"
-        height="300px"
+        height="400px"
         @selection-change="handleSelectionChange"
         :cell-style="cellStyleAdd"
         @scroll="tableScroll"
-        class="addScroll"
       >
         <el-table-column type="selection" width="45" show-overflow-tooltip></el-table-column>
         <el-table-column label="姓名" width="100" show-overflow-tooltip sortable>
@@ -450,22 +455,6 @@ export default {
           if (item.alarmType == 2 || item.alarmType == 3) {
             item.userName = currentMemberInfo.name;
             item.tel = currentMemberInfo.tel;
-            // let lng = item.longitude,
-            //   lat = item.latitude;
-            // let pt = new BMap.Point(lng, lat);
-            // let geoc = new BMap.Geocoder();
-            // geoc.getLocation(pt, function (rs) {
-            //   if (rs.addressComponents != null) {
-            //     let addComp = rs.addressComponents;
-            //     item.address =
-            //       addComp.province +
-            //       addComp.city +
-            //       addComp.district +
-            //       addComp.street +
-            //       addComp.streetNumber;
-            //     tmpHistory.data.push(item);
-            //   }
-            // });
             tmpHistory.data.push(item);
           }
           // temperature
@@ -502,7 +491,7 @@ export default {
         tmpHistory.newArr_tmp = newArr_tmp;
         tmpHistory.error_time = error_time;
         tmpHistory.error_tmp = error_tmp;
-        tmpHistory.newArr_position = newArr_position;
+        tmpHistory.newArr_position = newArr_position.reverse();  // 温度数据是从最新数据---之前的数据，这里地址也需要反向处理
         tmpHistory.tableData = new_tableData.reverse();
         tmpHistory.error_tableData = new_errorTableData.reverse();
       });
@@ -701,9 +690,8 @@ export default {
       } else {
         fuzzySearchNotGroup(params).then((res) => {
           if (res.code === 0) {
-            let data = res.data || [],
-              len = data.length;
-            ungrouped.data = res.data;
+            let data = res.data || [];
+            ungrouped.data = data;
             addNodepart_loading.value = false;
           } else {
             root.$message({

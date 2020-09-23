@@ -438,7 +438,7 @@
 }
 
 /** dialog
- * type: table
+ * type: table 
  */
 .table_dialog {
   .el-dialog {
@@ -462,11 +462,11 @@
 /** dialog
  * type: table and input
  */
- .table_input_dialog {
+.table_input_dialog {
   .el-dialog {
     width: 800px;
     .el-dialog__body {
-      padding: 15px 26px;
+      padding: 15px 31px;
     }
   }
 }
@@ -475,10 +475,26 @@
   color: #3c87c7;
 }
 
-
 /** table
- *
+ * 
  */
-.universal_table {
-  height: 50px;
+ // 表头
+.universal_table_header {
+  th {
+    padding: 5px 0;
+    font-size: 14px;
+  }
+}
+// 行
+.universal_table_row {
+  td {
+    padding: 5px 0;
+    font-size: 15px;
+  }
+}
+// 添加未分组成员单独设置padding
+#nodepart_dialog {
+  td {
+    padding: 10px 0;
+  }
 }
