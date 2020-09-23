@@ -493,7 +493,8 @@
   }
 }
 // 添加未分组成员单独设置padding
-#nodepart_dialog {
+#nodepart_dialog,
+#abnormal_position {
   td {
     padding: 10px 0;
   }

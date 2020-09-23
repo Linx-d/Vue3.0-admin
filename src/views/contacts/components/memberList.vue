@@ -451,6 +451,7 @@ export default {
           error_time = [],
           error_tmp = [],
           new_errorTableData = [];
+        tmpHistory.data.slice(0, tmpHistory.data.length);
         array.forEach((item) => {
           if (item.alarmType == 2 || item.alarmType == 3) {
             item.userName = currentMemberInfo.name;
@@ -481,10 +482,27 @@ export default {
 
           // tableData
           let tableObj = {
+            alarmType: item.alarmType,
+            type: "",
             name: props.currentMemberInfo.name,
             time: item.gmtCreate,
             temperature: temperature,
           };
+          switch(item.alarmType) {
+            case 0:
+              tableObj.type="";
+              break;
+            case 1:
+              tableObj.type="温度";
+              break;
+            case 2:
+              tableObj.type="位置";
+              break;
+            case 3:
+              tableObj.type="温度和位置";
+              break;
+          }
+          console.log(tableObj,'tableObj');
           new_tableData.push(tableObj);
         });
         tmpHistory.newArr_time = newArr_time;
@@ -774,6 +792,9 @@ export default {
             let step = deviceStep.step;
             if (gmtTime < step) {
               data[i].deviceOnline = "在线";
+              console.log(data[i], data[i].name);
+              console.log(step,'step');
+              console.log(gmtTime,'gmtTime');
             }
 
             props.memberData.data.push(data[i]);
@@ -831,6 +852,12 @@ export default {
             let step = deviceStep.step;
             if (gmtTime < step) {
               data[i].deviceOnline = "在线";
+            }
+            if (gmtTime < step) {
+              data[i].deviceOnline = "在线";
+              console.log(data[i], data[i].name);
+              console.log(step,'step');
+              console.log(gmtTime,'gmtTime');
             }
 
             props.memberData.data.push(data[i]);

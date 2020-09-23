@@ -544,13 +544,6 @@ export default {
     };
 
     /**
-     * 查询未分组用户
-     */
-    const selectNodepart = (pageNum, pageSize) => {
-      return listUserByNoDepartment(pageNum, pageSize);
-    };
-
-    /**
      * 查询所有部门
      */
     const selectAllDepart = () => {
@@ -594,6 +587,19 @@ export default {
                     displayOrder: 10001,
                   };
                   data.push(ungroupedDepart);
+
+                  // 解绑成员部门
+                  // let unbindDepart = {
+                  //   id: -2,
+                  //   pid: 6,
+                  //   name: "解绑成员",
+                  //   label: "解绑成员",
+                  //   hasAuthority: false,
+                  //   children: [],
+                  //   displayOrder: 10001,
+                  // };
+                  // data.push(unbindDepart);
+
                   data.forEach((item) => {
                     item.hasAuthority = true;
                   });

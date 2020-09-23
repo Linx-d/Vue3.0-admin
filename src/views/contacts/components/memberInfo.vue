@@ -187,20 +187,20 @@
             </el-tooltip>
           </li>
           <li>
-            <!-- <el-tooltip
+            <el-tooltip
               class="item"
               effect="light"
               :content="content.position.txt"
               placement="left"
-            >-->
-            <a href="javascript:;" @click="positionHandle('position')">
-              <span>位置告警：</span>
-              <i>
-                <span v-show="currentMemberInfo.pnumber!=null">{{ currentMemberInfo.pnumber }} 次</span>
-                <span v-show="currentMemberInfo.pnumber==null">0 次</span>
-              </i>
-            </a>
-            <!-- </el-tooltip> -->
+            >
+              <a href="javascript:;" @click="positionHandle('position')">
+                <span>位置告警：</span>
+                <i>
+                  <span v-show="currentMemberInfo.pnumber!=null">{{ currentMemberInfo.pnumber }} 次</span>
+                  <span v-show="currentMemberInfo.pnumber==null">0 次</span>
+                </i>
+              </a>
+            </el-tooltip>
           </li>
           <li>
             <span>备注：</span>
@@ -267,10 +267,10 @@
       >
         <el-table
           :data="railList.data"
-          style="width: 100%"
-          max-height="400"
           :row-class-name="'universal_table_row'"
           :header-row-class-name="'universal_table_header'"
+          style="width: 100%"
+          max-height="400"
         >
           <el-table-column
             fixed
@@ -298,30 +298,26 @@
 
       <!-- 位置异常统计 -->
       <el-dialog
+        id="abnormal_position"
         :title="database.position.title"
         :visible.sync="database.position.visible"
         :close-on-click-modal="false"
-        class="position_dialog"
+        class="position_dialog universal_dialog table_dialog"
       >
         <el-table
           :data="database.position.show"
+          :row-class-name="'universal_table_row'"
+          :header-row-class-name="'universal_table_header'"
           style="width: 100%"
+          :cell-style="cellStyle"
           max-height="500"
           height="500"
           v-loading="database.position.loading"
-          :row-class-name="tableRowClassName"
         >
-          <el-table-column prop="userName" label="姓名" width="100" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="temperature" label="体温" width="100" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="tel" label="联系方式" width="150" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="address" label="当前所在地址" width="300" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column
-            prop="gmtCreate"
-            label="最新上传数据时间"
-            width="250"
-            show-overflow-tooltip
-            sortable
-          ></el-table-column>
+          <el-table-column prop="temperature" label="温度" width="100" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="type" label="告警类型" width="120" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="address" label="当前所在地址" width="250" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="time" label="最新上传数据时间" width="250" show-overflow-tooltip sortable></el-table-column>
         </el-table>
         <div class="block">
           <el-pagination
@@ -486,17 +482,19 @@ export default {
       database[choose].show = database[choose].data.slice(start, end);
     };
     const positionHandle = (val) => {
-      return;
+      if (database.positionContent.length == 0) {
+        props.tmpHistory.tableData.forEach((item) => {
+          if (item.alarmType == 2 || item.alarmType == 3) {
+            database.positionContent.push(item);
+          }
+        });
+      }
       database.position.visible = true;
       database.position.pageNum = 1;
       database.position.pageSize = 15;
-      let len = database.position.data.length;
-      database.position.data.splice(0, len);
+      database.position.data = [];
       if (val == "position") {
         database.position.title = "位置异常统计";
-        database.positionContent.forEach((item) => {
-          //
-        });
         database.position.data = database.positionContent;
       }
       database.position.total = database.position.data.length;
@@ -505,6 +503,18 @@ export default {
         database.position.pageSize
       );
       database.position.loading = false;
+    };
+    // 位置告警表格
+    const cellStyle = ({ row, column }) => {
+      // 温度
+      let temperature = parseFloat(row.temperature).toFixed(1);
+      if (column.label == "温度" && temperature >= 37.3) {
+        return "color: #da5646;";
+      } else if (column.label == "温度" && temperature < 37.3) {
+        return "color: green;";
+      } else {
+        return "";
+      }
     };
 
     const handleCurrentChange_tmp = (val) => {
@@ -1072,16 +1082,6 @@ export default {
           });
         }
         // }
-
-        // 位置异常逆解析地址 database.position.visible temperature
-        if (database.position.visible) {
-          let position_len = props.tmpHistory.data.length;
-          if (position_len != 0) {
-            props.tmpHistory.data.forEach((item) => {
-              database.positionContent.push(item);
-            });
-          }
-        }
       } else {
         // 切换页码重置数据
         if (
@@ -1112,6 +1112,7 @@ export default {
       handleCurrentChange_tmp,
       handleSizeChange,
       positionHandle,
+      cellStyle,
       memberInfoBack,
       memberInfoModify,
       bindOpen,
