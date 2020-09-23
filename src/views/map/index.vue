@@ -362,14 +362,14 @@
     >
       <el-table
         :data="database.online.show"
+        :row-class-name="'universal_table_row'"
+        :header-row-class-name="'universal_table_header'"
         style="width: 100%"
         max-height="500"
         height="500"
         v-loading="database.online.loading"
-        :header-cell-class-name="'universal_table'"
         @row-click="showMemberInfo"
         :cell-style="cellStyle"
-        :stripe="true"
       >
         <el-table-column fixed prop="userName" label="姓名" width="80" show-overflow-tooltip sortable></el-table-column>
         <el-table-column prop="deviceOnline" label="状态" width="80" show-overflow-tooltip sortable>
@@ -414,6 +414,8 @@
     >
       <el-table
         :data="database.temperature.show"
+        :row-class-name="'universal_table_row'"
+        :header-row-class-name="'universal_table_header'"
         style="width: 100%"
         :cell-style="cellStyle"
         max-height="500"
@@ -472,6 +474,8 @@
     >
       <el-table
         :data="database.alarm.show"
+        :row-class-name="'universal_table_row'"
+        :header-row-class-name="'universal_table_header'"
         style="width: 100%"
         :cell-style="cellStyle"
         max-height="500"
@@ -524,6 +528,8 @@
     >
       <el-table
         :data="database.person.show"
+        :row-class-name="'universal_table_row'"
+        :header-row-class-name="'universal_table_header'"
         style="width: 100%"
         :cell-style="cellStyle"
         max-height="500"
@@ -1152,6 +1158,15 @@ export default {
         return ""; 
       }
     };
+    /**指定行设置样式
+     * 
+     */
+    const rowStyle = ({row, rowIndex}) => {
+      if(rowIndex==0) {
+        console.log(row);
+        return "padding: 0;"
+      }
+    }
 
     /**
      * 图表框
@@ -2002,7 +2017,7 @@ export default {
           code = res.code,
           msg = res.msg;
         if (code == 0) {
-          database.personContent = data;
+          database.personContent = data.reverse();
           // 地址逆解析
           database.personContent.forEach((item) => {
             // 状态
@@ -2043,7 +2058,8 @@ export default {
           msg = res.msg;
 
         if (code == 0) {
-          database.alarmContent = data;
+          let onlineArr = [];
+          database.alarmContent = data.reverse();
           // 地址逆解析
           database.alarmContent.forEach((item) => {
             // 状态
@@ -2053,6 +2069,7 @@ export default {
             let step = deviceStep.step;
             if (gmtTime < step) {
               item.deviceOnline = "在线";
+              onlineArr.push(item.userId);
             }
 
             // 地址
@@ -2069,6 +2086,15 @@ export default {
                 addComp.street +
                 addComp.streetNumber;
             });
+          });
+
+          // 判断在线情况
+          database.alarmContent.forEach(item => {
+            if(onlineArr.indexOf(item.userId)!=-1) {
+              item.deviceOnline = "在线";
+            }else {
+              item.deviceOnline = "离线";
+            }
           });
         } else {
           root.$message({
@@ -2126,6 +2152,7 @@ export default {
       currentMemberInfo,
       tmpHistory,
       cellStyle,
+      rowStyle,
     };
   },
 };
