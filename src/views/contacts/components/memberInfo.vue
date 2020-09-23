@@ -244,6 +244,7 @@
         </el-tooltip>
         <el-pagination
           background
+          :current-page="paging.pageNum"
           @current-change="handleCurrentChange_tmp"
           layout="prev, pager, next"
           :total="paging.total"
@@ -1080,6 +1081,19 @@ export default {
               database.positionContent.push(item);
             });
           }
+        }
+      } else {
+        // 切换页码重置数据
+        if (
+          paging.pageNum != 1 ||
+          paging.pageSize != 15 ||
+          paging.data.length != 0 ||
+          paging.total != 0
+        ) {
+          paging.pageNum = 1;
+          paging.pageSize = 15;
+          paging.data = [];
+          paging.total = 0;
         }
       }
 
