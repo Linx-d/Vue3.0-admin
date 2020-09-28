@@ -17,12 +17,17 @@
           id="suggestIdModify"
           size="20"
           placeholder="请输入目标地址"
-          style="width:150px;"
+          style="width: 150px"
         />
       </div>
       <div
         id="searchResultPanelModify"
-        style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"
+        style="
+          border: 1px solid #c0c0c0;
+          width: 150px;
+          height: auto;
+          display: none;
+        "
       ></div>
       <el-form
         :model="modifyRailData"
@@ -30,9 +35,14 @@
         ref="modifyRailData"
         label-width="100px"
         class="modify_ruleForm"
-        style="margin-top: -52px;"
+        style="margin-top: -52px"
       >
-        <el-form-item label="围栏地址" prop="railAddr" class="form-item" style="opacity: 0;">
+        <el-form-item
+          label="围栏地址"
+          prop="railAddr"
+          class="form-item"
+          style="opacity: 0"
+        >
           <el-input v-model="modifyRailData.railAddr"></el-input>
         </el-form-item>
         <el-form-item label="围栏名称" prop="railName" class="form-item">
@@ -44,8 +54,10 @@
         <el-form-item label="围栏半径" prop="radius" class="form-item">
           <p>{{ modifyRailData.radius }}&nbsp;m</p>
         </el-form-item>
-        <el-form-item class="railBtn">
-          <el-button type="primary" @click="modifySubmitForm('modifyRailData')">修改围栏</el-button>
+        <el-form-item class="railBtn universal_btn">
+          <el-button type="primary" @click="modifySubmitForm('modifyRailData')"
+            >修改围栏</el-button
+          >
           <el-button @click="closeModifyDrawer">关闭</el-button>
         </el-form-item>
       </el-form>
@@ -62,11 +74,22 @@
     >
       <div id="addMap"></div>
       <div id="r-result">
-        <input type="text" id="suggestIdAdd" size="20" placeholder="请输入目标地址" style="width:150px;" />
+        <input
+          type="text"
+          id="suggestIdAdd"
+          size="20"
+          placeholder="请输入目标地址"
+          style="width: 150px"
+        />
       </div>
       <div
         id="searchResultPanelAdd"
-        style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"
+        style="
+          border: 1px solid #c0c0c0;
+          width: 150px;
+          height: auto;
+          display: none;
+        "
       ></div>
       <el-form
         :model="addRailData"
@@ -74,9 +97,14 @@
         ref="addRailData"
         label-width="100px"
         class="modify_ruleForm"
-        style="margin-top: -52px;"
+        style="margin-top: -52px"
       >
-        <el-form-item label="围栏地址" prop="railAddr" class="form-item" style="opacity: 0;">
+        <el-form-item
+          label="围栏地址"
+          prop="railAddr"
+          class="form-item"
+          style="opacity: 0"
+        >
           <el-input v-model="addRailData.railAddr"></el-input>
         </el-form-item>
         <el-form-item label="围栏名称" prop="railName" class="form-item">
@@ -88,8 +116,10 @@
         <el-form-item label="围栏半径" prop="radius" class="form-item">
           <el-input v-model="addRailData.radius" disabled></el-input>
         </el-form-item>
-        <el-form-item class="railBtn">
-          <el-button type="primary" @click="addSubmitForm('addRailData')">增加围栏</el-button>
+        <el-form-item class="railBtn universal_btn">
+          <el-button type="primary" @click="addSubmitForm('addRailData')"
+            >增加围栏</el-button
+          >
           <el-button @click="closeAddDrawer">关闭</el-button>
         </el-form-item>
       </el-form>
@@ -100,7 +130,7 @@
         <div class="cnt_top">
           <div class="cnt_top_l">
             <span>围栏名称</span>
-            <span>&nbsp;共({{railData.total}})个围栏</span>
+            <span>&nbsp;共({{ railData.total }})个围栏</span>
           </div>
 
           <div class="cnt_top_r">
@@ -111,7 +141,9 @@
         <div class="cnt_bottom">
           <div class="has_depart" v-show="railData.status">
             <div class="cnt_tool">
-              <a class="memberLink" href="javascript:;" @click="addRailFn">增加围栏</a>
+              <a class="memberLink" href="javascript:;" @click="addRailFn"
+                >增加围栏</a
+              >
             </div>
             <table class="memberTable mm_tabel">
               <thead>
@@ -134,20 +166,32 @@
                 >
                   <td :title="rail.railName">{{ rail.railName }}</td>
                   <td :title="rail.personSum">{{ rail.personSum }}</td>
-                  <td :title="rail.abnormalPerson" class="railTemperatrue">{{ rail.abnormalPerson }}</td>
+                  <td :title="rail.abnormalPerson" class="railTemperatrue">
+                    {{ rail.abnormalPerson }}
+                  </td>
                   <td :title="rail.gmtCreate">{{ rail.gmtCreate }}</td>
                   <td :title="rail.gmtModified">{{ rail.gmtModified }}</td>
                   <td :title="rail.radius">{{ rail.radius }}</td>
-                  <td :title="rail.railAddr" class="railAddress">{{ rail.railAddr }}</td>
+                  <td :title="rail.railAddr" class="railAddress">
+                    {{ rail.railAddr }}
+                  </td>
                   <td class="tdTool">
-                    <a href="javascript:;" @click.stop="modifyRailFn(rail, index)">查看</a>
-                    <a href="javascript:;" @click.stop="delRailFn(rail, index)">删除</a>
+                    <a
+                      href="javascript:;"
+                      @click.stop="modifyRailFn(rail, index)"
+                      >查看</a
+                    >
+                    <a href="javascript:;" @click.stop="delRailFn(rail, index)"
+                      >删除</a
+                    >
                   </td>
                 </tr>
               </tbody>
             </table>
             <div class="cnt_tool">
-              <a class="memberLink" href="javascript:;" @click="addRailFn">增加围栏</a>
+              <a class="memberLink" href="javascript:;" @click="addRailFn"
+                >增加围栏</a
+              >
             </div>
             <div class="block">
               <el-pagination
@@ -449,7 +493,7 @@ export default {
          *
          */
         let ac = new BMap.Autocomplete({
-          input: 'suggestIdModify',
+          input: "suggestIdModify",
           location: map,
         }); //建立一个自动完成的对象
 
@@ -693,7 +737,7 @@ export default {
          *
          */
         let ac = new BMap.Autocomplete({
-          input: 'suggestIdAdd',
+          input: "suggestIdAdd",
           location: map,
         }); //建立一个自动完成的对象
 
@@ -843,6 +887,7 @@ export default {
             h("span", null, "修改围栏信息"),
             //h("i", { style: "color: teal" }, "VNode")
           ]),
+          customClass: "universal_dialog",
           showCancelButton: true,
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -1186,4 +1231,5 @@ $customerHeight: 648px;
     padding: 5px 14px;
   }
 }
+
 </style>
