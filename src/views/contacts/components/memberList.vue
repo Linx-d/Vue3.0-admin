@@ -17,13 +17,13 @@
             class="memberLink"
             href="javascript:;"
             @click="addMemberBtn"
-            v-if="memberListPaging.id!=-1"
+            v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
           >添加成员</a>
           <a
             class="memberLink"
             href="javascript:;"
             @click="delMemberBtn"
-            v-if="memberListPaging.id!=-1"
+            v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
           >移除成员</a>
           <!-- <a
             class="memberLink"
@@ -49,7 +49,7 @@
           :header-row-style="{'font-size': '13px', 'padding': 0, 'font-family': 'Microsoft YaHei'}"
           @cell-click="compileTool"
         >
-          <el-table-column type="selection" width="45" v-if="memberListPaging.id!=-1"></el-table-column>
+          <el-table-column type="selection" width="45" v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"></el-table-column>
           <el-table-column prop="name" label="姓名" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="deviceOnline" label="状态" sortable show-overflow-tooltip width="70">
             <template slot-scope="scope">
@@ -59,7 +59,8 @@
               >{{scope.row.deviceOnline}}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70" v-if="memberListPaging.id!=-2"></el-table-column>
+          <el-table-column label="温度" sortable show-overflow-tooltip width="70" v-else>0.0</el-table-column>
           <el-table-column prop="sex" label="性别" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="age" label="年龄" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="tel" label="电话" sortable show-overflow-tooltip width="110"></el-table-column>
@@ -69,7 +70,7 @@
             sortable
             show-overflow-tooltip
             width="170"
-            v-if="memberListPaging.id!=-1"
+            v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
           ></el-table-column>
           <el-table-column
             prop="address"
@@ -79,15 +80,19 @@
             width="210"
             v-else
           ></el-table-column>
-          <el-table-column prop="status" label="警告" sortable show-overflow-tooltip width="75"></el-table-column>
+          <el-table-column label="警告" sortable show-overflow-tooltip width="75">
+            <template slot-scope="scope">
+              <svg-icon iconClass="warning" className="wanrning_member" v-if="scope.row.status=='温度异常'"></svg-icon>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" show-overflow-tooltip width="85">
             <template slot-scope="scope">
               <el-button @click="compileTool(scope.row)" type="text" size="small">查看</el-button>
               <el-button
                 type="text"
                 size="small"
-                @click="delMember(scope.row.userId,scope.row)"
-                v-if="memberListPaging.id!=-1"
+                @click.stop="delMember(scope.row.userId,scope.row)"
+                v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
               >移除</el-button>
             </template>
           </el-table-column>
@@ -115,7 +120,7 @@
             </template>
           </el-table-column>
           </el-table-column>
-          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70"></el-table-column>
+          <el-table-column prop="temperature" label="温度" sortable show-overflow-tooltip width="70" v-if="memberListPaging.id!=-2"></el-table-column>
           <el-table-column prop="sex" label="性别" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="age" label="年龄" sortable show-overflow-tooltip width="70"></el-table-column>
           <el-table-column prop="tel" label="电话" sortable show-overflow-tooltip width="110"></el-table-column>
@@ -125,7 +130,7 @@
             sortable
             show-overflow-tooltip
             width="120"
-            v-if="memberListPaging.id!=-1"
+            v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
           ></el-table-column>
           <el-table-column
             prop="address"
@@ -143,7 +148,7 @@
                 type="text"
                 size="small"
                 @click="delMember(scope.row.userId,scope.row)"
-                v-if="memberListPaging.id!=-1"
+                v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
               >移除</el-button>
             </template>
           </el-table-column>
@@ -154,13 +159,13 @@
             class="memberLink"
             href="javascript:;"
             @click="addMemberBtn"
-            v-if="memberListPaging.id!=-1"
+            v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
           >添加成员</a>
           <a
             class="memberLink"
             href="javascript:;"
             @click="delMemberBtn"
-            v-if="memberListPaging.id!=-1"
+            v-if="memberListPaging.id!=-1 && memberListPaging.id!=-2"
           >移除成员</a>
         </div>
         <div class="block" v-show="changeModule.status">
@@ -259,6 +264,7 @@ import {
   fuzzySearchNotGroup,
   listDepartmentByUser,
   select,
+  findAllUserUntie,
 } from "@/api/contactsApi";
 import { getLoginEmployee } from "@/api/employeeApi";
 import { Message } from "element-ui";
@@ -319,7 +325,7 @@ export default {
         deviceStep.step = nightInterval * 60 * 1000 * 2;
       }
     });
-    /**检测当前管理员是否有权限查看当前部门
+    /** 检测当前管理员是否有权限查看当前部门
      *
      */
     let changeModule = reactive({
@@ -371,6 +377,12 @@ export default {
 
       // 切换页码时刷新获取成员最新数据
       selectChildMember(props.memberListPaging);
+
+      // if (!props.contactsModule.memberList) {
+      //   console.log(props.contactsModule.memberList, 'props.contactsModule.memberList');
+      //   clearInterval(updateList);
+      //   console.log('2');
+      // }
     });
 
     /**
@@ -420,29 +432,48 @@ export default {
           modifyMemberInfo[key] = data.userId;
           initial[key] = data.userId;
         } else {
-          modifyMemberInfo[key] = data[key];
-          initial[key] = data[key];
+          if (key == "depart") {
+            modifyMemberInfo.depart = props.currentDepart.label;
+            modifyMemberInfo.departId = props.currentDepart.id;
+          } else if (key == "departId") {
+            modifyMemberInfo.departId = props.currentDepart.id;
+          } else if (key == "pid") {
+            continue;
+          } else {
+            modifyMemberInfo[key] = data[key];
+            initial[key] = data[key];
+          }
         }
       }
       /**
        * 查询用户所属的所有部门
        */
       let selectId = {
-        id: data.userId,
+        id: data.id,
+        flag: "",
       };
-      listDepartmentByUser(selectId).then((res) => {
-        let listData = res.data;
-        currentMemberInfo.listDepart = [];
-        listData.forEach((item) => {
-          currentMemberInfo.listDepart.push(item.name);
+      if (selectId.id != undefined) {
+        listDepartmentByUser(selectId).then((res) => {
+          let listData = res.data;
+          currentMemberInfo.listDepart = [];
+          if (listData.length != 0) {
+            listData.forEach((item) => {
+              currentMemberInfo.listDepart.push(item.name);
+            });
+          }
         });
-      });
+      }
       let tmpHistory = props.tmpHistory;
       /**根据用户id获取历史数据信息 */
       let currentObj = {
-        userId: currentMemberInfo.userId,
+        userId: data.userId,
+        flag: "",
       };
+      if (props.currentDepart.id == -2) {
+        currentObj.flag = 0;
+      }
       listUserLocationById(currentObj).then((res) => {
+        console.log(res, "res");
         let array = res.data.list ? res.data.list : res.data; // 服务器与local切换
         let newArr_time = [],
           newArr_tmp = [],
@@ -488,60 +519,61 @@ export default {
             time: item.gmtCreate,
             temperature: temperature,
           };
-          switch(item.alarmType) {
+          switch (item.alarmType) {
             case 0:
-              tableObj.type="";
+              tableObj.type = "";
               break;
             case 1:
-              tableObj.type="温度";
+              tableObj.type = "温度";
               break;
             case 2:
-              tableObj.type="位置";
+              tableObj.type = "位置";
               break;
             case 3:
-              tableObj.type="温度和位置";
+              tableObj.type = "温度和位置";
               break;
           }
-          console.log(tableObj,'tableObj');
           new_tableData.push(tableObj);
         });
         tmpHistory.newArr_time = newArr_time;
         tmpHistory.newArr_tmp = newArr_tmp;
         tmpHistory.error_time = error_time;
         tmpHistory.error_tmp = error_tmp;
-        tmpHistory.newArr_position = newArr_position.reverse();  // 温度数据是从最新数据---之前的数据，这里地址也需要反向处理
+        tmpHistory.newArr_position = newArr_position.reverse(); // 温度数据是从最新数据---之前的数据，这里地址也需要反向处理
         tmpHistory.tableData = new_tableData.reverse();
         tmpHistory.error_tableData = new_errorTableData.reverse();
       });
       /**根据用户id获取设备最新数据和告警信息 */
-      let currentArray = [currentMemberInfo.userId];
-      listDeviceAlarmInfoByUserId(currentArray).then((res) => {
-        let data = res.data[0] ? res.data[0] : [];
-        props.tmpHistory.railName = data.railName;
-        for (let key in data) {
-          if (key == "age") {
-            let newDate = new Date().getTime();
-            let date = new Date(data[key]).getTime();
-            let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
-            let age = parseInt((newDate - date) / oneDay);
-            currentMemberInfo[key] = age;
-            currentMemberInfo.date = data[key];
-            modifyMemberInfo.age = data[key];
-            initial.age = data[key];
-          } else if (key === "temperature") {
-            currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
-          } else if (key == "online") {
-            continue;
-          } else {
-            currentMemberInfo[key] = data[key];
+      if (currentMemberInfo.userId != undefined) {
+        let currentArray = [currentMemberInfo.userId];
+        listDeviceAlarmInfoByUserId(currentArray).then((res) => {
+          let data = res.data[0] ? res.data[0] : [];
+          props.tmpHistory.railName = data.railName;
+          for (let key in data) {
+            if (key == "age") {
+              let newDate = new Date().getTime();
+              let date = new Date(data[key]).getTime();
+              let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+              let age = parseInt((newDate - date) / oneDay);
+              currentMemberInfo[key] = age;
+              currentMemberInfo.date = data[key];
+              modifyMemberInfo.age = data[key];
+              initial.age = data[key];
+            } else if (key === "temperature") {
+              currentMemberInfo[key] = parseFloat(data[key]).toFixed(1);
+            } else if (key == "online") {
+              continue;
+            } else {
+              currentMemberInfo[key] = data[key];
+            }
           }
-        }
-        for (let key in currentMemberInfo) {
-          if (key === "railName" || key == "online" || key == "remarks") {
-            continue;
+          for (let key in currentMemberInfo) {
+            if (key === "railName" || key == "online" || key == "remarks") {
+              continue;
+            }
           }
-        }
-      });
+        });
+      }
     };
 
     /**选择单个成员 */
@@ -793,15 +825,58 @@ export default {
             if (gmtTime < step) {
               data[i].deviceOnline = "在线";
               console.log(data[i], data[i].name);
-              console.log(step,'step');
-              console.log(gmtTime,'gmtTime');
+              console.log(step, "step");
+              console.log(gmtTime, "gmtTime");
             }
 
             props.memberData.data.push(data[i]);
           }
           //[ ... memberData.data] = data;
         });
-      // 已分组成员部门
+        // 已分组成员部门
+      } else if (memberListPaging.id === -2) {
+        let allUserUntie = {
+          pageNum: memberListPaging.pageNum,
+          pageSize: memberListPaging.pageSize,
+        };
+        findAllUserUntie(allUserUntie).then((res) => {
+          let code = res.code;
+          if (code === 0) {
+            props.memberData.data.splice(0, props.memberData.data.length);
+            let data = res.data.list ? res.data.list : res.data;
+            props.memberData.total = res.data.total;
+            props.currentDepart.length = data.length;
+            let i = 0,
+              len = data.length;
+            for (i; i < len; i++) {
+              data[i].temperature = Number(data[i].temperature).toFixed(1);
+              // age
+              let newDate = new Date().getTime();
+              let date = new Date(data[i].age).getTime();
+              let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+              let age = parseInt((newDate - date) / oneDay);
+              data[i].age = age;
+              if (data[i].temperature > 37.3) {
+                data[i].status = "温度异常";
+              } else {
+                data[i].status = "";
+              }
+              props.memberData.data.push(data[i]);
+
+              // 登录
+              let gmtTime =
+                new Date().getTime() - new Date(data[i].gmtCreate).getTime();
+              data[i].deviceOnline = "离线";
+              let step = deviceStep.step;
+              if (gmtTime < step) {
+                data[i].deviceOnline = "在线";
+              }
+            }
+            //[ ... memberData.data] = data;
+          } else if (code === 10004) {
+            props.memberData.total = res.data;
+          }
+        });
       } else {
         let params = new URLSearchParams(); // text post 提交
         params.append("id", memberListPaging.id);
@@ -855,9 +930,6 @@ export default {
             }
             if (gmtTime < step) {
               data[i].deviceOnline = "在线";
-              console.log(data[i], data[i].name);
-              console.log(step,'step');
-              console.log(gmtTime,'gmtTime');
             }
 
             props.memberData.data.push(data[i]);
@@ -866,11 +938,11 @@ export default {
         });
       }
     };
-    
+
     // 定时刷新获取成员最新数据
-    setInterval(() => {
+    let updateList = setInterval(() => {
       selectChildMember(props.memberListPaging);
-    }, 5000);
+    }, 15000);
 
     /**弹出框
      *
@@ -1127,6 +1199,9 @@ $contactsHeight: 592px;
           color: #da5646;
         }
       }
+      .el-button--text {
+        color: #466b96;
+      }
     }
     .no_member {
       .no_member_top {
@@ -1168,5 +1243,11 @@ $contactsHeight: 592px;
   a:hover {
     color: $tabNav_color;
   }
+}
+
+.wanrning_member {
+  width: 1.7em;
+  height: 1.7em;
+  margin: 6px 0 0 6px;
 }
 </style>
