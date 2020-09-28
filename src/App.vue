@@ -21,6 +21,20 @@ export default {
       let hasToken = sessionStorage.getItem("auth_token");
       loading.value =
         hasToken == null || hasToken == undefined || hasToken == "";
+      if (location.href.indexOf("auth_token") != -1) {
+        let start = location.href.indexOf("auth_token") - 1;
+        let arr = location.href.split("");
+        location.href = arr.splice(0, start).join("");
+      } else if (
+        location.href.indexOf("auth_token") != -1 &&
+        location.href.indexOf("appid") != -1
+      ) {
+        let start = location.href.indexOf("auth_token") - 1;
+        let end = location.href.indexOf("&", start) - 1;
+        let arr = location.href.split('');
+        arr.splice(start, end);
+        location.href = arr.join('');
+      }
     });
     return { full, loading };
   },
