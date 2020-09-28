@@ -44,6 +44,11 @@ Vue.use(VueRouter)
         path: "/corporation/corporation_set",
         name: "corporation_set",
         component: resolve => require(["@/views/corporation/components/set.vue"], resolve)
+      },
+      {
+        path: "/corporation/corporation_config",
+        name: "corporation_config",
+        component: resolve => require(["@/views/corporation/components/config.vue"], resolve)
       }
     ]
   },
