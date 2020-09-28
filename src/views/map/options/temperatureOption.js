@@ -1,7 +1,6 @@
 const temperature = {
     title: {
         text: '温度统计',
-        subtext: '信息',
         left: 'left'
     },
     tooltip: {

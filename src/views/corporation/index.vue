@@ -34,6 +34,11 @@ export default {
         path: "/corporation/corporation_set",
         current: false,
       },
+      {
+        name: "设置",
+        path: "/corporation/corporation_config",
+        current: false,
+      },
     ]);
     return { tabNavs };
   },
