@@ -3,7 +3,12 @@
     <div class="contacts_main frame_center_main" v-loading="loading">
       <div class="chunk_title">
         <div class="chunk_title_top">
-          <el-input class="search" placeholder="搜索成员、部门" v-model="filterText" @input="search_input"></el-input>
+          <el-input
+            class="search"
+            placeholder="搜索成员、部门"
+            v-model="filterText"
+            @input="search_input"
+          ></el-input>
           <a href="javascript:;" class="addChildMember" v-show="false">
             <i>+</i>
           </a>
@@ -18,11 +23,16 @@
                 @click="searchItem_active_fn(index)"
               >
                 <a href="javascript:;">
-                  <span class="searchResult_title_peopleName" :title="item.name">{{item.name}}</span>
+                  <span
+                    class="searchResult_title_peopleName"
+                    :title="item.name"
+                    >{{ item.name }}</span
+                  >
                   <span
                     class="searchResult_title_peopleDepartment"
                     :title="item.departMentStr"
-                  >{{ item.departMentStr }}</span>
+                    >{{ item.departMentStr }}</span
+                  >
                 </a>
               </li>
             </ul>
@@ -52,11 +62,18 @@
                 <el-button type="text" size="mini" @click="() => append(data)">Append</el-button>
                 <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>
                 -->
-                <div class="menu_right" @click.stop="showDepartClick" v-if="data.hasAuthority">
+                <div
+                  class="menu_right"
+                  @click.stop="showDepartClick"
+                  v-if="data.hasAuthority"
+                >
                   <el-col :span="12">
                     <el-dropdown>
                       <span class="el-dropdown-link">
-                        <svg-icon iconClass="menu_link" class="menu_right_svg"></svg-icon>
+                        <svg-icon
+                          iconClass="menu_link"
+                          class="menu_right_svg"
+                        ></svg-icon>
                       </span>
                       <el-dropdown-menu slot="dropdown">
                         <ul class="contactSlowdown">
@@ -65,23 +82,26 @@
                               type="text"
                               @click.stop="dialogShow(data, node)"
                               class="addMemberBtn"
-                            >添加子部门</el-button>
+                              >添加子部门</el-button
+                            >
                           </li>
                           <li>
                             <el-button
                               type="text"
                               @click.stop="dialogmodify(data, node)"
                               class="modifyMemberBtn"
-                            >修改部门名称</el-button>
+                              >修改部门名称</el-button
+                            >
                           </li>
                           <li>
                             <el-button
                               type="text"
                               @click.stop="dialogDel(data, node)"
                               class="delMemberBtn"
-                            >删除部门</el-button>
+                              >删除部门</el-button
+                            >
                           </li>
-                          <li>id:{{data.id}}</li>
+                          <li>id:{{ data.id }}</li>
                         </ul>
                       </el-dropdown-menu>
                     </el-dropdown>
@@ -96,25 +116,35 @@
                   :close-on-click-modal="false"
                 >
                   <el-form :model="form">
-                    <el-form-item label="部门名称" :label-width="formLabelWidth">
+                    <el-form-item
+                      label="部门名称"
+                      :label-width="formLabelWidth"
+                    >
                       <el-input
                         v-model="form.name"
                         autocomplete="off"
                         ref="partmentContent"
                         maxlength="30"
                         placeholder="请输入部门名称"
-                        @click.stop.native="() => { return }"
+                        @click.stop.native="
+                          () => {
+                            return;
+                          }
+                        "
                         @keyup.enter.native="dialogHide(childData)"
                       ></el-input>
                     </el-form-item>
                   </el-form>
                   <div slot="footer" class="dialog-footer">
-                    <el-button @click.stop="dialogFormVisible = false">取 消</el-button>
+                    <el-button @click.stop="dialogFormVisible = false"
+                      >取 消</el-button
+                    >
                     <el-button
                       type="primary"
                       @click.stop="dialogHide(childData)"
                       :disabled="addStatus"
-                    >确 定</el-button>
+                      >确 定</el-button
+                    >
                   </div>
                 </el-dialog>
 
@@ -127,7 +157,10 @@
                   :destroy-on-close="true"
                 >
                   <el-form :model="modifyData">
-                    <el-form-item label="部门名称" :label-width="formLabelWidth">
+                    <el-form-item
+                      label="部门名称"
+                      :label-width="formLabelWidth"
+                    >
                       <el-input
                         v-model="modifyData.name"
                         autocomplete="off"
@@ -135,17 +168,24 @@
                         maxlength="30"
                         :placeholder="modifyData.name"
                         @keyup.enter.native="dialogModifyHide()"
-                        @click.stop.native="() => { return }"
+                        @click.stop.native="
+                          () => {
+                            return;
+                          }
+                        "
                       ></el-input>
                     </el-form-item>
                   </el-form>
                   <div slot="footer" class="dialog-footer">
-                    <el-button @click.stop="modifyData.visibel = false">取 消</el-button>
+                    <el-button @click.stop="modifyData.visibel = false"
+                      >取 消</el-button
+                    >
                     <el-button
                       type="primary"
                       @click.stop="dialogModifyHide()"
                       :disabled="modifyData.status"
-                    >保 存</el-button>
+                      >保 存</el-button
+                    >
                   </div>
                 </el-dialog>
 
@@ -159,8 +199,12 @@
                 >
                   <span>{{ memberLabel }}</span>
                   <span slot="footer" class="dialog-footer">
-                    <el-button @click.stop="dialogVisible = false">取 消</el-button>
-                    <el-button type="primary" @click.stop="dialogDelHide()">确 定</el-button>
+                    <el-button @click.stop="dialogVisible = false"
+                      >取 消</el-button
+                    >
+                    <el-button type="primary" @click.stop="dialogDelHide()"
+                      >确 定</el-button
+                    >
                   </span>
                 </el-dialog>
               </span>
@@ -221,6 +265,7 @@ import {
   listUserLocationById,
   listDepartmentByUser,
   select,
+  findAllUserUntie,
 } from "@/api/contactsApi";
 import { getLoginEmployee, selectEmpDepRoleByEmpId } from "@/api/employeeApi";
 import { translateDataToTree, switchModule } from "@/utils/common";
@@ -304,7 +349,10 @@ export default {
       sex: "",
       age: "",
       address: "",
+      depart: "",
+      departId: null,
       remarks: "",
+      pid: "",
     });
     // 初始值
     const initial = reactive({
@@ -576,10 +624,11 @@ export default {
                     item.hasAuthority = false;
                   });
                 } else {
+                  let id = data[0].id;
                   // 未分组成员部门
                   let ungroupedDepart = {
                     id: -1,
-                    pid: 6,
+                    pid: id,
                     name: "未分组成员",
                     label: "未分组成员",
                     hasAuthority: false,
@@ -589,16 +638,16 @@ export default {
                   data.push(ungroupedDepart);
 
                   // 解绑成员部门
-                  // let unbindDepart = {
-                  //   id: -2,
-                  //   pid: 6,
-                  //   name: "解绑成员",
-                  //   label: "解绑成员",
-                  //   hasAuthority: false,
-                  //   children: [],
-                  //   displayOrder: 10001,
-                  // };
-                  // data.push(unbindDepart);
+                  let unbindDepart = {
+                    id: -2,
+                    pid: id,
+                    name: "已解绑成员",
+                    label: "已解绑成员",
+                    hasAuthority: false,
+                    children: [],
+                    displayOrder: 10001,
+                  };
+                  data.push(unbindDepart);
 
                   data.forEach((item) => {
                     item.hasAuthority = true;
@@ -608,6 +657,7 @@ export default {
                 companyData.companyId = id;
                 currentDepart.topId = id;
                 departData[0].id = id;
+                modifyMemberInfo.pid = id;
               }
               return roleId;
             })
@@ -633,7 +683,7 @@ export default {
                 }
                 // 未分组用户禁止操作
                 departData[0].children.forEach((item) => {
-                  if (item.id == -1) {
+                  if (item.id == -1 || item.id == -2) {
                     item.hasAuthority = false;
                     return;
                   }
@@ -1084,6 +1134,50 @@ export default {
         listUserByNoDepartment(
           memberListPaging.pageNum,
           memberListPaging.pageSize
+        ).then((res) => {
+          let code = res.code;
+          if (code === 0) {
+            memberData.data.splice(0, memberData.data.length);
+            let data = res.data.list ? res.data.list : res.data;
+            memberData.total = res.data.total;
+            currentDepart.length = data.length;
+            let i = 0,
+              len = data.length;
+            for (i; i < len; i++) {
+              data[i].temperature = Number(data[i].temperature).toFixed(1);
+              // age
+              let newDate = new Date().getTime();
+              let date = new Date(data[i].age).getTime();
+              let oneDay = 365 * 24 * 60 * 60 * 1000; // 一天的毫秒数
+              let age = parseInt((newDate - date) / oneDay);
+              data[i].age = age;
+              if (data[i].temperature > 37.3) {
+                data[i].status = "温度异常";
+              } else {
+                data[i].status = "";
+              }
+              memberData.data.push(data[i]);
+
+              // 登录
+              let gmtTime =
+                new Date().getTime() - new Date(data[i].gmtCreate).getTime();
+              data[i].deviceOnline = "离线";
+              let step = deviceStep.step;
+              if (gmtTime < step) {
+                data[i].deviceOnline = "在线";
+              }
+            }
+            //[ ... memberData.data] = data;
+          } else if (code === 10004) {
+            memberData.total = res.data;
+          }
+        });
+      }else if(memberListPaging.id === -2) {
+        let allUserUntie = {
+          pageNum:memberListPaging.pageNum,
+          pageSize: memberListPaging.pageSize
+          };
+        findAllUserUntie(allUserUntie
         ).then((res) => {
           let code = res.code;
           if (code === 0) {
