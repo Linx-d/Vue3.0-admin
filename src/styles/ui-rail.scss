@@ -1,0 +1,31 @@
+/*
+ * rail 模块 element-ui 样式
+ */
+// rail 新增围栏、修改围栏输入框
+.modify_ruleForm {
+  .el-input__inner {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// 围栏地址输入框
+#suggestIdModify,
+#suggestIdAdd {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+// btn login
+.railBtn {
+  .el-button {
+    width: 98px;
+    height: 41px;
+    font-size: 14px;
+    border-radius: 2px;
+    padding: 0;
+  }
+}
+
+.railBtn .el-button--default {
+  margin-top: -3px;
+}
+// btn end
