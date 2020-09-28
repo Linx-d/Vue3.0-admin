@@ -162,3 +162,37 @@ export function updateEmployeeNotAuth(data) {
     data,
   });
 }
+
+/**
+ * 设置设备上传频率
+ *
+ * @export
+ * @param {
+  dayTime: 8,  // hour
+  nightTime: 80, // hour
+  dayInterval: 20, // minute
+  nightInterval: 60 // minute
+  }
+* @returns data
+*/
+export function updateUpload(data) {
+  return service.request({
+    method: "post",
+    url: "/upload/updateUpload",
+    data,
+  });
+}
+
+/**
+ * 查询当前企业的设备上传频率
+ *
+ * @export
+ * @param null
+* @returns data
+*/
+export function select() {
+  return service.request({
+    method: "get",
+    url: "/upload/select"
+  });
+}
