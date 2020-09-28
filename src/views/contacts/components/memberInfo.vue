@@ -1,5 +1,8 @@
 <template>
-  <div class="chunk_cnt">
+  <div
+    class="chunk_cnt"
+    :style="{ 'min-width': chunk_config.min, 'max-width': chunk_config.max }"
+  >
     <div
       class="close_drawer_box"
       v-if="showMemberInfo_drawer.status.map"
@@ -11,15 +14,21 @@
       <span>成员详情</span>
     </div>
     <div class="cnt_tool" v-if="showMemberInfo_drawer.status.info">
-      <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
-        <svg-icon iconClass="double_headed" class="double_headed"></svg-icon>返回
+      <a
+        class="memberLink"
+        href="javascript:;"
+        @click="memberInfoBack(showMemberInfo_drawer)"
+      >
+        <svg-icon iconClass="double_headed" class="double_headed"></svg-icon
+        >返回
       </a>
       <a
-        v-if="loginEmployeeInfo.role.id!=3"
+        v-if="loginEmployeeInfo.role.id != 3"
         class="memberLink"
         href="javascript:;"
         @click="memberInfoModify"
-      >编辑</a>
+        >编辑</a
+      >
     </div>
     <!-- <div class="cnt_tool" v-if="showMemberInfo_drawer.status.map">
       <a class="memberLink" href="javascript:;" @click="memberInfoBack(showMemberInfo_drawer)">
@@ -28,11 +37,21 @@
     </div>-->
     <div class="info_main">
       <div class="info_head">
-        <div class="progress_box" :style="{'background-image': progressData.img}">
-          <div class="progress_bg" :style="{'width': progressData.width, 'height': '233px' }">
+        <div
+          class="progress_box"
+          :style="{ 'background-image': progressData.img }"
+        >
+          <div
+            class="progress_bg"
+            :style="{ width: progressData.width, height: '233px' }"
+          >
             <div
               class="progress_content"
-              :style="{'width': progressData.width, 'height': progressData.height, 'background': progressData.color, }"
+              :style="{
+                width: progressData.width,
+                height: progressData.height,
+                background: progressData.color,
+              }"
             ></div>
           </div>
         </div>
@@ -40,7 +59,7 @@
         <div class="info_head_l">
           <!-- <svg-icon iconClass="info" class="info_svg"></svg-icon> -->
           <el-image
-            style="height: 70px; width: 70px;"
+            style="height: 70px; width: 70px"
             :src="currentMemberInfo.photo"
             fit="cover"
             class="info_svg"
@@ -55,49 +74,75 @@
             </span>
           </p>
           <div class="info_status">
-            <span v-if="currentMemberInfo.online" :class="{online_txt: currentMemberInfo.online}">
-              <svg-icon iconClass="online1" class="online my_icon online_icon"></svg-icon>在线
+            <span
+              v-if="currentMemberInfo.online"
+              :class="{ online_txt: currentMemberInfo.online }"
+            >
+              <svg-icon
+                iconClass="online1"
+                class="online my_icon online_icon"
+              ></svg-icon
+              >在线
             </span>
             <span v-if="!currentMemberInfo.online">
-              <svg-icon iconClass="unline" class="unline online_icon"></svg-icon>离线
+              <svg-icon iconClass="unline" class="unline online_icon"></svg-icon
+              >离线
             </span>
             <div class="electricBox">
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric0"
                   class="electric my_icon_power online_icon"
-                  v-if="currentMemberInfo.electric==='0'"
+                  v-if="
+                    currentMemberInfo.electric === '0' ||
+                    currentMemberInfo.electric === null
+                  "
                 ></svg-icon>
               </span>
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric1"
                   class="electric my_icon_power online_icon"
-                  v-if="currentMemberInfo.electric==='1'"
+                  v-if="currentMemberInfo.electric === '1'"
                 ></svg-icon>
               </span>
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric2"
                   class="electric my_icon_power online_icon"
-                  v-if="currentMemberInfo.electric==='2'"
+                  v-if="currentMemberInfo.electric === '2'"
                 ></svg-icon>
               </span>
               <span v-if="currentMemberInfo.online">
                 <svg-icon
                   iconClass="electric3"
                   class="electric my_icon_power"
-                  v-if="currentMemberInfo.electric==='3'"
+                  v-if="currentMemberInfo.electric === '3'"
                 ></svg-icon>
               </span>
               <span v-if="!currentMemberInfo.online">
-                <svg-icon iconClass="power_placeholder" class="electric my_icon_power"></svg-icon>
+                <svg-icon
+                  iconClass="power_placeholder"
+                  class="electric my_icon_power"
+                ></svg-icon>
               </span>
             </div>
-            <el-tooltip class="item" effect="light" content="最新位置" placement="bottom">
+            <el-tooltip
+              class="item"
+              effect="light"
+              content="最新位置"
+              placement="bottom"
+            >
               <p class="positionBox">
-                <a class="info_position" href="#temperature_box" @click="newPosition">
-                  <svg-icon iconClass="quick_position" class="quick_position"></svg-icon>
+                <a
+                  class="info_position"
+                  href="#temperature_box"
+                  @click="newPosition"
+                >
+                  <svg-icon
+                    iconClass="quick_position"
+                    class="quick_position"
+                  ></svg-icon>
                 </a>
                 <span>{{ currentMemberInfo.location }}</span>
               </p>
@@ -107,19 +152,29 @@
         <el-tooltip class="item" effect="light" content="温度" placement="top">
           <div
             v-if="currentMemberInfo.online"
-            :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
+            :class="[
+              'info_head_main',
+              {
+                normal: currentMemberInfo.temperature < 37.3,
+                danger: currentMemberInfo.temperature >= 37.3,
+              },
+            ]"
           >
             {{ currentMemberInfo.temperature }}
-            <span
-              v-show="currentMemberInfo.temperature!='暂无数据'"
-            >°C</span>
+            <span v-show="currentMemberInfo.temperature != '暂无数据'">°C</span>
           </div>
           <div
             v-else
-            :class="['info_head_main', { normal: currentMemberInfo.temperature<37.3, danger: currentMemberInfo.temperature>=37.3 }]"
+            :class="[
+              'info_head_main',
+              {
+                normal: currentMemberInfo.temperature < 37.3,
+                danger: currentMemberInfo.temperature >= 37.3,
+              },
+            ]"
           >
             --.-
-            <span v-show="currentMemberInfo.temperature!='暂无数据'">°C</span>
+            <span v-show="currentMemberInfo.temperature != '暂无数据'">°C</span>
           </div>
         </el-tooltip>
       </div>
@@ -132,8 +187,16 @@
           <li>
             <span>性别：</span>
             <i>{{ currentMemberInfo.sex }}</i>
-            <svg-icon v-show="currentMemberInfo.sex=='男'" iconClass="boy" class="sex_icon"></svg-icon>
-            <svg-icon v-show="currentMemberInfo.sex=='女'" iconClass="girl" class="sex_icon"></svg-icon>
+            <svg-icon
+              v-show="currentMemberInfo.sex == '男'"
+              iconClass="boy"
+              class="sex_icon"
+            ></svg-icon>
+            <svg-icon
+              v-show="currentMemberInfo.sex == '女'"
+              iconClass="girl"
+              class="sex_icon"
+            ></svg-icon>
           </li>
           <li>
             <span>电话：</span>
@@ -141,23 +204,44 @@
           </li>
           <li>
             <span>住址：</span>
-            <i v-if="currentMemberInfo.address">{{ currentMemberInfo.address }}</i>
+            <i v-if="currentMemberInfo.address">{{
+              currentMemberInfo.address
+            }}</i>
             <i v-else>暂无数据</i>
-            <a class="info_position" href="#temperature_box" @click="new_address">
-              <svg-icon iconClass="address_info" class="quick_position"></svg-icon>
+            <a
+              class="info_position"
+              href="#temperature_box"
+              @click="new_address"
+            >
+              <svg-icon
+                iconClass="address_info"
+                class="quick_position"
+              ></svg-icon>
             </a>
           </li>
           <li>
             <span>围栏：</span>
-            <i v-if="tmpHistory.railName" class="railText">{{ tmpHistory.railName }}</i>
-            <strong v-if="!tmpHistory.railName" class="modifyInfoBtn" @click="addRail">添加</strong>
-            <strong v-else class="modifyInfoBtn" @click="unBindOpen">解绑围栏</strong>
+            <i v-if="tmpHistory.railName" class="railText">{{
+              tmpHistory.railName
+            }}</i>
+            <strong
+              v-if="!tmpHistory.railName"
+              class="modifyInfoBtn"
+              @click="addRail"
+              >添加</strong
+            >
+            <strong v-else class="modifyInfoBtn" @click="unBindOpen"
+              >解绑围栏</strong
+            >
           </li>
           <li class="departManagersBoxAll">
             <span>部门：</span>
             <div
               class="departManagers"
-              v-if="currentMemberInfo.listDepart!=null&&currentMemberInfo.listDepart.length!=0"
+              v-if="
+                currentMemberInfo.listDepart != null &&
+                currentMemberInfo.listDepart.length != 0
+              "
             >
               <div
                 v-for="depart in currentMemberInfo.listDepart"
@@ -174,14 +258,25 @@
             <span v-else>暂无</span>
           </li>
           <li
-            :class="{depart_margin_top: currentMemberInfo.listDepart!=null&&currentMemberInfo.listDepart.length!=0}"
+            :class="{
+              depart_margin_top:
+                currentMemberInfo.listDepart != null &&
+                currentMemberInfo.listDepart.length != 0,
+            }"
           >
-            <el-tooltip class="item" effect="light" :content="content.tmp.txt" placement="left">
+            <el-tooltip
+              class="item"
+              effect="light"
+              :content="content.tmp.txt"
+              placement="left"
+            >
               <a href="javascript:;" @click="toggleAbnormal">
                 <span>体温告警：</span>
                 <i>
-                  <span v-show="currentMemberInfo.tnumber!=null">{{ currentMemberInfo.tnumber }} 次</span>
-                  <span v-show="currentMemberInfo.tnumber==null">0 次</span>
+                  <span v-show="currentMemberInfo.tnumber != null"
+                    >{{ currentMemberInfo.tnumber }} 次</span
+                  >
+                  <span v-show="currentMemberInfo.tnumber == null">0 次</span>
                 </i>
               </a>
             </el-tooltip>
@@ -196,19 +291,28 @@
               <a href="javascript:;" @click="positionHandle('position')">
                 <span>位置告警：</span>
                 <i>
-                  <span v-show="currentMemberInfo.pnumber!=null">{{ currentMemberInfo.pnumber }} 次</span>
-                  <span v-show="currentMemberInfo.pnumber==null">0 次</span>
+                  <span v-show="currentMemberInfo.pnumber != null"
+                    >{{ currentMemberInfo.pnumber }} 次</span
+                  >
+                  <span v-show="currentMemberInfo.pnumber == null">0 次</span>
                 </i>
               </a>
             </el-tooltip>
           </li>
           <li>
             <span>备注：</span>
-            <i v-show="currentMemberInfo.remarks">{{ currentMemberInfo.remarks }}</i>
+            <i v-show="currentMemberInfo.remarks">{{
+              currentMemberInfo.remarks
+            }}</i>
             <strong
               hefr="javascript:;"
               class="modifyInfoBtn"
-              @click="modifyRemarks(currentMemberInfo.userId, currentMemberInfo.remarks)"
+              @click="
+                modifyRemarks(
+                  currentMemberInfo.userId,
+                  currentMemberInfo.remarks
+                )
+              "
             >
               <strong v-if="currentMemberInfo.remarks">修改</strong>
               <strong v-else>添加</strong>
@@ -217,12 +321,16 @@
         </ul>
       </div>
       <div id="temperature_box">
-        <div id="info_temperature" class="info_module" v-show="temperature"></div>
+        <div
+          id="info_temperature"
+          class="info_module"
+          v-show="temperature"
+        ></div>
         <div id="info_table" v-show="!temperature">
           <el-table
             :data="paging.data"
             style="width: 100%"
-            :row-class-name="tableRowClassName"
+            :cell-style="cellStyle"
             height="430"
           >
             <el-table-column
@@ -232,14 +340,39 @@
               show-overflow-tooltip
               sortable
             ></el-table-column>
-            <el-table-column prop="address" label="地址" width="340" show-overflow-tooltip sortable></el-table-column>
-            <el-table-column prop="time" label="上传数据时间" width="250" show-overflow-tooltip sortable></el-table-column>
+            <el-table-column
+              prop="address"
+              label="地址"
+              width="200"
+              show-overflow-tooltip
+              sortable
+            ></el-table-column>
+            <el-table-column
+              prop="time"
+              label="上传数据时间"
+              width="250"
+              show-overflow-tooltip
+              sortable
+            ></el-table-column>
           </el-table>
         </div>
-        <el-tooltip class="item" effect="light" :content="content.table.txt" placement="right">
+        <el-tooltip
+          class="item"
+          effect="light"
+          :content="content.table.txt"
+          placement="right"
+        >
           <div class="table_svg" @click="toggleTable">
-            <svg-icon iconClass="table_menu" class="table_menu" v-if="temperature"></svg-icon>
-            <svg-icon iconClass="line_chart" class="line_chart" v-else></svg-icon>
+            <svg-icon
+              iconClass="table_menu"
+              class="table_menu"
+              v-if="temperature"
+            ></svg-icon>
+            <svg-icon
+              iconClass="line_chart"
+              class="line_chart"
+              v-else
+            ></svg-icon>
           </div>
         </el-tooltip>
         <el-pagination
@@ -263,7 +396,7 @@
         class="railTable universal_dialog table_dialog"
         id="memberRailList"
         :close-on-click-modal="false"
-        :modal="false"
+        :modal="!showMemberInfo_drawer.status.map"
       >
         <el-table
           :data="railList.data"
@@ -280,17 +413,47 @@
             show-overflow-tooltip
             sortable
           ></el-table-column>
-          <el-table-column prop="personSum" label="人数" width="80" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="radius" label="半径" width="80" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="railAddr" label="地址" width="150" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="gmtCreate" label="创建时间" width="230" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column fixed="right" label="操作" show-overflow-tooltip width="80">
+          <el-table-column
+            prop="personSum"
+            label="人数"
+            width="80"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column
+            prop="radius"
+            label="半径"
+            width="80"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column
+            prop="railAddr"
+            label="地址"
+            width="150"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column
+            prop="gmtCreate"
+            label="创建时间"
+            width="230"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作"
+            show-overflow-tooltip
+            width="80"
+          >
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="selectRow(scope.$index, railList.data)"
                 type="text"
                 size="small"
-              >选择</el-button>
+                >选择</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -302,6 +465,7 @@
         :title="database.position.title"
         :visible.sync="database.position.visible"
         :close-on-click-modal="false"
+        :modal="!showMemberInfo_drawer.status.map"
         class="position_dialog universal_dialog table_dialog"
       >
         <el-table
@@ -314,10 +478,34 @@
           height="500"
           v-loading="database.position.loading"
         >
-          <el-table-column prop="temperature" label="温度" width="100" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="type" label="告警类型" width="120" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="address" label="当前所在地址" width="250" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="time" label="最新上传数据时间" width="250" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column
+            prop="temperature"
+            label="温度"
+            width="100"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column
+            prop="type"
+            label="告警类型"
+            width="120"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column
+            prop="address"
+            label="当前所在地址"
+            width="250"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
+          <el-table-column
+            prop="time"
+            label="最新上传数据时间"
+            width="250"
+            show-overflow-tooltip
+            sortable
+          ></el-table-column>
         </el-table>
         <div class="block">
           <el-pagination
@@ -347,7 +535,11 @@
           label-width="100px"
           class="employeeInfoClass"
         >
-          <el-form-item label="备注" :label-width="modifyData.formLabelWidth" prop="remarks">
+          <el-form-item
+            label="备注"
+            :label-width="modifyData.formLabelWidth"
+            prop="remarks"
+          >
             <el-input
               type="textarea"
               v-model="modifyData.remarks.txt"
@@ -359,7 +551,9 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="modifyBefore()">取 消</el-button>
-          <el-button type="primary" @click="confirmOpen('currentMemberInfo')">确 定</el-button>
+          <el-button type="primary" @click="confirmOpen('currentMemberInfo')"
+            >确 定</el-button
+          >
         </div>
       </el-dialog>
     </div>
@@ -973,8 +1167,13 @@ export default {
           pointArray.push(point);
           let mIcon = new BMap.Icon(member_location, new BMap.Size(85, 48));
           let marker = new BMap.Marker(point, { icon: mIcon });
+          let top_right_navigation = new BMap.NavigationControl({
+            anchor: BMAP_ANCHOR_BOTTOM_RIGHT,
+            type: BMAP_NAVIGATION_CONTROL_SMALL,
+            offset: new BMap.Size(30, 200),
+          });
+          map.addControl(top_right_navigation);
           map.addOverlay(marker); //添加一个标注
-          map.enableScrollWheelZoom(); //开启鼠标滚轮缩放功能。仅对PC上有效
           map.enableContinuousZoom(); //启用连续缩放效果，默认禁用
 
           //添加圆
@@ -1014,6 +1213,35 @@ export default {
       map_info.centerAndZoom(point, 19);
     };
     onMounted(() => {
+      if (props.showMemberInfo_drawer.status.map) {
+        if (window.outerWidth < 1700) {
+          setWidth(1);
+        } else if (window.outerWidth < 1800) {
+          setWidth(2);
+        } else if (window.outerWidth < 1900) {
+          setWidth(3);
+        } else if (window.outerWidth < 2000) {
+          setWidth(4);
+        } else {
+          setWidth(5);
+        }
+      }
+      function setWidth(num) {
+        let init = {
+          outerWidth: 1700,
+          min: 550,
+          max: 680,
+          multiple: 1,
+          outerStep: 100,
+          minStep: 100,
+          maxStep: 80,
+        };
+        init.multiple = num;
+        init.min = (init.multiple - 1) * init.minStep + init.min;
+        init.max = (init.multiple - 1) * init.maxStep + init.max;
+        chunk_config.min = `${init.min}px`;
+        chunk_config.max = `${init.max}px`;
+      }
       memberInfoEcharts();
       loading.value = false;
     });
@@ -1103,6 +1331,10 @@ export default {
         abnormal.value = false;
       }
     });
+    const chunk_config = reactive({
+      min: "840px",
+      max: "970px",
+    });
     return {
       loading,
       paging,
@@ -1137,6 +1369,7 @@ export default {
       modifyBefore,
       // 温度标记
       progressData,
+      chunk_config,
     };
   },
 };
@@ -1260,11 +1493,14 @@ $contactsHeight: 592px;
     .departManagersBoxAll {
       overflow: auto;
       line-height: 32px;
-      margin-bottom: 5px !important;
+      margin-bottom: 6px !important;
       margin-top: -3px !important;
+      position: relative;
       .departManagers {
-        width: 92%;
-        float: right;
+        position: absolute;
+        left: 55px;
+        top: -2px;
+        overflow: hidden;
         .depart_item {
           border: none;
           margin-right: 15px;
@@ -1283,7 +1519,7 @@ $contactsHeight: 592px;
   // 进度条
   .progress_box {
     position: absolute;
-    top: 106.5px;
+    top: 111.5px;
     right: 78.5px;
     width: 300px;
     height: 400px;
@@ -1346,7 +1582,7 @@ $contactsHeight: 592px;
         }
       }
       .depart_margin_top {
-        margin-top: -10px;
+        margin-top: -5px;
       }
     }
   }
