@@ -9,13 +9,17 @@
         class="memberLink"
         id="saveInfo"
         href="javascript:;"
-        @click="submitForm('ruleForm', modifyMemberInfo, currentMemberInfo, initial)"
-      >保存</a>
+        @click="
+          submitForm('ruleForm', modifyMemberInfo, currentMemberInfo, initial)
+        "
+        >保存</a
+      >
       <a
         class="memberLink"
         href="javascript:;"
         @click="memberInfoBack(currentMemberInfo, modifyMemberInfo, initial)"
-      >取消</a>
+        >取消</a
+      >
     </div>
 
     <div class="modify_form">
@@ -48,33 +52,106 @@
         <el-form-item label="电话:" prop="tel">
           <el-input v-model="modifyMemberInfo.tel" clearable></el-input>
         </el-form-item>
+        <el-form-item label="部门:" prop="depart">
+          <div class="depart_box">
+            <div>
+              <span class="depart_item">
+                <svg-icon iconClass="depart" class="depart"></svg-icon>
+                {{ modifyMemberInfo.depart }}
+              </span>
+              <a
+                hefr="javascript:;"
+                class="modifyInfoBtn"
+                @click="chooseDepart(modifyMemberInfo)"
+              >
+                <span>修改</span>
+              </a>
+            </div>
+          </div>
+        </el-form-item>
         <el-form-item label="住址:" prop="address">
           <el-input v-model="modifyMemberInfo.address" clearable></el-input>
         </el-form-item>
         <el-form-item label="备注:" prop="remarks">
-          <el-input type="textarea" v-model="modifyMemberInfo.remarks" clearable></el-input>
+          <el-input
+            type="textarea"
+            v-model="modifyMemberInfo.remarks"
+            clearable
+          ></el-input>
         </el-form-item>
       </el-form>
     </div>
 
+    <!-- 是否留在当前页 -->
     <el-dialog
       title="提示"
       :visible.sync="handle.dialogVisible"
       width="30%"
       :before-close="handleClose"
+      class="addDialog universal_dialog"
     >
+      <svg-icon
+        iconClass="dialog_wanrning"
+        className="dialog_wanrning"
+      ></svg-icon>
       <span>成员的资料尚未保存，确定要离开吗？</span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handle.dialogVisible = false">留在此页</el-button>
-        <el-button type="primary" @click="backHandle(modifyMemberInfo, initial)">离开此页</el-button>
+        <el-button @click="handle.dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="backHandle(modifyMemberInfo, initial)"
+          >确认</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- 修改部门 -->
+    <el-dialog
+      title="选择成员所在部门"
+      :visible.sync="departInfo.visible"
+      width="30%"
+      :before-close="handleClose"
+      class="addDialog universal_dialog"
+      :close-on-click-modal="false"
+    >
+      <div class="tree_box">
+        <el-tree
+          :data="departInfo.data"
+          ref="chooseTree"
+          show-checkbox
+          node-key="id"
+          :default-expanded-keys="[6]"
+          :default-checked-keys="[5]"
+          :props="departInfo.defaultProps"
+          :check-strictly="true"
+          @check="checkDepartNode"
+        >
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <i>
+              <svg-icon iconClass="depart" class="depart"></svg-icon>
+            </i>
+            <span class="tree-text">{{ node.label }}</span>
+          </span>
+        </el-tree>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click.stop="departInfo.visible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click.stop="chooseDepart_confirm(modifyMemberInfo)"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import { reactive, ref, watchEffect } from "@vue/composition-api";
-import { updateUser } from "@/api/contactsApi";
-import { switchModule } from "@/utils/common";
+import { onMounted, reactive } from "@vue/composition-api";
+import {
+  updateUser,
+  listAllDepartment,
+  addMember,
+  removeMember,
+} from "@/api/contactsApi";
+import { switchModule, translateDataToTree } from "@/utils/common";
 export default {
   name: "modify_form",
   props: {
@@ -149,6 +226,42 @@ export default {
      */
     // 提交
     const submitForm = (formName, data, memberData, initiData) => {
+      if (departInfo.id != null) {
+        // 原来的部门如果不是未分组部门，先移除这个成员
+        if (departInfo.changeDepartId == -1) {
+          //
+        } else {
+          let parmas_remove = {
+            depId: departInfo.departId,
+            userIds: [departInfo.id],
+          };
+          removeMember(parmas_remove).then((res) => {
+            if (res.code == 0) {
+              // 移除成功
+            } else {
+              root.$message({
+                type: "error",
+                message: "部门信息有误",
+              });
+              return;
+            }
+          });
+
+          // 部门信息
+          const parmas_add = {
+            userId: departInfo.id,
+            depId: departInfo.changeDepartId,
+          };
+          addMember(parmas_add).then((res) => {
+            if (res.code == 0) {
+              console.log(res, "true");
+            } else {
+              console.log(res, "false");
+            }
+          });
+        }
+      }
+
       refs[formName].validate((valid) => {
         if (valid) {
           updateUser(data).then((res) => {
@@ -160,9 +273,6 @@ export default {
                 message: "保存成功",
               });
               handle.save = true;
-              console.log(data, "data");
-              console.log(memberData, "memberData");
-              console.log(initiData, "initiData");
               for (let key in data) {
                 initiData[key] = data[key];
                 memberData[key] = data[key];
@@ -175,6 +285,15 @@ export default {
                 }
               }
               switchModule(props.contactsModule, "memberInfo");
+              // 选择了部门
+              if (departInfo.id != null) {
+                props.currentMemberInfo.listDepart = [
+                  departInfo.changeDepartLabel,
+                ];
+                departInfo.changeDepartId = null;
+                departInfo.changeDepartLabel = null;
+              }
+
             } else {
               root.$message({
                 type: "error",
@@ -183,7 +302,10 @@ export default {
             }
           });
         } else {
-          console.log("error submit!!");
+          root.$message({
+            type: "error",
+            message: "部门信息有误",
+          });
           return false;
         }
       });
@@ -238,6 +360,96 @@ export default {
       handle.dialogVisible = false;
       switchModule(props.contactsModule, "memberInfo");
     };
+
+    /**
+     * 选择部门
+     */
+    // 部门信息
+    const departInfo = reactive({
+      visible: false,
+      data: [
+        {
+          label: "",
+          displayOrder: 10001,
+          id: props.modifyMemberInfo.pid, // 顶级部门id
+          pid: 0,
+          children: [],
+          childrenLen: 0,
+        },
+      ],
+      id: null,
+      depart: null,
+      departId: null,
+      changeDepartId: null,
+      changeDepartLabel: null,
+      defaultProps: {
+        children: "children",
+        label: "label",
+      },
+    });
+    // fn
+    const chooseDepart = (data) => {
+      departInfo.visible = true;
+      departInfo.departId = data.departId;
+      departInfo.depart = data.depart;
+      if (departInfo.changeDepartId == null) {
+        // 获取所有部门信息生成树状结构
+        listAllDepartment().then((res) => {
+          // 未分组成员部门
+          let ungroupedDepart = {
+            id: -1,
+            pid: data.pid,
+            name: "未分组成员",
+            label: "未分组成员",
+            hasAuthority: false,
+            disabled: true,
+            children: [],
+            displayOrder: 10001,
+          };
+          res.data.list.push(ungroupedDepart);
+          let treeData = translateDataToTree(res.data.list)[0];
+          for (let key in departInfo.data[0]) {
+            if (key == "id") {
+              continue;
+            } else {
+              departInfo.data[0][key] = treeData[key];
+            }
+          }
+        });
+      }
+    };
+    // 确定
+    const chooseDepart_confirm = (data) => {
+      if (departInfo.changeDepartId == -1) {
+        root.$message({
+          type: "warning",
+          message: "未分组成员部门不能手动添加成员，请选择其他部门",
+        });
+      } else if (departInfo.changeDepartId == null) {
+        root.$message({
+          type: "warning",
+          message: "请选择部门",
+        });
+      } else {
+        root.$message({
+          type: "success",
+          message: `选择了"${departInfo.changeDepartLabel}"部门`,
+        });
+        props.modifyMemberInfo.depart = departInfo.changeDepartLabel;
+        departInfo.visible = false;
+        departInfo.id = data.id;
+      }
+    };
+    // 设置每次只能选择一个节点
+    const checkDepartNode = (checkedNodes) => {
+      departInfo.changeDepartId = checkedNodes.id;
+      departInfo.changeDepartLabel = checkedNodes.label;
+      refs.chooseTree.setCheckedKeys([checkedNodes.id]);
+    };
+    /**挂载完成
+     *
+     */
+    onMounted(() => {});
     return {
       ruleForm,
       rules,
@@ -248,6 +460,11 @@ export default {
       handle,
       backHandle,
       handleClose,
+      // 选择部门
+      departInfo,
+      chooseDepart,
+      chooseDepart_confirm,
+      checkDepartNode,
     };
   },
 };
@@ -274,6 +491,21 @@ $contactsHeight: 592px;
   }
   .modify_form {
     padding: 25px 60px 0 15px;
+    .depart_box {
+      padding-right: 3px;
+      color: #606266;
+      font-size: 14px;
+      .depart_item {
+        cursor: pointer;
+        .depart {
+          vertical-align: middle;
+          margin-right: 3px;
+        }
+        .modifyInfoBtn {
+          margin-left: 5px;
+        }
+      }
+    }
   }
 }
 .cnt_tool {
@@ -298,5 +530,11 @@ $contactsHeight: 592px;
     position: relative;
     @include webkit("box-sizing", border-box);
   }
+}
+
+// tree 节点
+.depart {
+  vertical-align: middle;
+  margin-right: 5px;
 }
 </style>
