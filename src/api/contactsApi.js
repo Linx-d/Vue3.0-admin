@@ -70,6 +70,27 @@ export function addMember(data) {
 }
 
 /**
+ * 获取所有已经解绑用户
+ *
+ * @export
+ * @param {
+  "pageNum": 1,
+  "pageSize": 15
+}
+* @returns
+*/
+export function findAllUserUntie(data) {
+  return service.request({
+    method: "get",
+    url:
+      "/userUntie/findAllUserUntie?pageNum=" +
+      data.pageNum +
+      "&pageSize=" +
+      data.pageSize, //url: "/dept/addMember",
+  });
+}
+
+/**
  * 删除部门
  *
  * @export
@@ -156,14 +177,15 @@ export function listDepartmentByPid(data) {
  *
  * @export
  * @param {
-    "userId": 49
+    "userId": 49,
+    "flag": 0, // 0 查询已解绑
   }
  * @returns
  */
 export function listUserLocationById(data) {
   return service.request({
     method: "post",
-    url: "/deviceData/listUserLocationById?userId=" + data.userId,
+    url: "/deviceData/listUserLocationById?userId=" + data.userId + "&flag=" + data.flag,
   });
 }
 
@@ -329,6 +351,6 @@ export function updateRemarks(data) {
     method: "post",
     // url: "/user/updateRemarks?id="+data.id+"&remarks="+data.remarks,
     url: "/user/updateRemarks",
-    data
+    data,
   });
 }
