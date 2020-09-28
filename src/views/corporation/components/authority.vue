@@ -163,10 +163,10 @@
             <label class="label-info">{{employee.gmtCreate}}</label>
           </el-form-item>
         </div>
-        <el-form-item>
+        <el-form-item class="universal_btn">
           <template v-if="isEdit">
             <el-button type="primary" @click="submit()">提 交</el-button>
-            <el-button type="primary" @click="cancel()">取 消</el-button>
+            <el-button type="default" @click="cancel()">取 消</el-button>
           </template>
         </el-form-item>
       </el-form>

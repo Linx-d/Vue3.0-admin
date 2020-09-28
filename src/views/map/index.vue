@@ -870,7 +870,7 @@ export default {
             item.type = "位置";
             database.alarm.data.push(item);
           } else if (alarmType == 3) {
-            item.type = "位置和位置";
+            item.type = "温度和位置";
             database.alarm.data.push(item);
           }
         });
@@ -1618,9 +1618,12 @@ export default {
       adaptionEchartsV2(temperatureChart);
       // 处理点击事件并且跳转到相应的开始
       temperatureChart.on("click", function (params) {
-        if (params.name == "温度正常人数") {
+        console.log(params, 'params');
+        if (params.name.indexOf("温度正常人数")!=-1) {
+          console.log("温度正常人数");
           temperatureHandle("normal");
         } else {
+          console.log("温度yichang常人数");
           temperatureHandle("abnormal");
         }
       });
