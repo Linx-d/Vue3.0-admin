@@ -14,6 +14,7 @@
 <script>
 import { reactive } from "@vue/composition-api";
 import titleTab from "@/components/common";
+import { getLoginEmployee } from "@/api/employeeApi";
 export default {
   name: "corporation",
   components: { titleTab },
@@ -34,12 +35,19 @@ export default {
         path: "/corporation/corporation_set",
         current: false,
       },
-      {
-        name: "设置",
-        path: "/corporation/corporation_config",
-        current: false,
-      },
     ]);
+    getLoginEmployee().then((res) => {
+      if (res.code == 0) {
+        if (res.data.role.id == 1) {
+          let params = {
+            name: "设置",
+            path: "/corporation/corporation_config",
+            current: false,
+          };
+          tabNavs.push(params);
+        }
+      }
+    });
     return { tabNavs };
   },
 };
