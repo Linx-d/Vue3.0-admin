@@ -449,10 +449,19 @@ export default {
        * 查询用户所属的所有部门
        */
       let selectId = {
-        id: data.id,
-        flag: "",
+        id: data.userId,
       };
       if (selectId.id != undefined) {
+        listDepartmentByUser(selectId).then((res) => {
+          let listData = res.data;
+          currentMemberInfo.listDepart = [];
+          if (listData.length != 0) {
+            listData.forEach((item) => {
+              currentMemberInfo.listDepart.push(item.name);
+            });
+          }
+        });
+      } else {
         listDepartmentByUser(selectId).then((res) => {
           let listData = res.data;
           currentMemberInfo.listDepart = [];
@@ -473,7 +482,6 @@ export default {
         currentObj.flag = 0;
       }
       listUserLocationById(currentObj).then((res) => {
-        console.log(res, "res");
         let array = res.data.list ? res.data.list : res.data; // 服务器与local切换
         let newArr_time = [],
           newArr_tmp = [],
@@ -544,9 +552,14 @@ export default {
         tmpHistory.error_tableData = new_errorTableData.reverse();
       });
       /**根据用户id获取设备最新数据和告警信息 */
+
       if (currentMemberInfo.userId != undefined) {
-        let currentArray = [currentMemberInfo.userId];
-        listDeviceAlarmInfoByUserId(currentArray).then((res) => {
+        let params = new URLSearchParams();
+        params.append("userIds", [currentMemberInfo.userId]);
+        if (props.currentDepart.id == -2) {
+          params.append("flag", 0);
+        }
+        listDeviceAlarmInfoByUserId(params).then((res) => {
           let data = res.data[0] ? res.data[0] : [];
           props.tmpHistory.railName = data.railName;
           for (let key in data) {
@@ -642,9 +655,9 @@ export default {
       },
     });
     const screenAbnormal = (departId, txt) => {
-      let parmas = new URLSearchParams();
-      parmas.append("id", departId);
-      listUserByDepartment(parmas).then((res) => {
+      let params = new URLSearchParams();
+      params.append("id", departId);
+      listUserByDepartment(params).then((res) => {
         let code = res.code,
           msg = res.msg,
           data = res.data.list,
@@ -878,6 +891,7 @@ export default {
           }
         });
       } else {
+        if (memberListPaging.id == null) return;
         let params = new URLSearchParams(); // text post 提交
         params.append("id", memberListPaging.id);
         params.append("pageNum", memberListPaging.pageNum);
@@ -983,11 +997,11 @@ export default {
           },
         })
         .then((action) => {
-          let parmas = {
+          let params = {
             depId: props.currentDepart.id,
             userIds: data,
           };
-          removeMember(parmas).then((res) => {
+          removeMember(params).then((res) => {
             let code = res.code;
             if (code === 0) {
               root.$message({
