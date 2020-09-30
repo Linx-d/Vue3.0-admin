@@ -3,7 +3,17 @@
     <div class="tab_cnt">企业信息</div>
     <div class="logo">
       <div class="logo_zi">
-        <img :src="corpInfo.logoUrl" />
+        <div
+          class="logo_box"
+          @click="modifyHandle('logoUrl')"
+          @mouseenter="imgMask(true)"
+          @mouseleave="imgMask(false)"
+        >
+          <img :src="corpInfo.logoUrl" />
+          <div class="logo_mask" v-show="imgData.visible">
+            <svg-icon iconClass="take_photo" class="take_photo"></svg-icon>
+          </div>
+        </div>
       </div>
     </div>
     <div class="info">
@@ -62,7 +72,7 @@
         </div>
       </div>
       <div class="info_item_center">
-        <div class="info_item_center_a">座机</div>
+        <div class="info_item_center_a">企业座机</div>
         <div class="info_item_center_b">
           <i v-show="corpInfo.landline">{{ corpInfo.landline }}</i>
           <span v-if="employeeInfo.roleId!=1">
@@ -114,18 +124,18 @@
     </div>
     <div class="tail">
       <div class="tail_item">
-        <div class="tail_item_a">创建时间</div>
-        <div class="tail_item_b">{{ corpInfo.gmtCreate }}</div>
+        <div class="tail_item_a">企业ID</div>
+        <div class="tail_item_b">{{ corpInfo.id }}</div>
       </div>
       <div class="tail_itemt">
-        <div class="tail_itemt_a">企业ID</div>
-        <div class="tail_itemt_b">{{ corpInfo.id }}</div>
+        <div class="tail_itemt_a">创建时间</div>
+        <div class="tail_itemt_b">{{ corpInfo.gmtCreate }}</div>
       </div>
     </div>
-
     <!-- 修改企业名称 弹出框 -->
     <el-dialog
       title="修改企业名称"
+      class="universal_dialog"
       :visible.sync="modifyCorpData.dialogNameVisible"
       :before-close="modifyCancle"
       :close-on-click-modal="false"
@@ -142,19 +152,20 @@
             v-model="corpInfoModify.name"
             autocomplete="off"
             maxlength="20"
-            @keyup.enter.native="confirmNameOpen"
+            @keyup.enter.native="confirmOpen('name')"
           ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyCancle()">取 消</el-button>
-        <el-button type="primary" @click="confirmNameOpen()">确 定</el-button>
+        <el-button type="primary" @click="confirmOpen('name')">确 定</el-button>
       </div>
     </el-dialog>
 
     <!-- 修改联系电话 弹出框 -->
     <el-dialog
       title="修改联系电话"
+      class="universal_dialog"
       :visible.sync="modifyCorpData.dialogTelVisible"
       :before-close="modifyCancle"
       :close-on-click-modal="false"
@@ -170,20 +181,21 @@
           <el-input
             v-model="corpInfoModify.tel"
             autocomplete="off"
-            @keyup.enter.native="confirmTelOpen()"
+            @keyup.enter.native="confirmOpen('tel')"
             maxlength="20"
           ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyCancle()">取 消</el-button>
-        <el-button type="primary" @click="confirmTelOpen()">确 定</el-button>
+        <el-button type="primary" @click="confirmOpen('tel')">确 定</el-button>
       </div>
     </el-dialog>
 
     <!-- 修改企业地址 弹出框 -->
     <el-dialog
       title="修改企业地址"
+      class="universal_dialog"
       :visible.sync="modifyCorpData.dialogAddressVisible"
       :before-close="modifyCancle"
       :close-on-click-modal="false"
@@ -200,19 +212,20 @@
             v-model="corpInfoModify.address"
             autocomplete="off"
             maxlength="20"
-            @keyup.enter.native="confirmAddressOpen()"
+            @keyup.enter.native="confirmOpen('address')"
           ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyCancle()">取 消</el-button>
-        <el-button type="primary" @click="confirmAddressOpen()">确 定</el-button>
+        <el-button type="primary" @click="confirmOpen('address')">确 定</el-button>
       </div>
     </el-dialog>
 
     <!-- 修改企业座机 弹出框 -->
     <el-dialog
       title="修改企业座机"
+      class="universal_dialog"
       :visible.sync="modifyCorpData.dialogLandlineVisible"
       :before-close="modifyCancle"
       :close-on-click-modal="false"
@@ -228,20 +241,21 @@
           <el-input
             v-model="corpInfoModify.landline"
             autocomplete="off"
-            @keyup.enter.native="confirmLandlineOpen()"
+            @keyup.enter.native="confirmOpen('landline')"
             maxlength="20"
           ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyCancle()">取 消</el-button>
-        <el-button type="primary" @click="confirmLandlineOpen()">确 定</el-button>
+        <el-button type="primary" @click="confirmOpen('landline')">确 定</el-button>
       </div>
     </el-dialog>
 
     <!-- 修改企业邮箱 弹出框 -->
     <el-dialog
       title="修改企业邮箱"
+      class="universal_dialog"
       :visible.sync="modifyCorpData.dialogEmailVisible"
       :before-close="modifyCancle"
       :close-on-click-modal="false"
@@ -257,14 +271,39 @@
           <el-input
             v-model="corpInfoModify.email"
             autocomplete="off"
-            @keyup.enter.native="confirmEmailOpen()"
+            @keyup.enter.native="confirmOpen('email')"
             maxlength="20"
           ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="modifyCancle()">取 消</el-button>
-        <el-button type="primary" @click="confirmEmailOpen()">确 定</el-button>
+        <el-button type="primary" @click="confirmOpen('email')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 修改企业头像 弹出框 -->
+    <el-dialog
+      id="modify_photo"
+      title="修改企业头像"
+      class="universal_dialog"
+      :visible.sync="modifyCorpData.dialogLogoUrlVisible"
+      :before-close="modifyCancle"
+      :close-on-click-modal="false"
+    >
+      <el-upload
+        class="avatar-uploader"
+        action="https://jsonplaceholder.typicode.com/posts/"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess"
+        :before-upload="beforeAvatarUpload"
+      >
+        <img v-if="imgData.url" :src="imgData.url" class="avatar" />
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="modifyCancle()">取 消</el-button>
+        <el-button type="primary" @click="confirmOpen('logoUrl')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -355,8 +394,41 @@ export default {
       dialogAddressVisible: false,
       dialogLandlineVisible: false,
       dialogEmailVisible: false,
+      dialogLogoUrlVisible: false,
       formLabelWidth: "120px",
     });
+    /**上传头像
+     *
+     */
+    const imgData = reactive({
+      visible: false,
+      url: "",
+      file: "",
+    });
+    const imgMask = (data) => {
+      return;
+      if (data) {
+        imgData.visible = true;
+      } else {
+        imgData.visible = false;
+      }
+    };
+    const handleAvatarSuccess = (res, file) => {
+      imgData.url = URL.createObjectURL(file.raw);
+      imgData.file = file;
+    };
+    const beforeAvatarUpload = (file) => {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 0.512;
+
+      if (!isJPG) {
+        root.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        root.$message.error("上传头像图片大小不能超过 512KB!");
+      }
+      return isJPG && isLt2M;
+    };
 
     const validateTel = (rule, value, callback) => {
       let exp = /^[1]([3-9])[0-9]{9}$/; // 匹配11位手机号码
@@ -393,64 +465,109 @@ export default {
     };
     const rules = reactive({
       name: [
-        { required: true, message: "请输入名称" },
+        { message: "请输入名称" },
         { min: 2, max: 20, message: "长度在 2 到 20 个字符" },
       ],
       tel: [{ validator: validateTel }],
       landline: [{ validator: validateLandline }],
       address: [
-        { required: true, message: "请输入地址" },
+        { message: "请输入地址" },
         { min: 2, max: 20, message: "长度在 2 到 20 个字符" },
       ],
       email: [{ validator: validateEmail }],
     });
     const submitForm = (formName, key, val, status) => {
-      refs[formName].validate((valid) => {
-        if (valid) {
-          let modifyData = {};
-          modifyData[key] = val;
-          updateCorporation(modifyData).then((res) => {
-            let code = res.code;
-            if (code === 0) {
-              if (key == "name") {
-                root.$store.commit("SET_CORPORINFO");
-              }
-              root.$message({
-                type: "success",
-                message: "修改成功",
-              });
-              refs[formName].model[key] = val;
-              corpInfo[key] = val;
-              modifyCorpData[status] = false;
-              let myGeo = new BMap.Geocoder();
-              myGeo.getPoint(
-                val,
-                function (point) {
-                  if (point) {
-                    sessionStorage.setItem(
-                      "corpAddress",
-                      JSON.stringify(point)
-                    );
-                  } else {
-                    root.$message({
-                      type: "warning",
-                      message: "您选取的地址没有获取到解析结果",
-                    });
-                  }
-                },
-                "北京市"
-              );
-            } else {
-              root.$message({
-                type: "warning",
-                message: res.msg,
-              });
+      if (key == "logoUrl") {
+        let modifyData = new FormData();
+        modifyData.append(key, val);
+        modifyData.append('name', corpInfo.name);
+        updateCorporation(modifyData).then((res) => {
+          let code = res.code;
+          if (code === 0) {
+            if (key == "name") {
+              root.$store.commit("SET_CORPORINFO");
             }
-          });
-        } else {
-          return false;
-        }
-      });
+            root.$message({
+              type: "success",
+              message: "修改成功",
+            });
+            imgData.file = "";
+
+            modifyCorpData[status] = false;
+            let myGeo = new BMap.Geocoder();
+            myGeo.getPoint(
+              val,
+              function (point) {
+                if (point) {
+                  sessionStorage.setItem("corpAddress", JSON.stringify(point));
+                } else {
+                  root.$message({
+                    type: "warning",
+                    message: "您选取的地址没有获取到解析结果",
+                  });
+                }
+              },
+              "北京市"
+            );
+          } else {
+            root.$message({
+              type: "warning",
+              message: res.msg,
+            });
+          }
+        });
+      } else {
+        refs[formName].validate((valid) => {
+          if (valid) {
+            let modifyData = new URLSearchParams();
+            modifyData.append(key, val);
+            updateCorporation(modifyData).then((res) => {
+              let code = res.code;
+              if (code === 0) {
+                if (key == "name") {
+                  root.$store.commit("SET_CORPORINFO");
+                }
+                root.$message({
+                  type: "success",
+                  message: "修改成功",
+                });
+                refs[formName].model[key] = val;
+                if (key == "logoUrl") {
+                  corpInfo[key] = res.data.logoUrl;
+                } else {
+                  corpInfo[key] = val;
+                }
+                modifyCorpData[status] = false;
+                let myGeo = new BMap.Geocoder();
+                myGeo.getPoint(
+                  val,
+                  function (point) {
+                    if (point) {
+                      sessionStorage.setItem(
+                        "corpAddress",
+                        JSON.stringify(point)
+                      );
+                    } else {
+                      root.$message({
+                        type: "warning",
+                        message: "您选取的地址没有获取到解析结果",
+                      });
+                    }
+                  },
+                  "北京市"
+                );
+              } else {
+                root.$message({
+                  type: "warning",
+                  message: res.msg,
+                });
+              }
+            });
+          } else {
+            return false;
+          }
+        });
+      }
     };
     const resetForm = (formName) => {
       corpInfoModify = corpInfo;
@@ -473,57 +590,67 @@ export default {
         case "email":
           modifyCorpData.dialogEmailVisible = true;
           break;
+        case "logoUrl":
+          return;
+          modifyCorpData.dialogLogoUrlVisible = true;
+          break;
       }
     };
-    const confirmNameOpen = () => {
-      submitForm("corpInfoModify", "name", corpInfoModify.name, "dialogNameVisible");
+    const confirmOpen = (data) => {
+      let str = "";
+      switch (data) {
+        case "name":
+          str = "dialogNameVisible";
+          break;
+        case "tel":
+          str = "dialogTelVisible";
+          break;
+        case "address":
+          str = "dialogAddressVisible";
+          break;
+        case "email":
+          str = "dialogEmailVisible";
+          break;
+        case "landline":
+          str = "dialogLandlineVisible";
+          break;
+        case "logoUrl":
+          str = "dialogLogoUrlVisible";
+          break;
+      }
+      if (data == "logoUrl") {
+        submitForm("corpInfoModify", [data], imgData.file, str);
+      } else {
+        submitForm("corpInfoModify", [data], corpInfoModify[data], str);
+      }
     };
-    const confirmTelOpen = () => {
-      submitForm("corpInfoModify", "tel", corpInfoModify.tel, "dialogTelVisible");
-    };
-    const confirmAddressOpen = () => {
-      submitForm(
-        "corpInfoModify",
-        "address",
-        corpInfoModify.address,
-        "dialogAddressVisible"
-      );
-    };
-    const confirmEmailOpen = () => {
-      submitForm("corpInfoModify", "email", corpInfoModify.email, "dialogEmailVisible");
-    };
-    const confirmLandlineOpen = () => {
-      submitForm(
-        "corpInfoModify",
-        "landline",
-        corpInfoModify.landline,
-        "dialogLandlineVisible"
-      );
-    };
+
     const modifyCancle = () => {
       for (let key in modifyCorpData) {
         if (key == "formLabelWidth") continue;
         modifyCorpData[key] = false;
       }
-      for(let key in corpInfo) {
+      for (let key in corpInfo) {
         corpInfoModify[key] = corpInfo[key];
       }
     };
     watchEffect(() => {});
     onMounted(() => {});
     return {
+      // 修改企业信息
       corpInfo,
       corpInfoModify,
       rules,
       modifyCorpData,
       modifyCancle,
       modifyHandle,
-      confirmNameOpen,
-      confirmTelOpen,
-      confirmAddressOpen,
-      confirmLandlineOpen,
-      confirmEmailOpen,
+      confirmOpen,
       employeeInfo,
+      // 上传头像
+      imgData,
+      imgMask,
+      handleAvatarSuccess,
+      beforeAvatarUpload,
     };
   },
 };
@@ -541,17 +668,36 @@ $mainWidth: 705px;
     border-bottom: 1px solid #dce1e6;
   }
   .logo {
-    height: 158px;
+    height: 178px;
     border-bottom: 1px solid #e4e6e9;
     .logo_zi {
-      height: 159px;
-      width: 200px;
+      height: 178px;
+      width: 178px;
       padding-top: 30px;
       color: #787878;
       font-size: 14px;
       @include webkit("box-sizing", border-box);
-      img {
-        width: 100%;
+      .logo_box {
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        img {
+          width: 100%;
+        }
+        .logo_mask {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          left: 0;
+          top: 0;
+          background: rgba(0, 0, 0, 0.35);
+          text-align: center;
+          .take_photo {
+            margin-top: 5%;
+            width: 2em;
+            height: 2em;
+          }
+        }
       }
     }
   }

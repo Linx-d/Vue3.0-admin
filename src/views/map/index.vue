@@ -1102,8 +1102,12 @@ export default {
       });
 
       /**根据用户id获取设备最新数据和告警信息 */
-      let currentArray = [userId];
-      listDeviceAlarmInfoByUserId(currentArray).then((res) => {
+      let params = new URLSearchParams();
+      let arr = [];
+      currentMemberInfo.userId = userId;
+      arr.push(currentMemberInfo.userId);
+      params.append("userIds", arr);
+      listDeviceAlarmInfoByUserId(params).then((res) => {
         let data = res.data[0] ? res.data[0] : [];
         tmpHistory.railName = data.railName;
         for (let key in data) {
@@ -1134,9 +1138,9 @@ export default {
             } else {
               currentMemberInfo.online = false;
             }
-          }else if(key == "userLongitude") {
+          } else if (key == "userLongitude") {
             currentMemberInfo[key] = data.longitude;
-          }else if(key == "userLatitude") {
+          } else if (key == "userLatitude") {
             currentMemberInfo[key] = data.latitude;
           }
         }
@@ -1150,23 +1154,23 @@ export default {
     const cellStyle = ({ row, column, rowIndex, columnIndex }) => {
       // 温度
       let temperature = parseFloat(row.temperature).toFixed(1);
-      if(column.label == "温度" && temperature>=37.3) {
+      if (column.label == "温度" && temperature >= 37.3) {
         return "color: #da5646;";
-      }else if(column.label == "温度" && temperature<37.3 ) {
+      } else if (column.label == "温度" && temperature < 37.3) {
         return "color: green;";
-      }else {
-        return ""; 
+      } else {
+        return "";
       }
     };
     /**指定行设置样式
-     * 
+     *
      */
-    const rowStyle = ({row, rowIndex}) => {
-      if(rowIndex==0) {
+    const rowStyle = ({ row, rowIndex }) => {
+      if (rowIndex == 0) {
         console.log(row);
-        return "padding: 0;"
+        return "padding: 0;";
       }
-    }
+    };
 
     /**
      * 图表框
@@ -1618,8 +1622,8 @@ export default {
       adaptionEchartsV2(temperatureChart);
       // 处理点击事件并且跳转到相应的开始
       temperatureChart.on("click", function (params) {
-        console.log(params, 'params');
-        if (params.name.indexOf("温度正常人数")!=-1) {
+        console.log(params, "params");
+        if (params.name.indexOf("温度正常人数") != -1) {
           console.log("温度正常人数");
           temperatureHandle("normal");
         } else {
@@ -2092,10 +2096,10 @@ export default {
           });
 
           // 判断在线情况
-          database.alarmContent.forEach(item => {
-            if(onlineArr.indexOf(item.userId)!=-1) {
+          database.alarmContent.forEach((item) => {
+            if (onlineArr.indexOf(item.userId) != -1) {
               item.deviceOnline = "在线";
-            }else {
+            } else {
               item.deviceOnline = "离线";
             }
           });
