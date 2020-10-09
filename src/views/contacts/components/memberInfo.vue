@@ -1582,7 +1582,7 @@ $contactsHeight: 592px;
         }
       }
       .depart_margin_top {
-        margin-top: -5px;
+        margin-top: 0;
       }
     }
   }
